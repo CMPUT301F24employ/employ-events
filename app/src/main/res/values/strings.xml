@@ -8,6 +8,20 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_facility">Facility</string>
+    <string name="menu_profile">Profile</string>
+    <string name="notification_status">Notification Status</string>
+    <string name="user_phone_number">User Phone Number</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="user_email">User Email</string>
+    <string name="email">Email</string>
+    <string name="user_name">User Name</string>
+    <string name="name">Name</string>
+    <string name="my_profile">My Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="facility">Facility</string>
+    <string name="edit_facility">Edit Facility</string>
+    <string name="create_event">Create Event</string>
+    <string name="view_event">View Event</string>
+    <string name="events">Events</string>
 </resources>
