@@ -7,12 +7,39 @@
     tools:context=".ui.profile.ProfileFragment">
 
     <Button
-        android:id="@+id/edit_profile_button"
+        android:id="@+id/upload_profile_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="#3D5AFE"
+        android:text="@string/upload"
+        app:layout_constraintEnd_toStartOf="@+id/remove_profile_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_profile_image" />
+
+    <Button
+        android:id="@+id/remove_profile_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="#3D5AFE"
+        android:text="@string/remove"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toEndOf="@+id/upload_profile_image"
+        app:layout_constraintTop_toBottomOf="@+id/user_profile_image" />
+
+    <Button
+        android:id="@+id/confirm_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:backgroundTint="#3D5AFE"
-        android:text="@string/edit_profile"
+        android:text="@string/confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -22,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/my_profile"
+        android:text="@string/edit_profile"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#000000"
         android:textStyle="bold"
@@ -48,24 +75,26 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/edit_profile_button"
+        app:layout_constraintBottom_toTopOf="@+id/confirm_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_profile_image">
+        app:layout_constraintTop_toBottomOf="@+id/upload_profile_image">
 
         <TextView
             android:id="@+id/name_textView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <TextView
-            android:id="@+id/profile_name"
+        <EditText
+            android:id="@+id/editTextUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/user_name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:ems="10"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:text="@string/name" />
 
         <Space
             android:layout_width="match_parent"
@@ -73,17 +102,19 @@
 
         <TextView
             android:id="@+id/email_TextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/email"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <TextView
-            android:id="@+id/profile_email"
+        <EditText
+            android:id="@+id/editTextUserEmailAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/user_email"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp"
+            android:text="@string/email" />
 
         <Space
             android:layout_width="match_parent"
@@ -91,17 +122,19 @@
 
         <TextView
             android:id="@+id/phone_num_textView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/phone_number"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <TextView
-            android:id="@+id/profile_phone_number"
+        <EditText
+            android:id="@+id/editTextUserPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/user_phone_number"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:ems="10"
+            android:inputType="phone"
+            android:minHeight="48dp"
+            android:text="@string/phone_number" />
 
         <Space
             android:layout_width="match_parent"
@@ -110,8 +143,10 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/profile_notification_status"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:clickable="false"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:minHeight="48dp"
             android:text="@string/notification_status"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
