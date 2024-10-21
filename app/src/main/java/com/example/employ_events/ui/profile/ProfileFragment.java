@@ -15,9 +15,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.employ_events.databinding.FragmentProfileBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import android.provider.Settings.Secure;
 
 import java.util.Objects;
@@ -25,8 +26,9 @@ import java.util.Objects;
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
-    private TextView name, email, phone_number;
+
     private SwitchCompat organizer_notifications, admin_notifications;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -36,24 +38,20 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-        String android_id = Secure.getString(requireContext().getContentResolver(), Secure.ANDROID_ID);
+        String android_id = Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         organizer_notifications = binding.profileOrganizerNotificationStatus;
         admin_notifications = binding.profileAdminNotificationStatus;
-        name = binding.profileName;
-        phone_number = binding.profilePhoneNumber;
-        email = binding.profileEmail;
+        final TextView name = binding.profileName;
+        final TextView phone_number = binding.profilePhoneNumber;
+        final TextView email = binding.profileEmail;
 
-
-        DocumentReference profileRef = db.collection("userProfiles").document(android_id);
-        profileRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection("userProfiles").whereEqualTo("userID", android_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
                         organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
                         admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
                         name.setText(Objects.requireNonNull(document.get("name")).toString());
@@ -63,6 +61,11 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
+        profileViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
+        profileViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
+        profileViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
+
         //final TextView textView = binding.textSlideshow;
         //slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;

@@ -1,16 +1,11 @@
 package com.example.employ_events;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
 import android.view.Menu;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -22,13 +17,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.employ_events.databinding.ActivityMainBinding;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private String android_id;
     private FirebaseFirestore db;
-    private CollectionReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
