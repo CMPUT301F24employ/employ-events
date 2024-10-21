@@ -26,6 +26,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 
@@ -61,15 +62,19 @@ public class MainActivity extends AppCompatActivity {
         android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         db = FirebaseFirestore.getInstance();
 
-        db.collection("userProfiles").document(android_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        // Creates a Profile if the current user does not already have one. Uses device ID to determine that.
+        db.collection("userProfiles").whereEqualTo("userID", android_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (!task.getResult().exists()) {
-                    Profile profile = new Profile(android_id);
-                    db.collection("userProfiles").add(profile);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    if (task.getResult().isEmpty()) {
+                        Profile profile = new Profile(android_id);
+                        db.collection("userProfiles").add(profile);
+                    }
                 }
             }
         });
+
     }
 
     @Override
