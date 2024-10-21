@@ -2,6 +2,7 @@ package com.example.employ_events;
 
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,9 +18,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.employ_events.databinding.ActivityMainBinding;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,18 +55,19 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Creates a Profile if the current user does not already have one. Uses device ID to determine that.
-        db.collection("userProfiles").whereEqualTo("userID", android_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        DocumentReference docRef = db.collection("userProfiles").document(android_id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    if (task.getResult().isEmpty()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (!document.exists()) {
                         Profile profile = new Profile(android_id);
-                        db.collection("userProfiles").add(profile);
+                        db.collection("userProfiles").document(android_id).set(profile);
                     }
                 }
             }
         });
-
     }
 
     @Override

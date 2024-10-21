@@ -108,6 +108,7 @@
             android:id="@+id/profile_organizer_notification_status"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:clickable="false"
             android:text="@string/organizer_notification_status"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
