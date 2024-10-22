@@ -28,4 +28,5 @@
     <string name="upload">Upload</string>
     <string name="remove">Remove</string>
     <string name="confirm">Confirm</string>
+    <string name="scan_qr_code">Scan QR Code</string>
 </resources>
