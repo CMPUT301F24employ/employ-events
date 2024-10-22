@@ -22,4 +22,10 @@
         android:name="com.example.employ_events.ui.profile.ProfileFragment"
         android:label="@string/menu_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_list"
+        android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
+        android:label="Registered Events"
+        tools:layout="@layout/fragment_registered_events" />
 </navigation>
