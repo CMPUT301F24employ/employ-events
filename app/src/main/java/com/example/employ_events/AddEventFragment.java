@@ -3,6 +3,7 @@ package com.example.employ_events;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.example.employ_events.databinding.AddEventBinding;
-
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +24,7 @@ public class AddEventFragment extends Fragment {
     private AddEventBinding binding;
     private Date eventDate, registrationDeadline;
     private Time eventStartTime, eventEndTime;
+    private String android_id;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +39,9 @@ public class AddEventFragment extends Fragment {
         Button startTimeButton = binding.eventStartTime;
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
+
+        android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
