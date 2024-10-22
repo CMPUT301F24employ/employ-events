@@ -26,7 +26,9 @@ public class FacilityFragment extends Fragment {
         View root = binding.getRoot();
 
         // Set the button click listener to navigate to AddEventFragment
-       // binding.createEventButton.setOnClickListener(view -> Navigation.findNavController(view).navigate(R.id.action_facility_to_addEvent));
+        binding.createEventButton.setOnClickListener(view ->
+                Navigation.findNavController(view).navigate(R.id.action_facility_to_addEvent)
+        );
 
         return root;
     }
