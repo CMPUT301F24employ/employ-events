@@ -14,13 +14,18 @@ public class Event {
     private String description;
     private Image image;
     private Integer limited;
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Boolean geoLocation, String description){
+    private String endTime;
+    private String startTime;
+    private Integer organizerID;
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Boolean geoLocation, String description, String endTime, String StartTime){
         this.description = description;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
+        this.endTime = endTime;
+        this.startTime = startTime;
 
     }
     public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Boolean geoLocation, String description, Integer limited){
@@ -31,6 +36,8 @@ public class Event {
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
         this.limited = limited;
+        this.startTime = startTime;
+
     }
     public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Integer fee, Boolean geoLocation, String description, Image eventImage){
         this.description = description;
