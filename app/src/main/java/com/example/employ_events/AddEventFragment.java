@@ -61,7 +61,7 @@ public class AddEventFragment extends Fragment {
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
                         eventTitle, eventDate, registrationDeadline, new Date(), false, description,
-                        eventStartTime.toString(), eventEndTime.toString()
+                        eventStartTime, eventEndTime
                 );
 
                 Toast.makeText(getContext(), "Event Created: " + eventTitle, Toast.LENGTH_SHORT).show();

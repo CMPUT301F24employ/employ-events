@@ -32,4 +32,10 @@
         android:name="com.example.employ_events.AddEventFragment"
         android:label="Add Event"
         tools:layout="@layout/add_event" />
+
+    <fragment
+        android:id="@+id/nav_list"
+        android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
+        android:label="Registered Events"
+        tools:layout="@layout/fragment_registered_events" />
 </navigation>
