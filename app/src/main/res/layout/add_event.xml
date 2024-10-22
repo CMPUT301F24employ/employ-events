@@ -16,69 +16,61 @@
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Event"
+            android:hint="Enter Event Title"
             android:minHeight="80dp"
             android:padding="10dp"
             android:singleLine="true" />
 
-        <EditText
+        <Button
             android:id="@+id/event_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
-            android:minHeight="80dp"
-            android:padding="10dp"
-            android:singleLine="true" />
-        <EditText
+            android:hint="Select Event Date"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center" />
+
+        <Button
             android:id="@+id/registration_date_deadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
-            android:minHeight="80dp"
-            android:padding="10dp"
-            android:singleLine="true" />
+            android:hint="Select Registration Deadline"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center" />
+
         <EditText
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
+            android:hint="Enter Description"
             android:minHeight="80dp"
             android:padding="10dp"
             android:singleLine="true" />
-        <EditText
+        <Button
             android:id="@+id/event_start_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
-            android:minHeight="80dp"
-            android:padding="10dp"
-            android:singleLine="true" />
-        <EditText
+            android:hint="Select Start Time"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center" />
+
+        <Button
             android:id="@+id/event_end_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
-            android:minHeight="80dp"
-            android:padding="10dp"
-            android:singleLine="true" />
+            android:hint="Select End Time"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center" />
+
         <ImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="15dp"
             android:src="@drawable/ic_menu_camera" />
-
-        <EditText
-            android:id="@+id/pdes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="start"
-            android:hint="Enter Description"
-            android:inputType="textCapSentences|textMultiLine"
-            android:minHeight="120dp"
-            android:padding="10dp"
-            android:singleLine="true" />
 
         <Button
             android:id="@+id/save_event_button"

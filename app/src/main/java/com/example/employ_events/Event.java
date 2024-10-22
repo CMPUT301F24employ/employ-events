@@ -4,6 +4,7 @@ import android.media.Image;
 
 import java.util.Date;
 
+//Update constructors...don't need all of them, can just set the stuff using getters and setters
 public class Event {
     //Constructors -> may not need all of them depending on AddEventFragment implementation
     private String eventTitle;
@@ -27,36 +28,6 @@ public class Event {
         this.endTime = endTime;
         this.startTime = startTime;
 
-    }
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Boolean geoLocation, String description, Integer limited){
-        this.description = description;
-        this.eventDate = eventDate;
-        this.eventTitle = eventTitle;
-        this.registrationStartDate = registrationStartDate;
-        this.registrationDateDeadline = registrationDateDeadline;
-        this.geoLocation = geoLocation;
-        this.limited = limited;
-        this.startTime = startTime;
-
-    }
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Integer fee, Boolean geoLocation, String description, Image eventImage){
-        this.description = description;
-        this.eventDate = eventDate;
-        this.eventTitle = eventTitle;
-        this.registrationStartDate = registrationStartDate;
-        this.registrationDateDeadline = registrationDateDeadline;
-        this.geoLocation = geoLocation;
-        this.image = eventImage;
-    }
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Integer fee, Boolean geoLocation, String description, Image eventImage, Integer limited){
-        this.description = description;
-        this.eventDate = eventDate;
-        this.eventTitle = eventTitle;
-        this.registrationStartDate = registrationStartDate;
-        this.registrationDateDeadline = registrationDateDeadline;
-        this.geoLocation = geoLocation;
-        this.image = eventImage;
-        this.limited = limited;
     }
 
     //Getters and setters
@@ -123,6 +94,22 @@ public class Event {
 
     public void setLimited(Integer limited) {
         this.limited = limited;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 }
 
