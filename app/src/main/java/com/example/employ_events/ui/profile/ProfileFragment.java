@@ -14,8 +14,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.Profile;
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentProfileBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -37,7 +40,7 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
 
     private SwitchCompat organizer_notifications, admin_notifications;
-    private Button editProfile;
+    private Button editProfileButton;
     private CollectionReference profilesRef;
 
 
@@ -60,7 +63,7 @@ public class ProfileFragment extends Fragment {
         final TextView name = binding.profileName;
         final TextView phone_number = binding.profilePhoneNumber;
         final TextView email = binding.profileEmail;
-        editProfile = binding.editProfileButton;
+        editProfileButton = binding.editProfileButton;
 
         // If profile exists, display the profile information.
         DocumentReference docRef = profilesRef.document(android_id);
@@ -91,7 +94,9 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        //editProfile.setOnClickListener();
+        editProfileButton.setOnClickListener(v->
+                NavHostFragment.findNavController(ProfileFragment.this)
+                        .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
         return root;
     }
