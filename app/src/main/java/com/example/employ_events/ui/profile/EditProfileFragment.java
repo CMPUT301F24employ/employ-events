@@ -5,6 +5,8 @@ import android.provider.Settings.Secure;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,8 +27,9 @@ import java.util.Objects;
 public class EditProfileFragment extends Fragment {
 
     private FragmentEditProfileBinding binding;
-    private TextView name, email, phone_number;
+    private EditText editName, editEmail, editPhone;
     private SwitchCompat organizer_notifications, admin_notifications;
+    private Button confirmButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class EditProfileFragment extends Fragment {
 
         String android_id = Secure.getString(requireContext().getContentResolver(), Secure.ANDROID_ID);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        //confirmButton.setOnClickListener();
 
 
         return root;

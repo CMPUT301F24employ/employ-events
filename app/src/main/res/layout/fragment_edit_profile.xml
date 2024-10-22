@@ -93,8 +93,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="text"
-            android:minHeight="48dp"
-            android:text="@string/name" />
+            android:hint="@string/name"
+            android:minHeight="48dp" />
 
         <Space
             android:layout_width="match_parent"
@@ -114,7 +114,7 @@
             android:ems="10"
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
-            android:text="@string/email" />
+            android:hint="@string/email" />
 
         <Space
             android:layout_width="match_parent"
@@ -134,7 +134,7 @@
             android:ems="10"
             android:inputType="phone"
             android:minHeight="48dp"
-            android:text="@string/phone_number" />
+            android:hint="@string/phone_number" />
 
         <Space
             android:layout_width="match_parent"
