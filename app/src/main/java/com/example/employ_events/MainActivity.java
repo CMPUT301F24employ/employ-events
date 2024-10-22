@@ -1,16 +1,12 @@
 package com.example.employ_events;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -22,12 +18,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.employ_events.databinding.ActivityMainBinding;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private String android_id;
     private FirebaseFirestore db;
-    private CollectionReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +54,17 @@ public class MainActivity extends AppCompatActivity {
         android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         db = FirebaseFirestore.getInstance();
 
-        db.collection("userProfiles").document(android_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        // Creates a Profile if the current user does not already have one. Uses device ID to determine that.
+        DocumentReference docRef = db.collection("userProfiles").document(android_id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (!task.getResult().exists()) {
-                    Profile profile = new Profile(android_id);
-                    db.collection("userProfiles").add(profile);
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (!document.exists()) {
+                        Profile profile = new Profile(android_id);
+                        db.collection("userProfiles").document(android_id).set(profile);
+                    }
                 }
             }
         });
