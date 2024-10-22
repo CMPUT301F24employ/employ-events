@@ -15,7 +15,11 @@
         android:id="@+id/nav_gallery"
         android:name="com.example.employ_events.ui.facility.FacilityFragment"
         android:label="@string/menu_facility"
-        tools:layout="@layout/fragment_facility" />
+        tools:layout="@layout/fragment_facility">
+        <action
+            android:id="@+id/action_facility_to_addEvent"
+            app:destination="@id/addEventFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_slideshow"
@@ -24,8 +28,8 @@
         tools:layout="@layout/fragment_profile" />
 
     <fragment
-        android:id="@+id/nav_list"
-        android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
-        android:label="Registered Events"
-        tools:layout="@layout/fragment_registered_events" />
+        android:id="@+id/addEventFragment"
+        android:name="com.example.employ_events.AddEventFragment"
+        android:label="Add Event"
+        tools:layout="@layout/add_event" />
 </navigation>
