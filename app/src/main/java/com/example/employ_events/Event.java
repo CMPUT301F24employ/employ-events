@@ -2,6 +2,7 @@ package com.example.employ_events;
 
 import android.media.Image;
 
+import java.sql.Time;
 import java.util.Date;
 
 //Update constructors...don't need all of them, can just set the stuff using getters and setters
@@ -15,10 +16,10 @@ public class Event {
     private String description;
     private Image image;
     private Integer limited;
-    private String endTime;
-    private String startTime;
+    private Time endTime;
+    private Time startTime;
     private Integer organizerID;
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline,  Date registrationStartDate, Boolean geoLocation, String description, String endTime, String StartTime){
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description, Time endTime, Time startTime){
         this.description = description;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
@@ -96,19 +97,19 @@ public class Event {
         this.limited = limited;
     }
 
-    public String getEndTime() {
+    public Time getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Time endTime) {
         this.endTime = endTime;
     }
 
-    public String getStartTime() {
+    public Time getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 }
