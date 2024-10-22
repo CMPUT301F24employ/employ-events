@@ -18,10 +18,14 @@ import com.example.employ_events.databinding.FragmentEditProfileBinding;
 import com.example.employ_events.databinding.FragmentProfileBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class EditProfileFragment extends Fragment {
@@ -29,7 +33,9 @@ public class EditProfileFragment extends Fragment {
     private FragmentEditProfileBinding binding;
     private EditText editName, editEmail, editPhone;
     private SwitchCompat organizer_notifications, admin_notifications;
-    private Button confirmButton;
+    private Button confirm_button;
+    private CollectionReference profilesRef;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,12 +45,61 @@ public class EditProfileFragment extends Fragment {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        editName = binding.editTextUserName;
+        editEmail = binding.editTextUserEmailAddress;
+        editPhone = binding.editTextUserPhone;
+        confirm_button = binding.confirmButton;
+        organizer_notifications = binding.profileOrganizerNotificationStatus;
+        admin_notifications = binding.profileAdminNotificationStatus;
 
         String android_id = Secure.getString(requireContext().getContentResolver(), Secure.ANDROID_ID);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        profilesRef = db.collection("userProfiles");
 
-        //confirmButton.setOnClickListener();
+        // If profile exists, display the profile information.
+        DocumentReference docRef = profilesRef.document(android_id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
+                        admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
+                        // if NULL, it will be blank. Otherwise, display the users info.
+                        if (document.get("name") != null) {
+                            editName.setText(Objects.requireNonNull(document.get("name")).toString());
+                            editProfileViewModel.getText().observe(getViewLifecycleOwner(), editName::setText);
+                        }
+                        if (document.get("email") != null) {
+                            editEmail.setText(Objects.requireNonNull(document.get("email")).toString());
+                            editProfileViewModel.getText().observe(getViewLifecycleOwner(), editEmail::setText);
+                        }
 
+                        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+                            editPhone.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
+                            editProfileViewModel.getText().observe(getViewLifecycleOwner(), editPhone::setText);
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+        confirm_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("name", editName.getText().toString());
+                data.put("email", editEmail.getText().toString());
+                data.put("phoneNumber", editPhone.getText().toString());
+                data.put("organizerNotifications", organizer_notifications.isChecked());
+                data.put("adminNotifications", admin_notifications.isChecked());
+
+                profilesRef.document(android_id).set(data, SetOptions.merge());
+            }
+        });
 
         return root;
     }
