@@ -31,14 +31,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/eventImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/userPFP"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/eventName"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@id/eventName" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -51,7 +50,7 @@
         app:layout_constraintBottom_toTopOf="@+id/edit_profile_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventImage">
+        app:layout_constraintTop_toBottomOf="@+id/userPFP">
 
         <TextView
             android:id="@+id/name_textView"

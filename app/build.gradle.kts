@@ -51,4 +51,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.zxing:core:3.4.1")
     implementation("com.journeyapps:zxing-android-embedded:4.2.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.1")
+    implementation(libs.material.v130alpha02)
 }

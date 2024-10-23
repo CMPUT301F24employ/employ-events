@@ -2,6 +2,9 @@ package com.example.employ_events;
 
 import android.provider.ContactsContract;
 
+/**
+ * This is a class that defines a user's Profile.
+ */
 public class Profile {
     private String userID, name, email;
     private int phoneNumber;
