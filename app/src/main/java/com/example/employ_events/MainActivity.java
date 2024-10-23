@@ -1,14 +1,23 @@
 package com.example.employ_events;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,12 +25,13 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import com.example.employ_events.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewProfileFragment.NewProfileDialogListener{
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
@@ -29,9 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     @Override
+    public void addProfile(Profile profile) {
+        db.collection("userProfiles").document(android_id).set(profile);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -52,17 +66,19 @@ public class MainActivity extends AppCompatActivity {
         android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         db = FirebaseFirestore.getInstance();
 
-        // Creates a Profile if the current user does not already have one. Uses device ID to determine that.
+        // Check if the profile exists
         DocumentReference docRef = db.collection("userProfiles").document(android_id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (!document.exists()) {
-                        Profile profile = new Profile(android_id);
-                        db.collection("userProfiles").document(android_id).set(profile);
+                    if (document != null && !document.exists()) {
+                        new NewProfileFragment().show(getSupportFragmentManager(), "Create Profile");
                     }
+                } else {
+                    // Handle the error, e.g., log it
+                    Log.e("MainActivity", "Error getting documents: ", task.getException());
                 }
             }
         });
@@ -81,4 +97,7 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+
+
 }

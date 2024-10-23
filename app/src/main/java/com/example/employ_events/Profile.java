@@ -10,7 +10,9 @@ public class Profile {
     private int phoneNumber;
     private boolean organizerNotifications, adminNotifications;
 
-    public Profile(String userID) {
+    public Profile(String userID, String name, String email) {
+        this.name = name;
+        this.email = email;
         this.userID = userID;
         this.organizerNotifications = true;
         this.adminNotifications = true;
