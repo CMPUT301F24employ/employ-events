@@ -13,11 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * A fragment that displays a dialog for creating a new user profile.
+ * The user must enter their name and email address to create the profile.
+ */
 public class NewProfileFragment extends DialogFragment {
     private String android_id;
     private NewProfileDialogListener listener;
 
+    /**
+     * Interface for communicating with the host activity.
+     */
     interface NewProfileDialogListener {
+        /**
+         * Called when a new profile is added.
+         * @param profile the new profile to be added
+         */
         void addProfile(Profile profile);
     }
 
@@ -31,6 +42,13 @@ public class NewProfileFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Creates a dialog for the user to enter their name and email.
+     * The dialog requires the user to provide this information before proceeding.
+     *
+     * @param savedInstanceState If non-null, this dialog is being re-created from a previous saved state.
+     * @return A dialog with input fields for the user's name and email.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

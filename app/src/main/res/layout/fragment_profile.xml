@@ -57,13 +57,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/profile_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -74,13 +76,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/email"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/profile_email"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -91,13 +95,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/phone_number"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/profile_phone_number"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -105,12 +111,13 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/profile_organizer_notification_status"
-            android:layout_width="350dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
             android:clickable="false"
             android:text="@string/organizer_notification_status"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp"
             app:thumbTint="#3D5AFE"
             app:trackTint="#82B1FF" />
 
@@ -120,13 +127,14 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/profile_admin_notification_status"
-            android:layout_width="350dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
             android:clickable="false"
             android:text="@string/admin_notification_status"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColorLink="#3D5AFE"
+            android:textSize="24sp"
             app:thumbTint="#3D5AFE"
             app:trackTint="#82B1FF" />
 
