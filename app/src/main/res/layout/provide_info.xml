@@ -18,13 +18,14 @@
 
     <EditText
         android:id="@+id/editName"
-        android:paddingStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/name"
         android:inputType="text"
         android:minHeight="48dp"
+        android:paddingStart="10dp"
+        android:textColorLink="#3D5AFE"
         tools:layout_editor_absoluteX="65dp"
         tools:layout_editor_absoluteY="171dp" />
 
@@ -42,11 +43,12 @@
         android:id="@+id/editEmailAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
         android:ems="10"
         android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
+        android:paddingStart="10dp"
+        android:textColorLink="#3D5AFE"
         tools:layout_editor_absoluteX="65dp"
         tools:layout_editor_absoluteY="272dp" />
 

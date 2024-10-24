@@ -91,9 +91,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="text"
             android:hint="@string/name"
-            android:minHeight="48dp" />
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textColorLink="#3D5AFE" />
 
         <Space
             android:layout_width="match_parent"
@@ -111,9 +112,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="@string/email"
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
-            android:hint="@string/email" />
+            android:textColorLink="#3D5AFE" />
 
         <Space
             android:layout_width="match_parent"
@@ -131,9 +133,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="@string/phone_number"
             android:inputType="phone"
             android:minHeight="48dp"
-            android:hint="@string/phone_number" />
+            android:textColorLink="#3D5AFE" />
 
         <Space
             android:layout_width="match_parent"
