@@ -10,10 +10,15 @@
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/name" />
+        android:paddingStart="10dp"
+        android:text="Enter Name"
+        android:textSize="20sp"
+        android:textColor="@color/primary_blue"
+         />
 
     <EditText
         android:id="@+id/editName"
+        android:paddingStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -27,12 +32,17 @@
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/email" />
+        android:paddingStart="10dp"
+        android:text="Enter Email"
+        android:textColor="@color/primary_blue"
+        android:textSize="20sp"
+        />
 
     <EditText
         android:id="@+id/editEmailAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="10dp"
         android:ems="10"
         android:hint="@string/email"
         android:inputType="textEmailAddress"

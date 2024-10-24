@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -18,7 +17,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentEditProfileBinding;
-import com.example.employ_events.databinding.FragmentProfileBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,9 +34,7 @@ public class EditProfileFragment extends Fragment {
     private FragmentEditProfileBinding binding;
     private EditText editName, editEmail, editPhone;
     private SwitchCompat organizer_notifications, admin_notifications;
-    private Button confirm_button, upload_button, delete_button;
     private CollectionReference profilesRef;
-    private ImageView pfp;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,10 +48,10 @@ public class EditProfileFragment extends Fragment {
         editName = binding.editTextUserName;
         editEmail = binding.editTextUserEmailAddress;
         editPhone = binding.editTextUserPhone;
-        confirm_button = binding.confirmButton;
-        upload_button = binding.uploadProfileImage;
-        delete_button = binding.removeProfileImage;
-        pfp = binding.userPFP;
+        Button confirm_button = binding.confirmButton;
+        Button upload_button = binding.uploadProfileImage;
+        Button delete_button = binding.removeProfileImage;
+        ImageView pfp = binding.userPFP;
         organizer_notifications = binding.profileOrganizerNotificationStatus;
         admin_notifications = binding.profileAdminNotificationStatus;
 
@@ -101,16 +97,28 @@ public class EditProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Map<String, Object> data = new HashMap<>();
-                data.put("name", editName.getText().toString());
-                data.put("email", editEmail.getText().toString());
-                data.put("phoneNumber", editPhone.getText().toString());
-                data.put("organizerNotifications", organizer_notifications.isChecked());
-                data.put("adminNotifications", admin_notifications.isChecked());
+                String name = editName.getText().toString().trim();
+                String email = editEmail.getText().toString().trim();
+                if (name.isEmpty()) {
+                    editName.setError("Name cannot be empty");
+                    editName.requestFocus();
+                }
+                else if (email.isEmpty()) {
+                    editEmail.setError("Email cannot be empty");
+                    editEmail.requestFocus();
+                }
+                else {
+                    data.put("name", editName.getText().toString());
+                    data.put("email", editEmail.getText().toString());
+                    data.put("phoneNumber", editPhone.getText().toString());
+                    data.put("organizerNotifications", organizer_notifications.isChecked());
+                    data.put("adminNotifications", admin_notifications.isChecked());
 
-                profilesRef.document(android_id).set(data, SetOptions.merge());
+                    profilesRef.document(android_id).set(data, SetOptions.merge());
 
-                NavHostFragment.findNavController(EditProfileFragment.this)
-                        .navigate(R.id.action_nav_edit_profile_pop);
+                    NavHostFragment.findNavController(EditProfileFragment.this)
+                            .navigate(R.id.action_nav_edit_profile_pop);
+                }
             }
         });
 
