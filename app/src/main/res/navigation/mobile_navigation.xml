@@ -65,4 +65,9 @@
         android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
         android:label="Registered Events"
         tools:layout="@layout/fragment_registered_events" />
+    <fragment
+        android:id="@+id/edit_facility"
+        android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
+        android:label="Edit Facility"
+        tools:layout="@layout/fragment_create_facility" />
 </navigation>

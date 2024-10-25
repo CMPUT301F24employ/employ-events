@@ -22,6 +22,7 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="facility">Facility</string>
     <string name="edit_facility">Edit Facility</string>
+    <string name="create_facility">Create Facility</string>
     <string name="create_event">Create Event</string>
     <string name="view_event">View Event</string>
     <string name="events">Events</string>
