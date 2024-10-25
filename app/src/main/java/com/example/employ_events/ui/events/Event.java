@@ -1,4 +1,4 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.events;
 
 import android.media.Image;
 

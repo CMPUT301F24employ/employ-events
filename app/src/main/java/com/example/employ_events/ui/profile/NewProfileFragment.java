@@ -1,4 +1,4 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.profile;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.employ_events.R;
+
 /**
  * A fragment that displays a dialog for creating a new user profile.
  * The user must enter their name and email address to create the profile.
@@ -24,7 +26,7 @@ public class NewProfileFragment extends DialogFragment {
     /**
      * Interface for communicating with the host activity.
      */
-    interface NewProfileDialogListener {
+    public interface NewProfileDialogListener {
         /**
          * Called when a new profile is added.
          * @param profile the new profile to be added

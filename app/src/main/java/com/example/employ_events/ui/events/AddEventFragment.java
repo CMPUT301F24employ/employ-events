@@ -1,4 +1,4 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.events;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.example.employ_events.databinding.AddEventBinding;
+
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

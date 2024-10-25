@@ -1,4 +1,4 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.profile;
 
 /**
  * This is a class that defines a user's Profile.
