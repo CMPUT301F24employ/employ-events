@@ -18,8 +18,8 @@ public class Event {
     private Integer limited;
     private Time endTime;
     private Time startTime;
-    private Integer organizerID;
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description, Time endTime, Time startTime){
+    private String organizerID;
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description, Time endTime, Time startTime, String organizerID){
         this.description = description;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
@@ -28,7 +28,7 @@ public class Event {
         this.geoLocation = geoLocation;
         this.endTime = endTime;
         this.startTime = startTime;
-
+        this.organizerID = organizerID;
     }
 
     //Getters and setters
