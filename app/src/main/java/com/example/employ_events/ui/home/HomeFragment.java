@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -25,8 +27,6 @@ import com.google.zxing.integration.android.IntentResult;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private TextView qrResult;
-    private TextView name;
     private CollectionReference eventsRef;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -42,23 +42,21 @@ public class HomeFragment extends Fragment {
             // Getting the contents of the Intent to use
             String eventID;
             if (result != null && result.getContents() != null) {
+                // If QR code retrieved data
                 eventID = result.getContents();
 
                 db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // If the event exists in the database, go to event details fragment and fill page with event details from firebase
                         navigateToEventDetailsFrag(eventID);
-                        // The event exists
-//                        NavController controller = Navigation.findNavController(getView());
-//                        controller.navigate();
-
-                        name.setText(documentSnapshot.getString("name"));
                     } else {
-                        name.setText("Didn't work!");
+                        // Else make a toast saying there was an error
+                        Toast.makeText(getContext(), "Error: Event not found in database!", Toast.LENGTH_SHORT).show();
                     }
                 });
-//                qrResult.setText(result.getContents());
             } else {
-                qrResult.setText("No Content Found: Please try again!");
+                // No data from QR code
+                Toast.makeText(getContext(), "Error: No data retrieved from QR code!", Toast.LENGTH_SHORT).show();
             }
         }
     });
@@ -70,15 +68,20 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        qrResult = binding.qrResult;
-        name = binding.eventName;
 
-        // BUTTON
         Button scanQRCode = binding.scanQrCodeButton;
         scanQRCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 scanInfo();
+            }
+        });
+
+        Button manageFacilityButton = binding.manageFacilityButton;
+        manageFacilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Manage facility button pressed", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -96,7 +99,6 @@ public class HomeFragment extends Fragment {
         args.putString("eventData", eventID);
         NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_nav_home_to_entrantEventDetails, args);
     }
-
 
     private void scanInfo() {
         IntentIntegrator integrator = IntentIntegrator.forSupportFragment(HomeFragment.this);
