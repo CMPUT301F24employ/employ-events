@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -144,7 +145,7 @@ public class EditProfileFragment extends Fragment {
             data.put("adminNotifications", admin_notifications.isChecked());
 
             profilesRef.document(uniqueID).set(data, SetOptions.merge());
-
+            Toast.makeText(getActivity(), "Profile Updated!", Toast.LENGTH_SHORT).show();
             NavHostFragment.findNavController(EditProfileFragment.this)
                     .navigate(R.id.action_nav_edit_profile_pop);
         }

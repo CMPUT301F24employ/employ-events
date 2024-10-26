@@ -3,11 +3,13 @@ package com.example.employ_events.ui.facility;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +23,6 @@ import com.example.employ_events.R;
  * and communicates the result back to the hosting activity or fragment.
  */
 public class CreateFacilityFragment extends DialogFragment {
-    private String android_id;
     private CreateFacilityDialogListener listener;
 
     /**
@@ -34,7 +35,7 @@ public class CreateFacilityFragment extends DialogFragment {
          *
          * @param facility The created facility with the name and android ID.
          */
-        void createFacility(Facility facility);
+        void createFacility(Facility facility, String uniqueID);
     }
 
     @Override
@@ -54,7 +55,10 @@ public class CreateFacilityFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        android_id = Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID;
+        uniqueID = sharedPreferences.getString("uniqueID", null);
 
         View view = getLayoutInflater().inflate(R.layout.create_facility, null);
         EditText edit_facility_name = view.findViewById(R.id.editFacilityName);
@@ -63,8 +67,8 @@ public class CreateFacilityFragment extends DialogFragment {
 
         builder.setView(view)
                 .setTitle("Create Facility")
-                .setPositiveButton("Confirm", null) // Initially set to null
-                .setNegativeButton("Cancel", null);
+                .setPositiveButton("Create", null) // Initially set to null
+                .setNegativeButton("Not Now", null);
 
 
         // Create the dialog
@@ -80,13 +84,28 @@ public class CreateFacilityFragment extends DialogFragment {
                     edit_facility_name.setError("Facility name cannot be empty");
                     edit_facility_name.requestFocus();
                 } else {
-                    listener.createFacility(new Facility(facilityName, android_id));
+                    listener.createFacility(new Facility(facilityName, uniqueID), uniqueID);
                     dialog.dismiss(); // Dismiss the dialog if input is valid
                 }
             });
+
+            Button no_button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            no_button.setOnClickListener(v -> {
+                onCancel(dialog);
+                dialog.dismiss();
+
+            });
         });
 
+
+
         return dialog;
+    }
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        // Handles the cancel action here - shows a Toast.
+        Toast.makeText(getActivity(), "Facility creation canceled. You can start again anytime!", Toast.LENGTH_SHORT).show();
     }
 
 }
