@@ -1,17 +1,17 @@
 package com.example.employ_events;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 
+import com.example.employ_events.ui.facility.CreateFacilityFragment;
+import com.example.employ_events.ui.facility.Facility;
 import com.example.employ_events.ui.profile.NewProfileFragment;
 import com.example.employ_events.ui.profile.Profile;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -24,23 +24,35 @@ import com.example.employ_events.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
-public class MainActivity extends AppCompatActivity implements NewProfileFragment.NewProfileDialogListener{
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class MainActivity extends AppCompatActivity
+        implements CreateFacilityFragment.CreateFacilityDialogListener, NewProfileFragment.NewProfileDialogListener{
 
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityMainBinding binding;
-    private String android_id;
     private FirebaseFirestore db;
 
     @Override
-    public void addProfile(Profile profile) {
-        db.collection("userProfiles").document(android_id).set(profile);
+    public void createFacility(Facility facility) {
+        db.collection("facilities").add(facility);
+    }
+
+    @Override
+    public void provideInfo(String name, String email, String uniqueID) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("email", email);
+        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.example.employ_events.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -50,18 +62,45 @@ public class MainActivity extends AppCompatActivity implements NewProfileFragmen
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_profile, R.id.nav_list)
+                R.id.nav_home, R.id.nav_facility, R.id.nav_profile, R.id.nav_list)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         db = FirebaseFirestore.getInstance();
 
-        // Check if the profile exists
-        DocumentReference docRef = db.collection("userProfiles").document(android_id);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID;
+
+        if (sharedPreferences.contains("uniqueID")) {
+            // Retrieve the existing UUID
+            uniqueID = sharedPreferences.getString("uniqueID", null);
+        } else {
+            // Generate a new UUID and save it
+            uniqueID = UUID.randomUUID().toString();
+            sharedPreferences.edit().putString("uniqueID", uniqueID).apply();
+        }
+
+        // Create an empty profile using their Unique ID (will not need to sign in).
+        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && !document.exists()) {
+                    db.collection("userProfiles").document(uniqueID).set(new Profile(uniqueID));
+                }
+            } else {
+                // Handle the error, e.g., log it
+                Log.e("MainActivity", "Error getting documents: ", task.getException());
+            }
+        });
+
+        // Use this to check if the required INFO exists - move to waiting list.
+
+        /*
+        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -76,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements NewProfileFragmen
                 }
             }
         });
+
+         */
     }
 
     @Override
