@@ -82,16 +82,19 @@
         android:id="@+id/addEventFragment"
         android:name="com.example.employ_events.ui.events.AddEventFragment"
         android:label="Add Event"
-        tools:layout="@layout/add_event" >
+        tools:layout="@layout/add_event">
+
         <action
-            android:id="@+id/action_addEventFragment_to_nav_upload_image"
-            app:destination="@id/nav_upload_image" />
+            android:id="@+id/action_addEventFragment_to_nav_facility"
+            app:destination="@id/nav_facility" />
     </fragment>
+
 
     <fragment
         android:id="@+id/nav_list"
         android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
         android:label="Registered Events"
         tools:layout="@layout/fragment_registered_events" />
+
 
 </navigation>

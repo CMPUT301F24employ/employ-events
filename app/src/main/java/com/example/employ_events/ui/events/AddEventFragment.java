@@ -12,7 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -66,16 +70,24 @@ public class AddEventFragment extends Fragment {
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
                         eventTitle, eventDate, registrationDeadline, new Date(), false, description,
-                        eventStartTime, eventEndTime
+                        eventStartTime, eventEndTime, android_id
                 );
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("events").add(newEvent)
+                        .addOnSuccessListener(documentReference -> {
+                            Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
+                            // Navigate back to FacilityFragment
+                            Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
-                Toast.makeText(getContext(), "Event Created: " + eventTitle, Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
+                }
 
                 // TODO: Save the event in a list or database
 
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
-            }
         });
 
         return root;
