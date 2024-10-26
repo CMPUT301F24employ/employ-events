@@ -4,23 +4,23 @@ package com.example.employ_events.ui.profile;
  * This is a class that defines a user's Profile.
  */
 public class Profile {
-    private String deviceID, name, email;
+    private String uniqueID, name, email;
     private int phoneNumber;
     private boolean organizerNotifications, adminNotifications;
+    private boolean isEntrant, isAdmin, isOrganizer;
 
     /**
-     * Constructs a new Profile with the specified device ID, name, and email.
+     * Constructs a new Profile with the specified unique ID..
      *
-     * @param deviceID the unique identifier for the device
-     * @param name the name of the user
-     * @param email the email address of the user
+     * @param uniqueID the unique identifier for the device
      */
-    public Profile(String deviceID, String name, String email) {
-        this.name = name;
-        this.email = email;
-        this.deviceID = deviceID;
+    public Profile(String uniqueID) {
+        this.uniqueID = uniqueID;
         this.organizerNotifications = false;
         this.adminNotifications = false;
+        this.isEntrant = false;
+        this.isOrganizer = false;
+        this.isAdmin = false;
     }
 
     /**
@@ -114,12 +114,55 @@ public class Profile {
     }
 
     /**
-     * Returns the device ID associated with this profile.
+     * Returns the unique ID associated with this profile.
      *
-     * @return the device ID
+     * @return the unique ID
      */
-    public String getDeviceID() {
-        return deviceID;
+    public String getUniqueID() {
+        return uniqueID;
+    }
+    /**
+     * Indicates if the user is an entrant.
+     *
+     * @return true if user has joined a waiting list.
+     */
+    public boolean isEntrant() {
+        return isEntrant;
     }
 
+    /**
+     * Sets the user's entrant role.
+     *
+     * @param entrant true to indicate user is an entrant, false otherwise.
+     */
+    public void setEntrant(boolean entrant) {
+        isEntrant = entrant;
+    }
+
+    /**
+     * Indicates if the user is an organizer.
+     *
+     * @return true if user is an organizer.
+     */
+    public boolean isOrganizer() {
+        return isOrganizer;
+    }
+
+    /**
+     * Sets the user's organizer role.
+     *
+     * @param organizer true to indicate user is an organizer, false otherwise.
+     */
+    public void setOrganizer(boolean organizer) {
+        isOrganizer = organizer;
+    }
+
+    /**
+     * Indicates if the user is an admin.
+     *
+     * @return true if user is an admin.
+     */
+    public boolean isAdmin() {
+        return isAdmin;
+    }
 }
