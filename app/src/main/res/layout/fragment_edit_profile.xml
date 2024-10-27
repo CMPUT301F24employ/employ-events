@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/blue_light_background"
     tools:context=".ui.profile.ProfileFragment">
 
     <Button
@@ -35,36 +36,23 @@
 
     <Button
         android:id="@+id/confirm_button"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:backgroundTint="#3D5AFE"
         android:text="@string/confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/eventName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/edit_profile"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="#000000"
-        android:textStyle="bold"
+    <ImageView
+        android:id="@+id/userPFP"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/userPFP"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/eventName" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -119,8 +107,8 @@
             android:backgroundTint="#3D5AFE"
             android:ems="10"
             android:hint="@string/email"
-            android:maxLength="255"
             android:inputType="textEmailAddress"
+            android:maxLength="255"
             android:minHeight="48dp"
             android:textColorLink="#3D5AFE"
             android:textSize="20sp" />
@@ -133,8 +121,8 @@
             android:id="@+id/phone_num_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/phone_number"
             android:maxLength="15"
+            android:text="@string/phone_number"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="24sp" />
 
@@ -149,40 +137,6 @@
             android:minHeight="48dp"
             android:textColorLink="#3D5AFE"
             android:textSize="20sp" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/profile_organizer_notification_status"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:minHeight="48dp"
-            android:text="@string/organizer_notification_status"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp"
-            app:thumbTint="#3D5AFE"
-            app:trackTint="#82B1FF" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/profile_admin_notification_status"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:minHeight="48dp"
-            android:text="@string/admin_notification_status"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp"
-            app:thumbTint="#3D5AFE"
-            app:trackTint="#82B1FF" />
 
     </LinearLayout>
 
