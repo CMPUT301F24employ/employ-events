@@ -1,8 +1,9 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.events;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -24,6 +29,7 @@ public class AddEventFragment extends Fragment {
     private AddEventBinding binding;
     private Date eventDate, registrationDeadline;
     private Time eventStartTime, eventEndTime;
+    private String android_id;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +44,9 @@ public class AddEventFragment extends Fragment {
         Button startTimeButton = binding.eventStartTime;
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
+
+        android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
@@ -61,16 +70,24 @@ public class AddEventFragment extends Fragment {
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
                         eventTitle, eventDate, registrationDeadline, new Date(), false, description,
-                        eventStartTime, eventEndTime
+                        eventStartTime, eventEndTime, android_id
                 );
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("events").add(newEvent)
+                        .addOnSuccessListener(documentReference -> {
+                            Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
+                            // Navigate back to FacilityFragment
+                            Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
-                Toast.makeText(getContext(), "Event Created: " + eventTitle, Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
+                }
 
                 // TODO: Save the event in a list or database
 
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
-            }
         });
 
         return root;

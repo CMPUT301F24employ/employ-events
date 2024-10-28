@@ -1,4 +1,4 @@
-package com.example.employ_events.ui;
+package com.example.employ_events.ui.entrants;
 
 import android.view.LayoutInflater;
 import android.view.View;

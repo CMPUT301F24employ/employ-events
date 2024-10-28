@@ -5,20 +5,51 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_home">
 
+
+
+    <fragment
+        android:id="@+id/entrantEventDetails"
+        android:name="com.example.employ_events.ui.entrants.EntrantEventDetails"
+        tools:layout="@layout/event_details">
+
+        <action
+            android:id="@+id/action_entrantEventDetails_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_create_facility"
+        android:name="com.example.employ_events.ui.facility.CreateFacilityFragment"
+        tools:layout="@layout/create_facility">
+    </fragment>
+
+
+
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.employ_events.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_entrantEventDetails"
+            app:destination="@id/entrantEventDetails" />
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_facility"
         android:name="com.example.employ_events.ui.facility.FacilityFragment"
         android:label="@string/menu_facility"
         tools:layout="@layout/fragment_facility">
         <action
             android:id="@+id/action_facility_to_addEvent"
             app:destination="@id/addEventFragment" />
+        <action
+            android:id="@+id/action_nav_facility_to_nav_create_facility"
+            app:destination="@id/nav_create_facility" />
+        <action
+            android:id="@+id/action_nav_facility_to_nav_home"
+            app:destination="@id/nav_home" />
     </fragment>
 
     <fragment
@@ -35,17 +66,38 @@
         android:id="@+id/nav_edit_profile"
         android:name="com.example.employ_events.ui.profile.EditProfileFragment"
         android:label="@string/edit_profile"
-        tools:layout="@layout/fragment_edit_profile" />
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/action_nav_edit_profile_to_nav_upload_image"
+            app:destination="@id/nav_upload_image" />
+        <action
+            android:id="@+id/action_nav_edit_profile_pop"
+            app:popUpTo="@id/nav_edit_profile"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_upload_image"
+        android:name="com.example.employ_events.ui.profile.UploadImageFragment"
+        android:label="Upload Image"
+        tools:layout="@layout/upload_image" />
 
     <fragment
         android:id="@+id/addEventFragment"
-        android:name="com.example.employ_events.AddEventFragment"
+        android:name="com.example.employ_events.ui.events.AddEventFragment"
         android:label="Add Event"
-        tools:layout="@layout/add_event" />
+        tools:layout="@layout/add_event">
+
+        <action
+            android:id="@+id/action_addEventFragment_to_nav_facility"
+            app:destination="@id/nav_facility" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_list"
         android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
         android:label="Registered Events"
         tools:layout="@layout/fragment_registered_events" />
+
+
 </navigation>
