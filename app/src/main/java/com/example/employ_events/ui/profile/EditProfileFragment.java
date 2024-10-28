@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -36,7 +37,7 @@ public class EditProfileFragment extends Fragment {
 
     private FragmentEditProfileBinding binding;
     private EditText editName, editEmail, editPhone;
-    private SwitchCompat organizer_notifications, admin_notifications;
+    //private SwitchCompat organizer_notifications, admin_notifications;
     private Button confirmButton, uploadButton, removeButton;
     private CollectionReference profilesRef;
     ImageView userPFP;
@@ -91,8 +92,8 @@ public class EditProfileFragment extends Fragment {
         uploadButton = binding.uploadProfileImage;
         removeButton = binding.removeProfileImage;
         userPFP = binding.userPFP;
-        organizer_notifications = binding.profileOrganizerNotificationStatus;
-        admin_notifications = binding.profileAdminNotificationStatus;
+        //organizer_notifications = binding.profileOrganizerNotificationStatus;
+        //admin_notifications = binding.profileAdminNotificationStatus;
     }
 
     /**
@@ -101,8 +102,8 @@ public class EditProfileFragment extends Fragment {
      * @param editProfileViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, EditProfileViewModel editProfileViewModel) {
-        organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
-        admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
+        //organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
+        //admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
         // if NULL, it will be blank. Otherwise, display the users info.
         if (document.get("name") != null) {
             editName.setText(Objects.requireNonNull(document.get("name")).toString());
@@ -140,11 +141,11 @@ public class EditProfileFragment extends Fragment {
             data.put("name", editName.getText().toString());
             data.put("email", editEmail.getText().toString());
             data.put("phoneNumber", editPhone.getText().toString());
-            data.put("organizerNotifications", organizer_notifications.isChecked());
-            data.put("adminNotifications", admin_notifications.isChecked());
+            //data.put("organizerNotifications", organizer_notifications.isChecked());
+            //data.put("adminNotifications", admin_notifications.isChecked());
 
             profilesRef.document(uniqueID).set(data, SetOptions.merge());
-
+            Toast.makeText(getActivity(), "Profile Updated!", Toast.LENGTH_SHORT).show();
             NavHostFragment.findNavController(EditProfileFragment.this)
                     .navigate(R.id.action_nav_edit_profile_pop);
         }

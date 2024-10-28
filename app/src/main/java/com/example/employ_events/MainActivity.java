@@ -37,8 +37,11 @@ public class MainActivity extends AppCompatActivity
     private FirebaseFirestore db;
 
     @Override
-    public void createFacility(Facility facility) {
+    public void createFacility(Facility facility, String uniqueID) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("organizer", true);
         db.collection("facilities").add(facility);
+        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
     }
 
     @Override

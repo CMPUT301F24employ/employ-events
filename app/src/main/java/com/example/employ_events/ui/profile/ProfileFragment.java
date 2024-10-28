@@ -31,7 +31,7 @@ import java.util.Objects;
 public class ProfileFragment extends Fragment{
 
     private FragmentProfileBinding binding;
-    private SwitchCompat organizer_notifications, admin_notifications;
+    //private SwitchCompat organizer_notifications, admin_notifications;
     private TextView name, email, phone_number;
     private Button editProfileButton;
 
@@ -76,8 +76,8 @@ public class ProfileFragment extends Fragment{
      * Initializes the views for the fragment.
      */
     private void initializeViews() {
-        organizer_notifications = binding.profileOrganizerNotificationStatus;
-        admin_notifications = binding.profileAdminNotificationStatus;
+        //organizer_notifications = binding.profileOrganizerNotificationStatus;
+        //admin_notifications = binding.profileAdminNotificationStatus;
         name = binding.profileName;
         phone_number = binding.profilePhoneNumber;
         email = binding.profileEmail;
@@ -90,8 +90,8 @@ public class ProfileFragment extends Fragment{
      * @param profileViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, ProfileViewModel profileViewModel) {
-        organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
-        admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
+        //organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
+        //admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
         // if NULL, it will be blank. Otherwise, display the users info.
         if (document.get("name") != null) {
             name.setText(Objects.requireNonNull(document.get("name")).toString());
