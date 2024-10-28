@@ -14,20 +14,19 @@ public class Event {
     private Date registrationStartDate;
     private Boolean geoLocation;
     private String description;
-    private Image image;
+    private String imageUri;
     private Integer limited;
     private Time endTime;
     private Time startTime;
     private String organizerID;
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description, Time endTime, Time startTime, String organizerID){
+    private Integer fee;
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description,  String organizerID){
         this.description = description;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
-        this.endTime = endTime;
-        this.startTime = startTime;
         this.organizerID = organizerID;
     }
 
@@ -81,12 +80,12 @@ public class Event {
         this.description = description;
     }
 
-    public Image getImage() {
-        return image;
+    public String getImage() {
+        return imageUri;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImage(String imageURI) {
+        this.imageUri = imageURI;
     }
 
     public Integer getLimited() {
@@ -111,6 +110,14 @@ public class Event {
 
     public void setStartTime(Time startTime) {
         this.startTime = startTime;
+    }
+
+    public Integer getFee() {
+        return fee;
+    }
+
+    public void setFee(Integer fee) {
+        this.fee = fee;
     }
 }
 
