@@ -2,6 +2,8 @@ package com.example.employ_events.ui.events;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -39,6 +41,7 @@ public class AddEventFragment extends Fragment {
         // Get references to input fields and buttons
         EditText eventTitleInput = binding.eventTitle;
         EditText descriptionInput = binding.description;
+        EditText limitInput = binding.limit;
         Button eventDateButton = binding.eventDate;
         Button registrationDeadlineButton = binding.registrationDateDeadline;
         Button startTimeButton = binding.eventStartTime;
@@ -46,7 +49,9 @@ public class AddEventFragment extends Fragment {
         Button saveButton = binding.saveEventButton;
 
         android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
+        // FACILITY ID !!!!!!!!!!!
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
@@ -61,17 +66,20 @@ public class AddEventFragment extends Fragment {
             try {
                 String eventTitle = eventTitleInput.getText().toString();
                 String description = descriptionInput.getText().toString();
+                String limitString = limitInput.getText().toString();
 
-                if (eventDate == null || registrationDeadline == null || eventStartTime == null || eventEndTime == null) {
+                if (eventDate == null || registrationDeadline == null) {
                     Toast.makeText(getContext(), "Please select all required fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
-                        eventTitle, eventDate, registrationDeadline, new Date(), false, description,
-                        eventStartTime, eventEndTime, android_id
+                        eventTitle, eventDate, registrationDeadline, new Date(), false, description, android_id
                 );
+                // MAKING SURE THE EVENT KNOWS WHAT FACILITY IT BELONGS TO
+                newEvent.setFacilityID(uniqueID);
+
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("events").add(newEvent)
                         .addOnSuccessListener(documentReference -> {
@@ -83,7 +91,7 @@ public class AddEventFragment extends Fragment {
                                 Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
                 } catch (Exception e) {
-                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
                 }
 
                 // TODO: Save the event in a list or database
