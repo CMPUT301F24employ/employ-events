@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employ_events.R;
@@ -22,11 +23,17 @@ public class FacilityEventsAdapter extends RecyclerView.Adapter<FacilityEventsAd
     // For storing info
     Context context;
     ArrayList<Event> eventArrayList;
+    private FEClickListener listener;
 
     // Constructor
-    public FacilityEventsAdapter(Context context, ArrayList<Event> eventArrayList) {
+    public FacilityEventsAdapter(Context context, ArrayList<Event> eventArrayList, FEClickListener listener) {
         this.context = context;
         this.eventArrayList = eventArrayList;
+        this.listener = listener;
+    }
+
+    public interface FEClickListener {
+        void onItemClick(Event event);
     }
 
     @NonNull
@@ -45,6 +52,12 @@ public class FacilityEventsAdapter extends RecyclerView.Adapter<FacilityEventsAd
         Event e = eventArrayList.get(position);
         // Looking into the holder, and setting the event card to show the details of the item we want to display
         holder.eventName.setText(e.getEventTitle());
+        holder.eventCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onItemClick(e);
+            }
+        });
 
         if (e.getEventDate() == null) {
             holder.eventDate.setText("No Event Date Found");
@@ -64,13 +77,14 @@ public class FacilityEventsAdapter extends RecyclerView.Adapter<FacilityEventsAd
 
     // Manages the views to be used in the class
     public static class FEViewHolder extends RecyclerView.ViewHolder {
-
+        CardView eventCard;
         TextView eventName, eventDate;
 
         public FEViewHolder(@NonNull View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.event_card_name);
             eventDate = itemView.findViewById(R.id.event_card_date);
+            eventCard = itemView.findViewById(R.id.event_card);
         }
     }
 }

@@ -36,7 +36,7 @@ import java.util.Objects;
 
 import java.util.Date;
 
-public class FacilityFragment extends Fragment {
+public class FacilityFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
     private FragmentFacilityBinding binding;
     private FirebaseFirestore db;
@@ -87,10 +87,16 @@ public class FacilityFragment extends Fragment {
         DividerItemDecoration d = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         eventsRecyclerView.addItemDecoration(d);
         eventList = new ArrayList<>();
-        eventsAdapter = new FacilityEventsAdapter(getContext(), eventList);
+        eventsAdapter = new FacilityEventsAdapter(getContext(), eventList, this);
         eventsRecyclerView.setAdapter(eventsAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         queryEvents(uniqueID);
+
+
+
+
+
+
         return root;
     }
 
@@ -144,5 +150,10 @@ public class FacilityFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onItemClick(Event event) {
+        Toast.makeText(getContext(), "Hello world", Toast.LENGTH_SHORT).show();
     }
 }
