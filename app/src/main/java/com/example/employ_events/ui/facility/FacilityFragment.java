@@ -21,17 +21,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
 import com.example.employ_events.ui.events.Event;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 import java.util.Date;
 
-public class FacilityFragment extends Fragment {
+public class FacilityFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
     private FragmentFacilityBinding binding;
     private FirebaseFirestore db;
@@ -48,7 +53,7 @@ public class FacilityFragment extends Fragment {
         View root = binding.getRoot();
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;  // Represents the FACILITY ID
+        String uniqueID;
         uniqueID = sharedPreferences.getString("uniqueID", null);
         db = FirebaseFirestore.getInstance();
 
@@ -82,22 +87,45 @@ public class FacilityFragment extends Fragment {
         DividerItemDecoration d = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         eventsRecyclerView.addItemDecoration(d);
         eventList = new ArrayList<>();
-        eventsAdapter = new FacilityEventsAdapter(getContext(), eventList);
+        eventsAdapter = new FacilityEventsAdapter(getContext(), eventList, this);
         eventsRecyclerView.setAdapter(eventsAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        queryEvents();
+        queryEvents(uniqueID);
+
+
+
+
+
+
         return root;
     }
 
-    private void queryEvents() {
-        db.collection("events").get().addOnCompleteListener(task -> {
+    private String getFacilityID(String uniqueID) {
+        final String[] facilityID = new String[1];
+        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
+        facility.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        facilityID[0] = document.getId();
+                    }
+                }
+            }
+        });
+        return facilityID[0];
+    }
+
+    private void queryEvents(String uniqueID) {
+        String facilityID = getFacilityID(uniqueID);
+        db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(task -> {
 
             // The task is the query: If we received events from the query do this code:
             if (task.isSuccessful()) {
                 // task.getResult() is a query snapshot which just holds the documents in the query (the results)
                 for (DocumentSnapshot eventDocument: task.getResult()) {
                     Event e = new Event();
-                    e.setEventTitle(eventDocument.getId());
+                    e.setEventTitle(eventDocument.getString("eventTitle"));
                     Timestamp timestamp = eventDocument.getTimestamp("eventDate");
 
                     // IF THE EVENT DOESN'T HAVE A DATE
@@ -122,5 +150,10 @@ public class FacilityFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onItemClick(Event event) {
+        Toast.makeText(getContext(), "Hello world", Toast.LENGTH_SHORT).show();
     }
 }
