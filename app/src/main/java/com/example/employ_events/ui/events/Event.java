@@ -27,8 +27,8 @@ public class Event {
 
     }
 
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description,  String organizerID){
-        this.description = description;
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID){
+
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
