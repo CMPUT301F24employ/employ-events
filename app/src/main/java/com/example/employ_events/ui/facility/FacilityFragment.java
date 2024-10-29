@@ -21,10 +21,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
 import com.example.employ_events.ui.events.Event;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -85,12 +90,29 @@ public class FacilityFragment extends Fragment {
         eventsAdapter = new FacilityEventsAdapter(getContext(), eventList);
         eventsRecyclerView.setAdapter(eventsAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        queryEvents();
+        queryEvents(uniqueID);
         return root;
     }
 
-    private void queryEvents() {
-        db.collection("events").get().addOnCompleteListener(task -> {
+    private String getFacilityID(String uniqueID) {
+        final String[] facilityID = new String[1];
+        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
+        facility.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        facilityID[0] = document.getId();
+                    }
+                }
+            }
+        });
+        return facilityID[0];
+    }
+
+    private void queryEvents(String uniqueID) {
+        String facilityID = getFacilityID(uniqueID);
+        db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(task -> {
 
             // The task is the query: If we received events from the query do this code:
             if (task.isSuccessful()) {

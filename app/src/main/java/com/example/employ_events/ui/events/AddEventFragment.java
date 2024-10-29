@@ -18,7 +18,12 @@ import androidx.navigation.Navigation;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -31,12 +36,13 @@ public class AddEventFragment extends Fragment {
     private AddEventBinding binding;
     private Date eventDate, registrationDeadline;
     private Time eventStartTime, eventEndTime;
-    private String android_id;
+    private FirebaseFirestore db;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = AddEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        db = FirebaseFirestore.getInstance();
 
         // Get references to input fields and buttons
         EditText eventTitleInput = binding.eventTitle;
@@ -48,10 +54,13 @@ public class AddEventFragment extends Fragment {
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
 
-        android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-        // FACILITY ID !!!!!!!!!!!
+        // Unique ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID = sharedPreferences.getString("uniqueID", null);
+        String uniqueID;  // Represents the FACILITY ID
+        uniqueID = sharedPreferences.getString("uniqueID", null);
+
+        // FACILITY ID !!!!!!!!!!!
+        String facilityID = getFacilityID(uniqueID);
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
@@ -75,10 +84,8 @@ public class AddEventFragment extends Fragment {
 
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
-                        eventTitle, eventDate, registrationDeadline, new Date(), false, description, android_id
+                        eventTitle, eventDate, registrationDeadline, new Date(), false, description, facilityID
                 );
-                // MAKING SURE THE EVENT KNOWS WHAT FACILITY IT BELONGS TO
-                newEvent.setFacilityID(uniqueID);
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("events").add(newEvent)
@@ -151,6 +158,22 @@ public class AddEventFragment extends Fragment {
         );
 
         timePickerDialog.show();
+    }
+
+    private String getFacilityID(String uniqueID) {
+        final String[] facilityID = new String[1];
+        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
+        facility.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        facilityID[0] = document.getId();
+                    }
+                }
+            }
+        });
+        return facilityID[0];
     }
 
     @Override

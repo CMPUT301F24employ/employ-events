@@ -45,6 +45,7 @@ public class FacilityEventsAdapter extends RecyclerView.Adapter<FacilityEventsAd
         Event e = eventArrayList.get(position);
         // Looking into the holder, and setting the event card to show the details of the item we want to display
         holder.eventName.setText(e.getEventTitle());
+
         if (e.getEventDate() == null) {
             holder.eventDate.setText("No Event Date Found");
         } else {
