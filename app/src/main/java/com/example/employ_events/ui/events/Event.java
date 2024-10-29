@@ -20,6 +20,13 @@ public class Event {
     private Time startTime;
     private String organizerID;
     private Integer fee;
+    private String facilityID;
+
+    // Empty constructor for Displaying only some details of an event
+    public Event() {
+
+    }
+
     public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description,  String organizerID){
         this.description = description;
         this.eventDate = eventDate;
@@ -119,5 +126,12 @@ public class Event {
     public void setFee(Integer fee) {
         this.fee = fee;
     }
-}
 
+    public String getFacilityID() {
+        return facilityID;
+    }
+
+    public void setFacilityID(String facilityID) {
+        this.facilityID = facilityID;
+    }
+}

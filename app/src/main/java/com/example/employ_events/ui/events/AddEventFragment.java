@@ -2,6 +2,8 @@ package com.example.employ_events.ui.events;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -47,7 +49,9 @@ public class AddEventFragment extends Fragment {
         Button saveButton = binding.saveEventButton;
 
         android_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
+        // FACILITY ID !!!!!!!!!!!
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
@@ -73,6 +77,8 @@ public class AddEventFragment extends Fragment {
                 Event newEvent = new Event(
                         eventTitle, eventDate, registrationDeadline, new Date(), false, description, android_id
                 );
+                // MAKING SURE THE EVENT KNOWS WHAT FACILITY IT BELONGS TO
+                newEvent.setFacilityID(uniqueID);
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("events").add(newEvent)

@@ -22,7 +22,7 @@
         app:layout_constraintVertical_bias="0.023" />
 
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/facility_events"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
