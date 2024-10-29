@@ -45,7 +45,7 @@ public class RegisteredEventsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         eventsRef = db.collection("waitinglist");
 
-        registeredList = binding.getRoot().findViewById(R.id.listView);
+        //registeredList = binding.getRoot().findViewById(R.id.listView);
         eventDataList = new ArrayList<>();
 
         registeredArrayAdapter = new RegisteredArrayAdapter(getContext(), eventDataList);
