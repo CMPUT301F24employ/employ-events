@@ -53,7 +53,7 @@ public class FacilityFragment extends Fragment {
         View root = binding.getRoot();
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;  // Represents the FACILITY ID
+        String uniqueID;
         uniqueID = sharedPreferences.getString("uniqueID", null);
         db = FirebaseFirestore.getInstance();
 
@@ -119,7 +119,7 @@ public class FacilityFragment extends Fragment {
                 // task.getResult() is a query snapshot which just holds the documents in the query (the results)
                 for (DocumentSnapshot eventDocument: task.getResult()) {
                     Event e = new Event();
-                    e.setEventTitle(eventDocument.getId());
+                    e.setEventTitle(eventDocument.getString("eventTitle"));
                     Timestamp timestamp = eventDocument.getTimestamp("eventDate");
 
                     // IF THE EVENT DOESN'T HAVE A DATE
