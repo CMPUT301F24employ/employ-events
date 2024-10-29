@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -54,6 +55,7 @@ public class AddEventFragment extends Fragment {
         Button startTimeButton = binding.eventStartTime;
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
+        CheckBox geoLocation = binding.geolocationStatus;
 
         // Unique ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -85,9 +87,34 @@ public class AddEventFragment extends Fragment {
                 }
 
                 // Create a new Event object (assuming Event constructor exists)
-                Event newEvent = new Event(
-                        eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, description, facilityID
-                );
+                Event newEvent;
+                if (registrationStartDeadline!= null){
+                    newEvent = new Event(
+                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false,  facilityID
+                    );
+                } else {
+                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false,  facilityID);
+                }
+                if (!limitString.isEmpty()){
+                    Integer limit = Integer.parseInt(limitString);
+                    newEvent.setLimited(limit);
+                }
+                if (!feeString.isEmpty()){
+                    Integer fee = Integer.parseInt(feeString);
+                    newEvent.setFee(fee);
+                }
+                if (eventStartTime != null ){
+                    newEvent.setStartTime(eventStartTime);
+                }
+                if (eventEndTime !=null){
+                    newEvent.setEndTime(eventEndTime);
+                }
+                if (geoLocation.isChecked()){
+                    newEvent.setGeoLocation(Boolean.TRUE);
+                }
+                if (!description.isEmpty()){
+                    newEvent.setDescription(description);
+                }
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("events").add(newEvent)
