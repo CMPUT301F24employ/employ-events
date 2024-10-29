@@ -5,7 +5,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,7 @@ import java.util.Locale;
 public class AddEventFragment extends Fragment {
 
     private AddEventBinding binding;
-    private Date eventDate, registrationDeadline;
+    private Date eventDate, registrationDeadline, registrationStartDeadline;
     private Time eventStartTime, eventEndTime;
     private FirebaseFirestore db;
 
@@ -48,8 +47,10 @@ public class AddEventFragment extends Fragment {
         EditText eventTitleInput = binding.eventTitle;
         EditText descriptionInput = binding.description;
         EditText limitInput = binding.limit;
+        EditText feeInput = binding.fee;
         Button eventDateButton = binding.eventDate;
         Button registrationDeadlineButton = binding.registrationDateDeadline;
+        Button registrationStartDeadlineButton = binding.registrationStartDeadline;
         Button startTimeButton = binding.eventStartTime;
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
@@ -65,7 +66,7 @@ public class AddEventFragment extends Fragment {
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
         registrationDeadlineButton.setOnClickListener(view -> showDatePicker(registrationDeadlineButton, false));
-
+        registrationStartDeadlineButton.setOnClickListener(view-> showDatePicker(registrationStartDeadlineButton, false));
         // Time picker dialogs
         startTimeButton.setOnClickListener(view -> showTimePicker(startTimeButton, true));
         endTimeButton.setOnClickListener(view -> showTimePicker(endTimeButton, false));
@@ -76,6 +77,7 @@ public class AddEventFragment extends Fragment {
                 String eventTitle = eventTitleInput.getText().toString();
                 String description = descriptionInput.getText().toString();
                 String limitString = limitInput.getText().toString();
+                String feeString = feeInput.getText().toString();
 
                 if (eventDate == null || registrationDeadline == null) {
                     Toast.makeText(getContext(), "Please select all required fields", Toast.LENGTH_SHORT).show();
@@ -84,7 +86,7 @@ public class AddEventFragment extends Fragment {
 
                 // Create a new Event object (assuming Event constructor exists)
                 Event newEvent = new Event(
-                        eventTitle, eventDate, registrationDeadline, new Date(), false, description, facilityID
+                        eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, description, facilityID
                 );
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();

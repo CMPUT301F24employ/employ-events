@@ -67,6 +67,14 @@
 
             <!-- Registration Deadline Button -->
             <Button
+                android:id="@+id/registration_start_deadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Registration Start Date"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/button_background"
+                android:textColor="@android:color/white" />
+            <Button
                 android:id="@+id/registration_date_deadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
