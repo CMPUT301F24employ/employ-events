@@ -101,6 +101,13 @@ public class CreateFacilityFragment extends DialogFragment {
 
         return dialog;
     }
+
+    /**
+     * Called when the dialog is canceled.
+     * This method shows a Toast message to inform the user that the facility creation has been canceled.
+     *
+     * @param dialog The dialog that was canceled.
+     */
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
