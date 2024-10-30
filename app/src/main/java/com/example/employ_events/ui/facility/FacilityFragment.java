@@ -36,6 +36,10 @@ import java.util.Objects;
 
 import java.util.Date;
 
+/**
+ * FacilityFragment is a Fragment that displays events associated with a facility.
+ * It allows users to create events and shows a list of existing events for a facility.
+ */
 public class FacilityFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
     private FragmentFacilityBinding binding;
@@ -53,8 +57,7 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
         View root = binding.getRoot();
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
-        uniqueID = sharedPreferences.getString("uniqueID", null);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
         db = FirebaseFirestore.getInstance();
 
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
@@ -63,13 +66,10 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
                 DocumentSnapshot document = task.getResult();
                 if (Objects.equals(document.getBoolean("organizer"), false)) {
                     new CreateFacilityFragment().show(requireActivity().getSupportFragmentManager(), "Create Facility");
-                    if (Objects.equals(document.getBoolean("organizer"), false)) {
-                        NavHostFragment.findNavController(FacilityFragment.this)
-                                .navigate(R.id.action_nav_facility_to_nav_home);
-                    }
+                    NavHostFragment.findNavController(FacilityFragment.this)
+                            .navigate(R.id.action_nav_facility_to_nav_home);
                 }
             } else {
-                // Handle the error, e.g., log it
                 Log.e("MainActivity", "Error getting documents: ", task.getException());
             }
         });
@@ -78,82 +78,93 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
                 Navigation.findNavController(view).navigate(R.id.action_facility_to_addEvent)
         );
 
-        // VIEWING THE EVENTS IN A FACILITY
-        // Only need to store the info of the event name and date on the cardview, more info will be accessed elsewhere
-
-        // Setting up the RecyclerView and its adapter
         RecyclerView eventsRecyclerView = binding.eventsRecyclerView;
-        // Lines between each event
         DividerItemDecoration d = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         eventsRecyclerView.addItemDecoration(d);
         eventList = new ArrayList<>();
         eventsAdapter = new FacilityEventsAdapter(getContext(), eventList, this);
         eventsRecyclerView.setAdapter(eventsAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        queryEvents(uniqueID);
 
-
-
-
-
+        // Fetch the facility ID and then query events
+        getFacilityID(uniqueID, facilityID -> {
+            if (facilityID != null) {
+                queryEvents(facilityID);
+            } else {
+                Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return root;
     }
 
-    private String getFacilityID(String uniqueID) {
-        final String[] facilityID = new String[1];
+    /**
+     * Retrieves the facility ID associated with the given unique ID.
+     *
+     * @param uniqueID The unique ID of the user.
+     * @param listener Callback to return the facility ID.
+     */
+    private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
         Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
-        facility.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        facilityID[0] = document.getId();
-                    }
+        facility.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    listener.onFacilityIDFetched(document.getId());
+                    return; // Stop after finding the first match
                 }
             }
+            listener.onFacilityIDFetched(null); // No match found
         });
-        return facilityID[0];
     }
 
-    private void queryEvents(String uniqueID) {
-        String facilityID = getFacilityID(uniqueID);
+    /**
+     * Queries the events associated with the given facility ID.
+     *
+     * @param facilityID The ID of the facility.
+     */
+    private void queryEvents(String facilityID) {
         db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(task -> {
-
-            // The task is the query: If we received events from the query do this code:
             if (task.isSuccessful()) {
-                // task.getResult() is a query snapshot which just holds the documents in the query (the results)
-                for (DocumentSnapshot eventDocument: task.getResult()) {
+                for (DocumentSnapshot eventDocument : task.getResult()) {
                     Event e = new Event();
                     e.setEventTitle(eventDocument.getString("eventTitle"));
                     Timestamp timestamp = eventDocument.getTimestamp("eventDate");
 
-                    // IF THE EVENT DOESN'T HAVE A DATE
                     if (timestamp == null) {
                         e.setEventDate(null);
                     } else {
-                        Date eDate = timestamp.toDate();  // Might cause an issue if timestamp isn't a proper date?
+                        Date eDate = timestamp.toDate();
                         e.setEventDate(eDate);
                     }
                     eventList.add(e);
                 }
                 eventsAdapter.notifyDataSetChanged();
-            }
-            // We didn't receive any events from the query
-            else {
+            } else {
                 Toast.makeText(getContext(), "Error loading events or no events found!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Handles click events on items in the event list.
+     *
+     * @param event The event that was clicked.
+     */
+    @Override
+    public void onItemClick(Event event) {
+        Toast.makeText(getContext(), "Event Clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Callback interface for fetching facility ID.
+     */
+    public interface OnFacilityIDFetchedListener {
+        void onFacilityIDFetched(String facilityID);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void onItemClick(Event event) {
-        Toast.makeText(getContext(), "Hello world", Toast.LENGTH_SHORT).show();
     }
 }
