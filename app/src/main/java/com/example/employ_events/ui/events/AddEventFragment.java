@@ -68,7 +68,6 @@ public class AddEventFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
 
-
         // Fetch the facility ID
         fetchFacilityID(uniqueID);
 
@@ -215,7 +214,7 @@ public class AddEventFragment extends Fragment {
      * @param listener Callback to return the facility ID.
      */
     private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
-        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
+        Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
         facility.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -238,7 +237,7 @@ public class AddEventFragment extends Fragment {
             if (facilityID != null) {
                 System.out.println("Fetched Facility ID: " + facilityID);
             } else {
-                System.out.println("No Facility ID found for owner_id: " + uniqueID);
+                System.out.println("No Facility ID found for organizer_id: " + uniqueID);
             }
         });
     }

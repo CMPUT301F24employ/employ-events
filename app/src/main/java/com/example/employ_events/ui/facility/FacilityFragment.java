@@ -105,7 +105,7 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
      * @param listener Callback to return the facility ID.
      */
     private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
-        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
+        Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
         facility.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
