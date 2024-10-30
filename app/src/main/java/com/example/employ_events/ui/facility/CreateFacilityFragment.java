@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.employ_events.BuildConfig;
 import com.example.employ_events.R;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
@@ -45,7 +46,8 @@ public class CreateFacilityFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Initialize Places API
-        Places.initialize(requireContext().getApplicationContext(), "AIzaSyBYcN9VJ-Vwxxsyawj1PuobuIsKyQ1_zmc");
+        String apiKey = BuildConfig.MAPS_API_KEY;
+        Places.initialize(requireContext().getApplicationContext(), apiKey);
     }
 
     @NonNull
