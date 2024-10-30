@@ -24,6 +24,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "MAPS_API_KEY", "\"AIzaSyBYcN9VJ-Vwxxsyawj1PuobuIsKyQ1_zmc\"")
+        }
+        debug {
+            buildConfigField("String", "MAPS_API_KEY", "\"AIzaSyBYcN9VJ-Vwxxsyawj1PuobuIsKyQ1_zmc\"")
         }
     }
     compileOptions {
@@ -32,6 +36,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
