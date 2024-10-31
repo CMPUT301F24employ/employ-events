@@ -4,8 +4,7 @@ package com.example.employ_events.ui.profile;
  * This is a class that defines a user's Profile.
  */
 public class Profile {
-    private String uniqueID, name, email;
-    private int phoneNumber;
+    private String uniqueID, name, email, pfpURI, phoneNumber;
     private boolean organizerNotifications, adminNotifications;
     private boolean isEntrant, isAdmin, isOrganizer;
 
@@ -64,7 +63,7 @@ public class Profile {
      *
      * @return the phone number of the user
      */
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -73,7 +72,7 @@ public class Profile {
      *
      * @param phoneNumber the new phone number of the user
      */
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -164,5 +163,13 @@ public class Profile {
      */
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public String getPfpURI() {
+        return pfpURI;
+    }
+
+    public void setPfpURI(String pfpURI) {
+        this.pfpURI = pfpURI;
     }
 }
