@@ -92,7 +92,7 @@
                 android:id="@+id/registration_start_deadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Registration Start Date"
+                android:text="Select Registration Start Date (Optional)"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
@@ -110,7 +110,7 @@
                 android:id="@+id/event_start_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Start Time"
+                android:text="Select Start Time (Optional)"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
@@ -120,17 +120,26 @@
                 android:id="@+id/event_end_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select End Time"
+                android:text="Select End Time (Optional)"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
-
+            <EditText
+                android:id="@+id/event_capacity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Event Capacity"
+                android:inputType="number"
+                android:background="@drawable/input_background"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:singleLine="true" />
             <!-- Capacity Limit Input -->
             <EditText
                 android:id="@+id/limit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter Capacity Limit (Optional)"
+                android:hint="Enter Waiting List Limit (Optional)"
                 android:inputType="number"
                 android:background="@drawable/input_background"
                 android:padding="12dp"

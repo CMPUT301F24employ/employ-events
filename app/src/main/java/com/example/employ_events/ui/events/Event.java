@@ -24,6 +24,7 @@ public class Event {
     private Time startTime;
     private String organizerID;
     private Integer fee;
+    private Integer eventCapacity;
     private String facilityID;
     private String bannerUrl;
 
@@ -44,7 +45,7 @@ public class Event {
      * @param geoLocation            Indicates if geolocation is enabled.
      * @param organizerID            The ID of the organizer.
      */
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID){
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID, Integer eventCapacity){
 
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
@@ -52,6 +53,7 @@ public class Event {
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
         this.organizerID = organizerID;
+        this.eventCapacity = eventCapacity;
     }
 
     //Getters and setters
@@ -159,5 +161,13 @@ public class Event {
 
     public void setFacilityID(String facilityID) {
         this.facilityID = facilityID;
+    }
+
+    public Integer getEventCapacity() {
+        return eventCapacity;
+    }
+
+    public void setEventCapacity(Integer eventCapacity) {
+        this.eventCapacity = eventCapacity;
     }
 }
