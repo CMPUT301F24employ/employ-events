@@ -157,11 +157,10 @@ public class AddEventFragment extends Fragment {
                 newEvent.setFacilityID(facilityID);
 
                 if (bannerUri != null) {
-                    uploadBannerAndSaveEvent(newEvent);
+                    uploadBannerAndSaveEvent(newEvent, view);
                 } else {
-                    saveEvent(newEvent);
+                    saveEvent(newEvent, view);
                 }
-                Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
 
 
             } catch (Exception e) {
@@ -289,22 +288,25 @@ public class AddEventFragment extends Fragment {
         }
     }
 
-    private void uploadBannerAndSaveEvent(Event newEvent) {
+    private void uploadBannerAndSaveEvent(Event newEvent, View view) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(bannerUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     newEvent.setBannerUrl(uri.toString());
-                    saveEvent(newEvent);
+                    saveEvent(newEvent, view);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
+        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
     }
 
-    private void saveEvent(Event newEvent) {
+    private void saveEvent(Event newEvent, View view) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
+
     }
 
     private void checkStoragePermission() {
