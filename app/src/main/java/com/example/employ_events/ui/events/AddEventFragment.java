@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,24 +17,18 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.Navigation;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -79,6 +72,7 @@ public class AddEventFragment extends Fragment {
         CheckBox geoLocation = binding.geolocationStatus;
         Button uploadBannerButton = binding.uploadBannerButton;
         ImageView bannerImageView = binding.bannerImage;
+        Button removeBannerButton = binding.removeBannerButton;
 
         // Unique ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -99,8 +93,18 @@ public class AddEventFragment extends Fragment {
         // Check for storage permission
         checkStoragePermission();
 
+        // Initially hide the remove button
+        removeBannerButton.setVisibility(View.GONE);
+
         // Set click listener for the upload banner button
         uploadBannerButton.setOnClickListener(v -> openImageChooser());
+
+        // Set click listener for the remove banner button
+        removeBannerButton.setOnClickListener(v -> {
+            bannerUri = null; // Clear the banner URI
+            bannerImageView.setImageDrawable(null); // Clear the displayed image
+            removeBannerButton.setVisibility(View.GONE); // Hide the remove button
+        });
 
 
         // Save event button click listener
@@ -158,13 +162,6 @@ public class AddEventFragment extends Fragment {
                     saveEvent(newEvent, view);
                 }
 
-                db.collection("events").add(newEvent)
-                        .addOnSuccessListener(documentReference -> {
-                            Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
-                        })
-                        .addOnFailureListener(e ->
-                                Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
@@ -263,11 +260,6 @@ public class AddEventFragment extends Fragment {
     public void fetchFacilityID(String uniqueID) {
         getFacilityID(uniqueID, id -> {
             facilityID = id; // Store the facility ID
-            if (facilityID != null) {
-                System.out.println("Fetched Facility ID: " + facilityID);
-            } else {
-                System.out.println("No Facility ID found for organizer_id: " + uniqueID);
-            }
         });
     }
 
@@ -292,6 +284,7 @@ public class AddEventFragment extends Fragment {
             bannerUri = data.getData();
             binding.bannerImage.setImageURI(bannerUri);
             binding.bannerImage.setVisibility(View.VISIBLE);
+            binding.removeBannerButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -303,15 +296,17 @@ public class AddEventFragment extends Fragment {
                     saveEvent(newEvent, view);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
+        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
     }
 
     private void saveEvent(Event newEvent, View view) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
-                    // Navigate back or to another fragment
+                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
+
     }
 
     private void checkStoragePermission() {
@@ -321,7 +316,6 @@ public class AddEventFragment extends Fragment {
         }
 
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
