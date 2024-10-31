@@ -296,14 +296,14 @@ public class AddEventFragment extends Fragment {
                     saveEvent(newEvent, view);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
-        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
+        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
     }
 
     private void saveEvent(Event newEvent, View view) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
+                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
