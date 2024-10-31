@@ -5,7 +5,11 @@ import android.media.Image;
 import java.sql.Time;
 import java.util.Date;
 
+
 //Update constructors...don't need all of them, can just set the stuff using getters and setters
+/**
+ * Represents an event with various attributes such as title, date, registration deadlines, and more.
+ */
 public class Event {
     //Constructors -> may not need all of them depending on AddEventFragment implementation
     private String eventTitle;
@@ -21,14 +25,27 @@ public class Event {
     private String organizerID;
     private Integer fee;
     private String facilityID;
+    private String bannerUrl;
 
-    // Empty constructor for Displaying only some details of an event
+    /**
+     * Empty constructor for displaying only some details of an event.
+     */
     public Event() {
 
     }
 
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation, String description,  String organizerID){
-        this.description = description;
+    /**
+     * Constructs an Event with the specified details.
+     *
+     * @param eventTitle             The title of the event.
+     * @param eventDate              The date of the event.
+     * @param registrationDateDeadline The registration deadline date.
+     * @param registrationStartDate   The registration start date.
+     * @param geoLocation            Indicates if geolocation is enabled.
+     * @param organizerID            The ID of the organizer.
+     */
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID){
+
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
@@ -38,6 +55,15 @@ public class Event {
     }
 
     //Getters and setters
+
+    // Getter and setter for bannerUrl
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
+    }
 
     public String getEventTitle() {
         return eventTitle;
