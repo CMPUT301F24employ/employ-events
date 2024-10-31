@@ -140,9 +140,14 @@ public class EditProfileFragment extends Fragment {
         else {
             data.put("name", editName.getText().toString());
             data.put("email", editEmail.getText().toString());
-            data.put("phoneNumber", editPhone.getText().toString());
-            //data.put("organizerNotifications", organizer_notifications.isChecked());
-            //data.put("adminNotifications", admin_notifications.isChecked());
+            int phone;
+            if (editPhone.getText().toString().trim().isEmpty()) {
+                phone = 0;
+            }
+            else {
+                phone = Integer.parseInt(editPhone.getText().toString().trim());
+            }
+            data.put("phoneNumber", phone);
 
             profilesRef.document(uniqueID).set(data, SetOptions.merge());
             Toast.makeText(getActivity(), "Profile Updated!", Toast.LENGTH_SHORT).show();

@@ -11,9 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.Navigation;
 
 import com.example.employ_events.R;
@@ -30,13 +33,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
+/**
+ * AddEventFragment is a Fragment that allows organizers to create an new event
+ * by providing details such as title, description, dates, time, fee, capacity and location.
+ */
 public class AddEventFragment extends Fragment {
 
     private AddEventBinding binding;
     private Date eventDate, registrationDeadline, registrationStartDeadline;
     private Time eventStartTime, eventEndTime;
     private FirebaseFirestore db;
+    private String facilityID; // Variable to hold the facility ID
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,22 +66,27 @@ public class AddEventFragment extends Fragment {
 
         // Unique ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;  // Represents the FACILITY ID
-        uniqueID = sharedPreferences.getString("uniqueID", null);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
 
-        // FACILITY ID !!!!!!!!!!!
-        String facilityID = getFacilityID(uniqueID);
+        // Fetch the facility ID
+        fetchFacilityID(uniqueID);
 
         // Date picker dialogs
         eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
         registrationDeadlineButton.setOnClickListener(view -> showDatePicker(registrationDeadlineButton, false));
-        registrationStartDeadlineButton.setOnClickListener(view-> showDatePicker(registrationStartDeadlineButton, false));
+        registrationStartDeadlineButton.setOnClickListener(view -> showDatePicker(registrationStartDeadlineButton, false));
+
         // Time picker dialogs
         startTimeButton.setOnClickListener(view -> showTimePicker(startTimeButton, true));
         endTimeButton.setOnClickListener(view -> showTimePicker(endTimeButton, false));
 
         // Save event button click listener
         saveButton.setOnClickListener(view -> {
+            if (facilityID == null) {
+                Toast.makeText(getContext(), "Facility ID not fetched yet.", Toast.LENGTH_SHORT).show();
+                return; // Prevent saving if facility ID is not available
+            }
+
             try {
                 String eventTitle = eventTitleInput.getText().toString();
                 String description = descriptionInput.getText().toString();
@@ -86,57 +98,59 @@ public class AddEventFragment extends Fragment {
                     return;
                 }
 
-                // Create a new Event object (assuming Event constructor exists)
                 Event newEvent;
-                if (registrationStartDeadline!= null){
+                if (registrationStartDeadline != null) {
                     newEvent = new Event(
-                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false,  facilityID
+                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID
                     );
                 } else {
-                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false,  facilityID);
+                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID);
                 }
-                if (!limitString.isEmpty()){
+                if (!limitString.isEmpty()) {
                     Integer limit = Integer.parseInt(limitString);
                     newEvent.setLimited(limit);
                 }
-                if (!feeString.isEmpty()){
+                if (!feeString.isEmpty()) {
                     Integer fee = Integer.parseInt(feeString);
                     newEvent.setFee(fee);
                 }
-                if (eventStartTime != null ){
+                if (eventStartTime != null) {
                     newEvent.setStartTime(eventStartTime);
                 }
-                if (eventEndTime !=null){
+                if (eventEndTime != null) {
                     newEvent.setEndTime(eventEndTime);
                 }
-                if (geoLocation.isChecked()){
-                    newEvent.setGeoLocation(Boolean.TRUE);
+                if (geoLocation.isChecked()) {
+                    newEvent.setGeoLocation(true);
                 }
-                if (!description.isEmpty()){
+                if (!description.isEmpty()) {
                     newEvent.setDescription(description);
                 }
 
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                newEvent.setFacilityID(facilityID);
+
                 db.collection("events").add(newEvent)
                         .addOnSuccessListener(documentReference -> {
                             Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
-                            // Navigate back to FacilityFragment
                             Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
                         })
                         .addOnFailureListener(e ->
                                 Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
 
-                } catch (Exception e) {
-                    Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
-                }
-
-                // TODO: Save the event in a list or database
-
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return root;
     }
 
+    /**
+     * Displays a date picker dialog and updates the associated button and date variables.
+     *
+     * @param button      The button to update with the selected date.
+     * @param isEventDate Indicates if the date is for the event date or registration deadline.
+     */
     private void showDatePicker(Button button, boolean isEventDate) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -146,7 +160,6 @@ public class AddEventFragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 getContext(),
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    // Format and display the selected date
                     Calendar selectedDate = Calendar.getInstance();
                     selectedDate.set(selectedYear, selectedMonth, selectedDay);
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -164,6 +177,12 @@ public class AddEventFragment extends Fragment {
         datePickerDialog.show();
     }
 
+    /**
+     * Displays a time picker dialog and updates the associated button and time variables.
+     *
+     * @param button     The button to update with the selected time.
+     * @param isStartTime Indicates if the time is for the event start time or end time.
+     */
     private void showTimePicker(Button button, boolean isStartTime) {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -172,7 +191,6 @@ public class AddEventFragment extends Fragment {
         TimePickerDialog timePickerDialog = new TimePickerDialog(
                 getContext(),
                 (view, selectedHour, selectedMinute) -> {
-                    // Format and display the selected time
                     String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
                     button.setText(formattedTime);
 
@@ -189,20 +207,46 @@ public class AddEventFragment extends Fragment {
         timePickerDialog.show();
     }
 
-    private String getFacilityID(String uniqueID) {
-        final String[] facilityID = new String[1];
-        Query facility = db.collection("facilities").whereEqualTo("owner_id", uniqueID);
-        facility.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        facilityID[0] = document.getId();
-                    }
+    /**
+     * Retrieves the facility ID associated with the given unique ID.
+     *
+     * @param uniqueID The unique ID of the user.
+     * @param listener Callback to return the facility ID.
+     */
+    private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
+        Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
+        facility.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    listener.onFacilityIDFetched(document.getId());
+                    return; // Stop after finding the first match
                 }
             }
+            listener.onFacilityIDFetched(null); // No match found
         });
-        return facilityID[0];
+    }
+
+    /**
+     * Fetches the facility ID for the current user and stores it in the facilityID variable.
+     *
+     * @param uniqueID The unique ID of the user.
+     */
+    public void fetchFacilityID(String uniqueID) {
+        getFacilityID(uniqueID, id -> {
+            facilityID = id; // Store the facility ID
+            if (facilityID != null) {
+                System.out.println("Fetched Facility ID: " + facilityID);
+            } else {
+                System.out.println("No Facility ID found for organizer_id: " + uniqueID);
+            }
+        });
+    }
+
+    /**
+     * Callback interface for fetching facility ID.
+     */
+    public interface OnFacilityIDFetchedListener {
+        void onFacilityIDFetched(String facilityID);
     }
 
     @Override
@@ -210,4 +254,6 @@ public class AddEventFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
 }
