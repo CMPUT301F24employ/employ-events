@@ -1,4 +1,4 @@
-package com.example.employ_events.ui;
+package com.example.employ_events.ui.entrants;
 
 import android.os.Bundle;
 import android.widget.Toast;
@@ -42,7 +42,7 @@ public class EntrantsActivity extends AppCompatActivity {
 
     private void fetchWaitingListEntrants() {
         if (eventId != null) {
-            db.collection("events").document(eventId)
+            db.collection("com/example/employ_events/ui/events").document(eventId)
                     .collection("waitingList")
                     .get()
                     .addOnCompleteListener(task -> {

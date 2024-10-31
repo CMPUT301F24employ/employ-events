@@ -9,5 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="button_colour">#3D5AFE</color>
     <color name="primary_blue">#3D5AFE</color>
+    <color name="lighter_blue">#97a5f3</color>
+    <color name="blue_light_background">#edf2fb</color>
+    <color name="screen_background_colour">#4652A6</color>
 
 </resources>

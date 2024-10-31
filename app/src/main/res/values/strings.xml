@@ -2,8 +2,8 @@
     <string name="app_name">Employ-Events</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">Employ Events</string>
+    <string name="nav_header_subtitle">Join or create an event today!</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
@@ -30,4 +30,13 @@
     <string name="remove">Remove</string>
     <string name="confirm">Confirm</string>
     <string name="scan_qr_code">Scan QR Code</string>
+    <string name="Notifications">Notification</string>
+    <string name="clearAll">clearAll</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_facility_name">Enter Facility Name</string>
+    <string name="enter_facility_email_address">Enter Facility Email Address</string>
+    <string name="enter_facility_phone_number_optional">Enter Facility Phone Number (Optional)</string>
+    <string name="search_for_facility_address_above">Search for Facility Address Above</string>
+    <string name="enter_facility_address">Enter Facility Address</string>
 </resources>

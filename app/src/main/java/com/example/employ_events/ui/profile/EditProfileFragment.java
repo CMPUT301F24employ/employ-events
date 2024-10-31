@@ -1,13 +1,15 @@
 package com.example.employ_events.ui.profile;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings.Secure;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -17,8 +19,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentEditProfileBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -37,19 +37,12 @@ public class EditProfileFragment extends Fragment {
 
     private FragmentEditProfileBinding binding;
     private EditText editName, editEmail, editPhone;
-    private SwitchCompat organizer_notifications, admin_notifications;
+    //private SwitchCompat organizer_notifications, admin_notifications;
     private Button confirmButton, uploadButton, removeButton;
     private CollectionReference profilesRef;
     ImageView userPFP;
 
-    /**
-     * Creates the view hierarchy associated with this fragment.
-     *
-     * @param inflater           The LayoutInflater object that can be used to inflate views in the fragment.
-     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
-     * @return The root view of the fragment's layout.
-     */
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         EditProfileViewModel editProfileViewModel =
@@ -58,22 +51,23 @@ public class EditProfileFragment extends Fragment {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+
         initializeViews();
 
-        String android_id = Secure.getString(requireContext().getContentResolver(), Secure.ANDROID_ID);
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID;
+        uniqueID = sharedPreferences.getString("uniqueID", null);
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         profilesRef = db.collection("userProfiles");
 
-        // If profile exists, display the profile information.
-        DocumentReference docRef = profilesRef.document(android_id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        displayProfile(document, editProfileViewModel);
-                    }
+        // Display the profile information.
+        DocumentReference docRef = profilesRef.document(uniqueID);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    displayProfile(document, editProfileViewModel);
                 }
             }
         });
@@ -82,12 +76,7 @@ public class EditProfileFragment extends Fragment {
                 NavHostFragment.findNavController(EditProfileFragment.this)
                         .navigate(R.id.action_nav_edit_profile_to_nav_upload_image));
 
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editProfile(profilesRef, android_id);
-            }
-        });
+        confirmButton.setOnClickListener(view -> editProfile(profilesRef, uniqueID));
 
         return root;
     }
@@ -103,8 +92,8 @@ public class EditProfileFragment extends Fragment {
         uploadButton = binding.uploadProfileImage;
         removeButton = binding.removeProfileImage;
         userPFP = binding.userPFP;
-        organizer_notifications = binding.profileOrganizerNotificationStatus;
-        admin_notifications = binding.profileAdminNotificationStatus;
+        //organizer_notifications = binding.profileOrganizerNotificationStatus;
+        //admin_notifications = binding.profileAdminNotificationStatus;
     }
 
     /**
@@ -113,8 +102,8 @@ public class EditProfileFragment extends Fragment {
      * @param editProfileViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, EditProfileViewModel editProfileViewModel) {
-        organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
-        admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
+        //organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
+        //admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
         // if NULL, it will be blank. Otherwise, display the users info.
         if (document.get("name") != null) {
             editName.setText(Objects.requireNonNull(document.get("name")).toString());
@@ -134,9 +123,9 @@ public class EditProfileFragment extends Fragment {
      * Edits the user's profile based on the input fields and updates the Firestore database.
      *
      * @param profilesRef The Firestore collection reference for user profiles.
-     * @param android_id The unique identifier for the user's device.
+     * @param uniqueID The unique identifier for the user's device.
      */
-    private void editProfile(CollectionReference profilesRef, String android_id) {
+    private void editProfile(CollectionReference profilesRef, String uniqueID) {
         Map<String, Object> data = new HashMap<>();
         String name = editName.getText().toString().trim();
         String email = editEmail.getText().toString().trim();
@@ -151,20 +140,22 @@ public class EditProfileFragment extends Fragment {
         else {
             data.put("name", editName.getText().toString());
             data.put("email", editEmail.getText().toString());
-            data.put("phoneNumber", editPhone.getText().toString());
-            data.put("organizerNotifications", organizer_notifications.isChecked());
-            data.put("adminNotifications", admin_notifications.isChecked());
+            int phone;
+            if (editPhone.getText().toString().trim().isEmpty()) {
+                phone = 0;
+            }
+            else {
+                phone = Integer.parseInt(editPhone.getText().toString().trim());
+            }
+            data.put("phoneNumber", phone);
 
-            profilesRef.document(android_id).set(data, SetOptions.merge());
-
+            profilesRef.document(uniqueID).set(data, SetOptions.merge());
+            Toast.makeText(getActivity(), "Profile Updated!", Toast.LENGTH_SHORT).show();
             NavHostFragment.findNavController(EditProfileFragment.this)
                     .navigate(R.id.action_nav_edit_profile_pop);
         }
     }
 
-    /**
-     * Cleans up resources when the view is destroyed.
-     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

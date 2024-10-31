@@ -1,10 +1,10 @@
-package com.example.employ_events;
+package com.example.employ_events.ui.profile;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,23 +13,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.employ_events.R;
+
 /**
  * A fragment that displays a dialog for creating a new user profile.
  * The user must enter their name and email address to create the profile.
  */
 public class NewProfileFragment extends DialogFragment {
-    private String android_id;
     private NewProfileDialogListener listener;
 
     /**
      * Interface for communicating with the host activity.
      */
-    interface NewProfileDialogListener {
+    public interface NewProfileDialogListener {
         /**
          * Called when a new profile is added.
-         * @param profile the new profile to be added
+         *
          */
-        void addProfile(Profile profile);
+        void provideInfo(String name, String email, String uniqueID);
     }
 
     @Override
@@ -52,8 +53,9 @@ public class NewProfileFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        android_id = Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID;
+        uniqueID = sharedPreferences.getString("uniqueID", null);
         View view = getLayoutInflater().inflate(R.layout.provide_info, null);
         EditText edit_name = view.findViewById(R.id.editName);
         EditText edit_email = view.findViewById(R.id.editEmailAddress);
@@ -85,7 +87,7 @@ public class NewProfileFragment extends DialogFragment {
                     edit_email.setError("Email cannot be empty");
                     edit_email.requestFocus();
                 } else {
-                    listener.addProfile(new Profile(android_id, name, email));
+                    listener.provideInfo(name, email, uniqueID);
                     dialog.dismiss(); // Dismiss the dialog if input is valid
                 }
             });

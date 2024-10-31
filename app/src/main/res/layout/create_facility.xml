@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:background="@drawable/white_card_background"
+    android:padding="16dp"
+    android:layout_marginBottom="16dp"
+    android:elevation="4dp">
+
+    <EditText
+        android:id="@+id/editFacilityName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_facility_name"
+        android:padding="10dp"
+        android:background="@drawable/input_background"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:layout_marginBottom="10dp"
+        android:textColorLink="#3D5AFE" />
+
+    <EditText
+        android:id="@+id/editFacilityEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_background"
+        android:padding="10dp"
+        android:hint="@string/enter_facility_email_address"
+        android:inputType="textEmailAddress"
+        android:minHeight="48dp"
+        android:layout_marginBottom="10dp"
+        android:textColorLink="#3D5AFE" />
+
+
+    <EditText
+        android:id="@+id/editFacilityPhone"
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_background"
+        android:hint="@string/enter_facility_phone_number_optional"
+        android:inputType="phone"
+        android:minHeight="48dp"
+        android:layout_marginBottom="10dp"
+        android:textColorLink="#3D5AFE" />
+
+    <EditText
+        android:id="@+id/editFacilityAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/input_background"
+        android:padding="10dp"
+        android:hint="@string/enter_facility_address"
+        android:inputType="textPostalAddress"
+        android:minHeight="48dp" />
+
+</LinearLayout>
