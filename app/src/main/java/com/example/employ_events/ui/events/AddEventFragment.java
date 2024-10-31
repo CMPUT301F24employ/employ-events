@@ -1,9 +1,15 @@
 package com.example.employ_events.ui.events;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +17,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -27,6 +36,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -44,6 +55,9 @@ public class AddEventFragment extends Fragment {
     private Time eventStartTime, eventEndTime;
     private FirebaseFirestore db;
     private String facilityID; // Variable to hold the facility ID
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int STORAGE_PERMISSION_CODE = 100;
+    private Uri bannerUri;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,6 +77,8 @@ public class AddEventFragment extends Fragment {
         Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
         CheckBox geoLocation = binding.geolocationStatus;
+        Button uploadBannerButton = binding.uploadBannerButton;
+        ImageView bannerImageView = binding.bannerImage;
 
         // Unique ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -79,6 +95,13 @@ public class AddEventFragment extends Fragment {
         // Time picker dialogs
         startTimeButton.setOnClickListener(view -> showTimePicker(startTimeButton, true));
         endTimeButton.setOnClickListener(view -> showTimePicker(endTimeButton, false));
+
+        // Check for storage permission
+        checkStoragePermission();
+
+        // Set click listener for the upload banner button
+        uploadBannerButton.setOnClickListener(v -> openImageChooser());
+
 
         // Save event button click listener
         saveButton.setOnClickListener(view -> {
@@ -128,6 +151,12 @@ public class AddEventFragment extends Fragment {
                 }
 
                 newEvent.setFacilityID(facilityID);
+
+                if (bannerUri != null) {
+                    uploadBannerAndSaveEvent(newEvent, view);
+                } else {
+                    saveEvent(newEvent, view);
+                }
 
                 db.collection("events").add(newEvent)
                         .addOnSuccessListener(documentReference -> {
@@ -247,6 +276,63 @@ public class AddEventFragment extends Fragment {
      */
     public interface OnFacilityIDFetchedListener {
         void onFacilityIDFetched(String facilityID);
+    }
+
+    private void openImageChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Banner"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            bannerUri = data.getData();
+            binding.bannerImage.setImageURI(bannerUri);
+            binding.bannerImage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void uploadBannerAndSaveEvent(Event newEvent, View view) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
+        storageRef.putFile(bannerUri)
+                .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    newEvent.setBannerUrl(uri.toString());
+                    saveEvent(newEvent, view);
+                }))
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
+    }
+
+    private void saveEvent(Event newEvent, View view) {
+        db.collection("events").add(newEvent)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
+                    // Navigate back or to another fragment
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
+    }
+
+    private void checkStoragePermission() {
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_CODE);
+        }
+
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
