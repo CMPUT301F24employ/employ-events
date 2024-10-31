@@ -63,6 +63,7 @@ public class AddEventFragment extends Fragment {
         EditText descriptionInput = binding.description;
         EditText limitInput = binding.limit;
         EditText feeInput = binding.fee;
+        EditText eventCapacityInput = binding.eventCapacity;
         Button eventDateButton = binding.eventDate;
         Button registrationDeadlineButton = binding.registrationDateDeadline;
         Button registrationStartDeadlineButton = binding.registrationStartDeadline;
@@ -119,19 +120,21 @@ public class AddEventFragment extends Fragment {
                 String description = descriptionInput.getText().toString();
                 String limitString = limitInput.getText().toString();
                 String feeString = feeInput.getText().toString();
+                String eventCapacityString = eventCapacityInput.getText().toString();
 
-                if (eventDate == null || registrationDeadline == null) {
+                if (eventDate == null || registrationDeadline == null || eventCapacityString.isEmpty()) {
                     Toast.makeText(getContext(), "Please select all required fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 Event newEvent;
+                Integer eventCapacity = Integer.parseInt(eventCapacityString);
                 if (registrationStartDeadline != null) {
                     newEvent = new Event(
-                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID
+                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID, eventCapacity
                     );
                 } else {
-                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID);
+                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID, eventCapacity);
                 }
                 if (!limitString.isEmpty()) {
                     Integer limit = Integer.parseInt(limitString);
