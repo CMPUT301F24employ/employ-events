@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
 
@@ -39,7 +42,6 @@ public class ProfileFragment extends Fragment{
     private TextView name, email, phone_number;
     private Button editProfileButton;
     private ImageView pfp;
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -98,21 +100,21 @@ public class ProfileFragment extends Fragment{
         //organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
         //admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
         // if NULL, it will be blank. Otherwise, display the users info.
-        if (document.get("name") != null) {
+        if (document.getString("name") != null) {
             name.setText(Objects.requireNonNull(document.get("name")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
         }
-        if (document.get("email") != null) {
+        if (document.getString("email") != null) {
             email.setText(Objects.requireNonNull(document.get("email")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
         }
 
-        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+        if (document.getString("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
             phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
         }
-        if (document.get("pfpURI") != null) {
-            String uri = document.get("pfpURI").toString();
+        if (document.getString("pfpURI") != null) {
+            String uri = document.getString("pfpURI");
             loadImageFromUrl(uri);
         }
 
@@ -122,13 +124,19 @@ public class ProfileFragment extends Fragment{
         new Thread(() -> {
             try {
                 URL imageUrl = new URL(url);
-                Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
                 getActivity().runOnUiThread(() -> pfp.setImageBitmap(bitmap));
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
+
 
     @Override
     public void onDestroyView() {
