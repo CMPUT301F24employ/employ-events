@@ -2,15 +2,18 @@ package com.example.employ_events.ui.profile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -22,6 +25,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -31,9 +36,9 @@ import java.util.Objects;
 public class ProfileFragment extends Fragment{
 
     private FragmentProfileBinding binding;
-    //private SwitchCompat organizer_notifications, admin_notifications;
     private TextView name, email, phone_number;
     private Button editProfileButton;
+    private ImageView pfp;
 
 
     @Override
@@ -52,7 +57,7 @@ public class ProfileFragment extends Fragment{
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference profilesRef = db.collection("userProfiles");
 
-       initializeViews();
+        initializeViews();
 
         // Display the profile information.
         DocumentReference docRef = profilesRef.document(uniqueID);
@@ -76,12 +81,12 @@ public class ProfileFragment extends Fragment{
      * Initializes the views for the fragment.
      */
     private void initializeViews() {
-        //organizer_notifications = binding.profileOrganizerNotificationStatus;
-        //admin_notifications = binding.profileAdminNotificationStatus;
+
         name = binding.profileName;
         phone_number = binding.profilePhoneNumber;
         email = binding.profileEmail;
         editProfileButton = binding.editProfileButton;
+        pfp = binding.userPFP;
     }
 
     /**
@@ -106,8 +111,24 @@ public class ProfileFragment extends Fragment{
             phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
         }
+        if (document.get("pfpURI") != null) {
+            String uri = document.get("pfpURI").toString();
+            loadImageFromUrl(uri);
+        }
+
     }
 
+    private void loadImageFromUrl(String url) {
+        new Thread(() -> {
+            try {
+                URL imageUrl = new URL(url);
+                Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+                getActivity().runOnUiThread(() -> pfp.setImageBitmap(bitmap));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
     @Override
     public void onDestroyView() {
