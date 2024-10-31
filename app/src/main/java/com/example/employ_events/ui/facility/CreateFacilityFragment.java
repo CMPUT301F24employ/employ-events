@@ -16,14 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.employ_events.BuildConfig;
 import com.example.employ_events.R;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.api.model.Place;
-
-import java.util.Arrays;
 
 public class CreateFacilityFragment extends DialogFragment {
     private CreateFacilityDialogListener listener;
@@ -42,17 +35,10 @@ public class CreateFacilityFragment extends DialogFragment {
         }
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Initialize Places API
-        String apiKey = BuildConfig.MAPS_API_KEY;
-        Places.initialize(requireContext().getApplicationContext(), apiKey);
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
 
@@ -95,26 +81,6 @@ public class CreateFacilityFragment extends DialogFragment {
                     dialog.dismiss();
                 }
             });
-
-            // Set up the AutocompleteSupportFragment
-            AutocompleteSupportFragment autocompleteFragment =
-                    (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-            if (autocompleteFragment != null) {
-                autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ADDRESS));
-                autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                    @Override
-                    public void onPlaceSelected(@NonNull Place place) {
-                        Log.d("Place Data", "Retrieved place: " + place);
-                        editFacilityAddress.setText(place.getAddress()); // Update the EditText
-                    }
-
-                    @Override
-                    public void onError(@NonNull com.google.android.gms.common.api.Status status) {
-                        Log.e("Autocomplete Error", "An error occurred: " + status);
-                    }
-                });
-            }
 
             Button noButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
             noButton.setOnClickListener(v -> {

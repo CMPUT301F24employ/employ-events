@@ -35,4 +35,5 @@
     <string name="enter_facility_email_address">Enter Facility Email Address</string>
     <string name="enter_facility_phone_number_optional">Enter Facility Phone Number (Optional)</string>
     <string name="search_for_facility_address_above">Search for Facility Address Above</string>
+    <string name="enter_facility_address">Enter Facility Address</string>
 </resources>
