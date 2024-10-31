@@ -21,6 +21,8 @@ import com.example.employ_events.databinding.FragmentFacilityBinding;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.Objects;
 
@@ -56,7 +58,59 @@ public class FacilityFragment extends Fragment {
                 Navigation.findNavController(view).navigate(R.id.action_facilityFragment_to_eventListFragment)
         );
 
+        // Fetch the facility ID and display profile.
+        getFacilityID(uniqueID, facilityID -> {
+            if (facilityID != null) {
+                DocumentReference facilityRef = db.collection("facilities").document(facilityID);
+                facilityRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        displayProfile(document, facilityViewModel);
+                    }
+                });
+            } else {
+                Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return root;
+    }
+
+    /**
+     * Retrieves the facility ID associated with the given unique ID.
+     *
+     * @param uniqueID The unique ID of the user.
+     * @param listener Callback to return the facility ID.
+     */
+    private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
+        Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
+        facility.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    listener.onFacilityIDFetched(document.getId());
+                    return; // Stop after finding the first match
+                }
+            }
+            listener.onFacilityIDFetched(null); // No match found
+        });
+    }
+    private void displayProfile(DocumentSnapshot document, FacilityViewModel facilityViewModel) {
+        name.setText(Objects.requireNonNull(document.get("name")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
+        email.setText(Objects.requireNonNull(document.get("email")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
+        address.setText(Objects.requireNonNull(document.get("address")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), address::setText);
+        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+            phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
+            facilityViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
+        }
+    }
+    /**
+     * Callback interface for fetching facility ID.
+     */
+    public interface OnFacilityIDFetchedListener {
+        void onFacilityIDFetched(String facilityID);
     }
 
     private void setupUserProfile(String uniqueID, FacilityViewModel facilityViewModel) {
