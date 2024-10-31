@@ -68,7 +68,7 @@
         app:layout_constraintTop_toBottomOf="@+id/upload_profile_image">
 
         <TextView
-            android:id="@+id/name_textView"
+            android:id="@+id/facilityName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name"
@@ -93,7 +93,7 @@
             android:layout_height="10dp" />
 
         <TextView
-            android:id="@+id/email_TextView"
+            android:id="@+id/facilityEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/email"
@@ -118,7 +118,7 @@
             android:layout_height="10dp" />
 
         <TextView
-            android:id="@+id/phone_num_textView"
+            android:id="@+id/facilityPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLength="15"

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,15 +22,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
 import com.example.employ_events.ui.events.Event;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -46,6 +44,7 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
     private FirebaseFirestore db;
     private ArrayList<Event> eventList;
     private FacilityEventsAdapter eventsAdapter;
+    private TextView name, email, phone_number, address;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,6 +73,11 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
             }
         });
 
+        name = binding.facilityNameTV;
+        email = binding.facilityEmailTV;
+        phone_number = binding.facilityPhoneTV;
+        address = binding.facilityAddressTV;
+
         binding.createEventButton.setOnClickListener(view ->
                 Navigation.findNavController(view).navigate(R.id.action_facility_to_addEvent)
         );
@@ -86,10 +90,19 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
         eventsRecyclerView.setAdapter(eventsAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Fetch the facility ID and then query events
+        // Fetch the facility ID and then query events, display profile.
         getFacilityID(uniqueID, facilityID -> {
             if (facilityID != null) {
                 queryEvents(facilityID);
+
+                DocumentReference facilityRef = db.collection("facilities").document(facilityID);
+                facilityRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        displayProfile(document, facilityViewModel);
+                    }
+                });
+
             } else {
                 Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
             }
@@ -115,6 +128,24 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
             }
             listener.onFacilityIDFetched(null); // No match found
         });
+    }
+
+
+    private void displayProfile(DocumentSnapshot document, FacilityViewModel facilityViewModel) {
+
+        name.setText(Objects.requireNonNull(document.get("name")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
+
+        email.setText(Objects.requireNonNull(document.get("email")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
+
+        address.setText(Objects.requireNonNull(document.get("address")).toString());
+        facilityViewModel.getText().observe(getViewLifecycleOwner(), address::setText);
+
+        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+            phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
+            facilityViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
+        }
     }
 
     /**
