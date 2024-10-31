@@ -9,37 +9,52 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employ_events.R;
 import com.example.employ_events.ui.events.Event;
 
 import java.util.ArrayList;
 
-public class RegisteredArrayAdapter extends ArrayAdapter<Event> {
+public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArrayAdapter.ViewHolder> {
     private ArrayList<Event> registeredEvents;
     private Context context;
 
+    // Constructor for initialization
     public RegisteredArrayAdapter(Context context, ArrayList<Event> registeredEvents) {
-        super(context, 0, registeredEvents);
         this.registeredEvents = registeredEvents;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View view = convertView;
+    public RegisteredArrayAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_registered_events, parent, false);
 
-        if(view == null){
-            view = LayoutInflater.from(context).inflate(R.layout.event_details, parent,false);
+        // Passing view to ViewHolder
+        //RegisteredArrayAdapter.ViewHolder viewHolder = new RegisteredArrayAdapter(view);
+        //return viewHolder;
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RegisteredArrayAdapter.ViewHolder holder, int position) {
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return registeredEvents.size();
+    }
+
+    // Initializing the Views
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView name;
+
+        public ViewHolder(@NonNull View view) {
+            super(view);
+            name = view.findViewById(R.id.eventName);
         }
-
-        Event event = registeredEvents.get(position);
-
-        TextView eventName = view.findViewById(R.id.eventName);
-        eventName.setText(event.getEventTitle());
-
-        return view;
     }
 }
 
