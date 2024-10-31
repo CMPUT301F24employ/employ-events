@@ -25,6 +25,7 @@ public class Event {
     private String organizerID;
     private Integer fee;
     private String facilityID;
+    private String bannerUrl;
 
     /**
      * Empty constructor for displaying only some details of an event.
@@ -54,6 +55,15 @@ public class Event {
     }
 
     //Getters and setters
+
+    // Getter and setter for bannerUrl
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
+    }
 
     public String getEventTitle() {
         return eventTitle;
