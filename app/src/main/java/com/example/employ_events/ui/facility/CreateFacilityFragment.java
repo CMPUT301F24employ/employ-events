@@ -48,10 +48,6 @@ public class CreateFacilityFragment extends DialogFragment {
         EditText editFacilityEmail = view.findViewById(R.id.editFacilityEmail);
         EditText editFacilityPhone = view.findViewById(R.id.editFacilityPhone);
 
-        editFacilityAddress.setClickable(false);
-        editFacilityAddress.setFocusable(false);
-        editFacilityAddress.setFocusableInTouchMode(false);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(view)
                 .setTitle("Create Facility")

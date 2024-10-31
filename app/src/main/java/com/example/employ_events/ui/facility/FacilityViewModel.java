@@ -14,7 +14,6 @@ public class FacilityViewModel extends ViewModel {
 
     public FacilityViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is facility fragment");
     }
 
     public LiveData<String> getText() {
