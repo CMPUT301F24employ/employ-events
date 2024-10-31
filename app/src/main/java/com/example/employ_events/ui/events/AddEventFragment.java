@@ -157,10 +157,11 @@ public class AddEventFragment extends Fragment {
                 newEvent.setFacilityID(facilityID);
 
                 if (bannerUri != null) {
-                    uploadBannerAndSaveEvent(newEvent, view);
+                    uploadBannerAndSaveEvent(newEvent);
                 } else {
-                    saveEvent(newEvent, view);
+                    saveEvent(newEvent);
                 }
+                Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
 
 
             } catch (Exception e) {
@@ -288,25 +289,22 @@ public class AddEventFragment extends Fragment {
         }
     }
 
-    private void uploadBannerAndSaveEvent(Event newEvent, View view) {
+    private void uploadBannerAndSaveEvent(Event newEvent) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(bannerUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     newEvent.setBannerUrl(uri.toString());
-                    saveEvent(newEvent, view);
+                    saveEvent(newEvent);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
-        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
     }
 
-    private void saveEvent(Event newEvent, View view) {
+    private void saveEvent(Event newEvent) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_nav_facility);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
-
     }
 
     private void checkStoragePermission() {

@@ -142,7 +142,7 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
         address.setText(Objects.requireNonNull(document.get("address")).toString());
         facilityViewModel.getText().observe(getViewLifecycleOwner(), address::setText);
 
-        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+        if (document.get("phoneNumber") != null) {
             phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
             facilityViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
         }
