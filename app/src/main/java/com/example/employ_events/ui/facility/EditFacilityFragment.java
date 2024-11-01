@@ -260,7 +260,7 @@ public class EditFacilityFragment extends Fragment {
         Map<String, Object> data = new HashMap<>();
         data.put("name", editProfile.getName());
         data.put("email", editProfile.getEmail());
-        data.put("phone_umber", editProfile.getPhone_number());
+        data.put("phone_number", editProfile.getPhone_number());
         data.put("address", editProfile.getAddress());
         data.put("facilityPfpUri", editProfile.getFacilityPfpUri());
         db.collection("facilities").document(facilityID).set(data, SetOptions.merge())
