@@ -2,11 +2,14 @@ package com.example.employ_events.ui.facility;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +27,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -34,6 +41,7 @@ public class FacilityFragment extends Fragment {
     private FragmentFacilityBinding binding;
     private FirebaseFirestore db;
     private TextView name, email, phone_number, address;
+    private ImageView facilityPFP;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +60,7 @@ public class FacilityFragment extends Fragment {
         email = binding.facilityEmailTV;
         phone_number = binding.facilityPhoneTV;
         address = binding.facilityAddressTV;
+        facilityPFP = binding.facilityPFP;
 
         // Button to navigate to EventListFragment to view events
         binding.viewEventButton.setOnClickListener(view ->
@@ -72,6 +81,10 @@ public class FacilityFragment extends Fragment {
                 Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        binding.editFacilityButton.setOnClickListener(view ->
+                        Navigation.findNavController(view).navigate(R.id.action_nav_facility_to_nav_edit_facility)
+                );
 
         return root;
     }
@@ -101,10 +114,31 @@ public class FacilityFragment extends Fragment {
         facilityViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
         address.setText(Objects.requireNonNull(document.get("address")).toString());
         facilityViewModel.getText().observe(getViewLifecycleOwner(), address::setText);
-        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
-            phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
+        if (document.get("phone_number") != null) {
+            phone_number.setText(Objects.requireNonNull(document.get("phone_number")).toString());
             facilityViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
         }
+        if (document.get("facilityPfpUri") != null) {
+            String uri = document.getString("facilityPfpUri");
+            loadImageFromUrl(uri);
+        }
+    }
+
+    private void loadImageFromUrl(String url) {
+        new Thread(() -> {
+            try {
+                URL imageUrl = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                getActivity().runOnUiThread(() -> facilityPFP.setImageBitmap(bitmap));
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
+            }
+        }).start();
     }
     /**
      * Callback interface for fetching facility ID.
