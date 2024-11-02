@@ -85,6 +85,7 @@ public class EditProfileFragment extends Fragment {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     displayProfile(document, editProfileViewModel);
+                    isInitialLoad = Boolean.TRUE.equals(document.getBoolean("customPFP"));
                 }
             }
         });
@@ -224,7 +225,6 @@ public class EditProfileFragment extends Fragment {
             profile.setName(name);
             profile.setEmail(email);
             profile.setPhoneNumber(phone.isEmpty() ? null : phone);
-            // Handle profile picture logic
             if (pfpUri != null) { // User uploaded a custom profile picture
                 profile.setCustomPFP(true); // Set custom PFP flag to true
                 uploadPFPAndSaveProfile(profile, onComplete); // Upload custom PFP
@@ -241,26 +241,6 @@ public class EditProfileFragment extends Fragment {
                 profile.setCustomPFP(false); // Set custom PFP flag to false
                 saveProfile(profile, uniqueID, onComplete); // Save profile data to Firestore
             }
-
-
-            /*if (pfpUri != null && isInitialLoad) {
-                // User uploaded a custom profile picture
-                profile.setCustomPFP(true);  // Set custom PFP flag to true
-                uploadPFPAndSaveProfile(profile);
-            }
-            else { // Use auto-generated profile picture based on initial
-                String imagePath;
-                if (!Character.isLetter(name.charAt(0))) {
-                    imagePath = "autoPFP/" + "Other.png";
-                }
-                else {
-                    String initial = name.substring(0, 1).toUpperCase();
-                    imagePath = "autoPFP/" + initial + ".png";
-                }
-                profile.setPfpURI("https://firebasestorage.googleapis.com/v0/b/employ-events.appspot.com/o/" + Uri.encode(imagePath) + "?alt=media"); // Save path for auto-generated PFP
-                profile.setCustomPFP(false); // Set custom PFP flag to false
-                saveProfile(profile, uniqueID);
-            }*/
         }
     }
 
