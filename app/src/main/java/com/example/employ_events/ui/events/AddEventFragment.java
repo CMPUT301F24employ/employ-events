@@ -295,11 +295,11 @@ public class AddEventFragment extends Fragment {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(bannerUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    newEvent.setBannerUrl(uri.toString());
+                    newEvent.setBannerUri(uri.toString());
                     saveEvent(newEvent, view);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
-        Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
+
     }
 
     private void saveEvent(Event newEvent, View view) {
