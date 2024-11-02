@@ -1,6 +1,7 @@
 package com.example.employ_events.ui.registeredEvents;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import java.util.Objects;
 public class EventDetailsFragment extends Fragment {
 
     private EventDetailsBinding binding;
-    private TextView name, fee, description;
+    private TextView name, fee, description, date, facility, location, geolocation, deadline;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -39,22 +40,22 @@ public class EventDetailsFragment extends Fragment {
         assert getArguments() != null;
         String eventId = getArguments().getString("EVENT_ID");
         db = FirebaseFirestore.getInstance();
-        eventsRef = db.collection("waitinglist");
+        //eventsRef = db.collection("waitinglist");
 
 
         initializeViews();
 
-        assert eventId != null;
-        DocumentReference eventRef = db.collection("events").document(eventId);
-        eventRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    displayDetails(document, galleryViewModel);
+        if (eventId != null) {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+            eventRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        displayDetails(document, galleryViewModel);
+                    }
                 }
-            }
-        });
-
+            });
+        }
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
         joinButton.setOnClickListener(new View.OnClickListener() {
@@ -71,12 +72,47 @@ public class EventDetailsFragment extends Fragment {
         name = binding.eventName;
         description = binding.eventDescription;
         fee = binding.fee;
+        date = binding.eventDates;
+        facility = binding.faciltyName;
+        location = binding.eventLocation;
+        deadline = binding.registrationDeadline;
+        geolocation = binding.geolocationStatus;
     }
 
     private void displayDetails(DocumentSnapshot document, DetailsViewModel galleryViewModel) {
         if (document.get("eventTitle") != null) {
-            name.setText(Objects.requireNonNull(document.get("name")).toString());
+            name.setText(Objects.requireNonNull(document.get("eventTitle")).toString());
             galleryViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
+        }
+
+        if (document.get("eventDate") != null) {
+            date.setText(Objects.requireNonNull(document.get("eventDate")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), date::setText);
+        }
+
+        if (document.get("registrationDateDeadline") != null) {
+            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
+        }
+
+        if (document.get("registrationDateDeadline") != null) {
+            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
+        }
+
+        if (document.get("geoLocation") != null) {
+            geolocation.setText(Objects.requireNonNull(document.get("geoLocation")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), geolocation::setText);
+        }
+
+        if (document.get("description") != null) {
+            description.setText(Objects.requireNonNull(document.get("description")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), description::setText);
+        }
+
+        if (document.get("fee") != null) {
+            fee.setText(Objects.requireNonNull(document.get("fee")).toString());
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), fee::setText);
         }
     }
 
