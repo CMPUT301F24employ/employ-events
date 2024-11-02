@@ -24,7 +24,6 @@ public class Event {
     private Date registrationStartDate;
     private Boolean geoLocation;
     private String description;
-    private String imageUri;
     private Integer limited;
     private Time endTime;
     private Time startTime;
@@ -32,7 +31,7 @@ public class Event {
     private Integer fee;
     private Integer eventCapacity;
     private String facilityID;
-    private String bannerUrl;
+    private String bannerUri;
     private ArrayList<Entrant> entrantsList;
 
     /**
@@ -66,12 +65,12 @@ public class Event {
     //Getters and setters
 
     // Getter and setter for bannerUrl
-    public String getBannerUrl() {
-        return bannerUrl;
+    public String getBannerUri() {
+        return bannerUri;
     }
 
-    public void setBannerUrl(String bannerUrl) {
-        this.bannerUrl = bannerUrl;
+    public void setBannerUri(String bannerUri) {
+        this.bannerUri = bannerUri;
     }
 
     public String getEventTitle() {
@@ -120,14 +119,6 @@ public class Event {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getImage() {
-        return imageUri;
-    }
-
-    public void setImage(String imageURI) {
-        this.imageUri = imageURI;
     }
 
     public Integer getLimited() {
