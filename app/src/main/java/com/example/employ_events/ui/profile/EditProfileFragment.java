@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -36,7 +38,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ import java.util.Objects;
 /**
  * A fragment that allows users to edit their profile information.
  * This fragment interacts with Firestore to retrieve and update user profiles.
+ * This fragment auto generates a profile picture if no custom one is provided.
  */
 public class EditProfileFragment extends Fragment {
 
@@ -53,11 +55,11 @@ public class EditProfileFragment extends Fragment {
     private Button confirmButton, uploadButton, removeButton;
     private CollectionReference profilesRef;
     private ImageView userPFP;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int STORAGE_PERMISSION_CODE = 100;
     private Uri pfpUri;
-    private FirebaseFirestore db;
     private boolean isInitialLoad = true;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -68,17 +70,48 @@ public class EditProfileFragment extends Fragment {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
+        // Initialize the UI components for the fragment
         initializeViews();
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
-        uniqueID = sharedPreferences.getString("uniqueID", null);
+        // Initialize the ActivityResultLauncher for requesting permission
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permission was granted
+                        Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Permission was denied
+                        Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
-        db = FirebaseFirestore.getInstance();
+        // Initialize the ActivityResultLauncher for picking an image.
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // Handle the image selection
+                        pfpUri = result.getData().getData();
+                        userPFP.setImageURI(pfpUri);
+                        userPFP.setVisibility(View.VISIBLE);
+                        removeButton.setVisibility(View.VISIBLE);
+                        isInitialLoad = false;
+                    }
+                }
+        );
+
+        // Retrieve uniqueID from SharedPreferences for Firestore lookup
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
+
+        // Initialize Firestore database instance  and set reference to "userProfiles" collection
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         profilesRef = db.collection("userProfiles");
 
-        // Display the profile information.
+        // Display the profile information if uniqueID is available
+        assert uniqueID != null;
         DocumentReference docRef = profilesRef.document(uniqueID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -89,35 +122,30 @@ public class EditProfileFragment extends Fragment {
                 }
             }
         });
-        // Check for storage permission
-        checkStoragePermission();
 
         // Initially hide the remove button
         removeButton.setVisibility(View.GONE);
 
-        // Set click listener for the upload banner button
-        uploadButton.setOnClickListener(v -> openImageChooser());
+        // Set click listener for the upload pfp button
+        uploadButton.setOnClickListener(v -> pickImage());
 
-        // Set click listener for the remove banner button
+        // Set click listener for the remove pfp button
         removeButton.setOnClickListener(v -> {
-            pfpUri = null; // Clear the banner URI
+            pfpUri = null; // Clear the pfp URI
             userPFP.setImageDrawable(null); // Clear the displayed image
             removeButton.setVisibility(View.GONE); // Hide the remove button
             isInitialLoad = false;
         });
 
-        confirmButton.setOnClickListener(view -> {
-            editProfile(uniqueID, () -> {
-                NavHostFragment.findNavController(EditProfileFragment.this)
-                        .navigate(R.id.action_nav_edit_profile_to_nav_profile);
-            });
-        });
+        // Navigate to the profile screen when the changes are confirmed.
+        confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(EditProfileFragment.this)
+                .navigate(R.id.action_nav_edit_profile_to_nav_profile)));
 
         return root;
     }
 
     /**
-     * Initializes the views for the fragment.
+     * Initializes the views for the fragment by binding UI elements to variables.
      */
     private void initializeViews() {
         editName = binding.editTextUserName;
@@ -127,8 +155,6 @@ public class EditProfileFragment extends Fragment {
         uploadButton = binding.uploadPFP;
         removeButton = binding.removePFP;
         userPFP = binding.userPFP;
-
-
     }
 
     /**
@@ -152,21 +178,28 @@ public class EditProfileFragment extends Fragment {
             editProfileViewModel.getText().observe(getViewLifecycleOwner(), editPhone::setText);
         }
 
-        boolean isCustomPFP = document.getBoolean("customPFP") != null && document.getBoolean("customPFP");
+        boolean isCustomPFP = document.getBoolean("customPFP") != null && Boolean.TRUE.equals(document.getBoolean("customPFP"));
 
         if (isCustomPFP && document.get("pfpURI") != null) {
             // Load custom profile picture
-            String uri = document.get("pfpURI").toString();
+            String uri = Objects.requireNonNull(document.get("pfpURI")).toString();
             loadImageFromUrl(uri);
             removeButton.setVisibility(View.VISIBLE);
         } else {
             // Load auto-generated profile picture based on user initial
-            String name = document.get("name") != null ? document.get("name").toString() : "-";
+            String name = document.get("name") != null ? Objects.requireNonNull(document.get("name")).toString() : "-";
             loadDefaultProfileImage(name);
         }
 
     }
 
+    /**
+     * Loads a default profile picture based on the initial of the user's name.
+     * If the initial is not a letter, or if an image is not found for that initial, a fallback image is used.
+     * The image is retrieved from Firebase Storage and displayed in the UI.
+     *
+     * @param name The name of the user, used to determine the initial for the profile picture.
+     */
     private void loadDefaultProfileImage(String name) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference fallbackRef = storage.getReference().child("autoPFP/Other.png");
@@ -174,38 +207,40 @@ public class EditProfileFragment extends Fragment {
         if (name == null || name.trim().isEmpty() || !Character.isLetter(name.charAt(0))) {
             // If name is null, empty, or starts with a non-letter, load fallback image
             fallbackRef.getDownloadUrl().addOnSuccessListener(fallbackUri -> loadImageFromUrl(fallbackUri.toString()));
-            return; // Exit the method early
+            return;
         }
 
-        String initial = name.substring(0, 1).toUpperCase(); // Get the first letter of the name
-        String imagePath = "autoPFP/" + initial + ".png"; // Adjust this path to match your Firebase Storage
+        String initial = name.substring(0, 1).toUpperCase();
+        String imagePath = "autoPFP/" + initial + ".png";
 
         // Get the reference to the image in Firebase Storage
         StorageReference storageRef = storage.getReference().child(imagePath);
 
         // Retrieve the download URL for the image and load it
         storageRef.getDownloadUrl().addOnSuccessListener(uri -> loadImageFromUrl(uri.toString())).addOnFailureListener(e -> {
-            // Handle errors or set a fallback image
+            // Set a fallback image
             fallbackRef.getDownloadUrl().addOnSuccessListener(fallbackUri -> loadImageFromUrl(fallbackUri.toString()));
         });
     }
 
+    /**
+     * Loads an image from a URL and displays it in the ImageView.
+     * @param url The URL of the image to be loaded.
+     */
     private void loadImageFromUrl(String url) {
         new Thread(() -> {
             try {
                 URL imageUrl = new URL(url);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-                getActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
+                requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("EditProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
 
     /**
      * Edits the user's profile based on the input fields and updates the Firestore database.
-     *
-     *
      * @param uniqueID The unique identifier for the user's device.
      */
     private void editProfile(String uniqueID, Runnable onComplete) {
@@ -244,25 +279,25 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    private void openImageChooser() {
-        Intent intent = new Intent();
+    /**
+     * Launches the image picker intent to select a profile picture.
+     */
+    private void pickImage() {
+        // Check for storage permission
+        checkAndRequestStoragePermission();
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select PFP"), PICK_IMAGE_REQUEST);
+        pickImageLauncher.launch(intent);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            pfpUri = data.getData();
-            userPFP.setImageURI(pfpUri);
-            userPFP.setVisibility(View.VISIBLE);
-            removeButton.setVisibility(View.VISIBLE);
-            isInitialLoad = false;
-        }
-    }
-
+    /**
+     * Uploads a custom profile picture to Firebase Storage and updates the user's profile with the image URI.
+     * After successfully uploading, the `saveProfile` method is called to update the profile data in Firestore.
+     *
+     * @param editProfile The Profile object representing the user's profile.
+     * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
+     */
     private void uploadPFPAndSaveProfile(Profile editProfile, Runnable onComplete) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(pfpUri)
@@ -273,42 +308,40 @@ public class EditProfileFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading pfp!", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Saves the user's profile information in Firestore.
+     * The data is saved under the document ID `uniqueID`, with fields for name, email, phone number, profile picture URI, and custom profile picture flag.
+     *
+     * @param editProfile The Profile object representing the user's profile.
+     * @param uniqueID    The unique identifier for the user's document in Firestore.
+     * @param onComplete  A callback to execute after successfully saving the profile data in Firestore.
+     */
     private void saveProfile(Profile editProfile, String uniqueID, Runnable onComplete) {
         Map<String, Object> data = new HashMap<>();
         data.put("name", editProfile.getName());
         data.put("email", editProfile.getEmail());
         data.put("phoneNumber", editProfile.getPhoneNumber());
         data.put("pfpURI", editProfile.getPfpURI());
-        data.put("customPFP", editProfile.isCustomPFP()); // Save custom PFP flag
+        data.put("customPFP", editProfile.isCustomPFP());
         profilesRef.document(uniqueID).set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     if (onComplete != null) {
                         onComplete.run(); // Call the callback after successful update
                     }
                 })
-                .addOnFailureListener(e -> {
-                    // Handle errors here
-                    Toast.makeText(getContext(), "Error updating profile!", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating profile!", Toast.LENGTH_SHORT).show());
     }
 
-    private void checkStoragePermission() {
+    /**
+     * Checks if storage permission is granted and requests it if necessary.
+     */
+    private void checkAndRequestStoragePermission() {
+        String permission = PERMISSION_READ_MEDIA_IMAGES;
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_CODE);
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
-            }
+        if (ContextCompat.checkSelfPermission(requireContext(), permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted; request permission
+            requestPermissionLauncher.launch(permission);
         }
     }
 
