@@ -2,8 +2,14 @@ package com.example.employ_events.ui.events;
 
 import android.media.Image;
 
+import com.example.employ_events.ui.entrants.Entrant;
+
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
+
+
 
 
 //Update constructors...don't need all of them, can just set the stuff using getters and setters
@@ -24,8 +30,10 @@ public class Event {
     private Time startTime;
     private String organizerID;
     private Integer fee;
+    private Integer eventCapacity;
     private String facilityID;
     private String bannerUrl;
+    private ArrayList<Entrant> entrantsList;
 
     /**
      * Empty constructor for displaying only some details of an event.
@@ -44,7 +52,7 @@ public class Event {
      * @param geoLocation            Indicates if geolocation is enabled.
      * @param organizerID            The ID of the organizer.
      */
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID){
+    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID, Integer eventCapacity){
 
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
@@ -52,6 +60,7 @@ public class Event {
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
         this.organizerID = organizerID;
+        this.eventCapacity = eventCapacity;
     }
 
     //Getters and setters
@@ -160,4 +169,41 @@ public class Event {
     public void setFacilityID(String facilityID) {
         this.facilityID = facilityID;
     }
+
+    public Integer getEventCapacity() {
+        return eventCapacity;
+    }
+
+    public void setEventCapacity(Integer eventCapacity) {
+        this.eventCapacity = eventCapacity;
+    }
+    public void addEntrant(Entrant entrant){
+        entrantsList.add(entrant);
+    }
+    public void generateSample(){
+        Random random = new Random();
+        ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<Integer>();
+        Integer i = 0;
+        Integer sampled;
+        Integer capOfSample = Math.min(this.eventCapacity, this.entrantsList.size());
+        while (i < capOfSample){
+            sampled = random.nextInt(capOfSample);
+            if (randomlyGeneratedNumbers.contains(sampled)){
+                continue;
+            }
+            randomlyGeneratedNumbers.add(sampled);
+            i +=1;
+        }
+        Entrant selected;
+        Integer k;
+        Integer selectedIndex;
+        for (k =0; k<randomlyGeneratedNumbers.size(); k++){
+            selectedIndex = randomlyGeneratedNumbers.get(k);
+            selected = entrantsList.get(selectedIndex);
+            selected.setOnAcceptedList(Boolean.TRUE);
+        }
+
+
+    }
+
 }

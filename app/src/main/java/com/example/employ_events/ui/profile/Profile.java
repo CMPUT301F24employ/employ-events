@@ -4,10 +4,8 @@ package com.example.employ_events.ui.profile;
  * This is a class that defines a user's Profile.
  */
 public class Profile {
-    private String uniqueID, name, email;
-    private int phoneNumber;
-    private boolean organizerNotifications, adminNotifications;
-    private boolean isEntrant, isAdmin, isOrganizer;
+    private String uniqueID, name, email, pfpURI, phoneNumber;
+    private boolean isEntrant, isAdmin, isOrganizer, customPFP;
 
     /**
      * Constructs a new Profile with the specified unique ID..
@@ -16,11 +14,10 @@ public class Profile {
      */
     public Profile(String uniqueID) {
         this.uniqueID = uniqueID;
-        this.organizerNotifications = false;
-        this.adminNotifications = false;
         this.isEntrant = false;
         this.isOrganizer = false;
         this.isAdmin = false;
+        this.customPFP = false;
     }
 
     /**
@@ -64,7 +61,7 @@ public class Profile {
      *
      * @return the phone number of the user
      */
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -73,45 +70,10 @@ public class Profile {
      *
      * @param phoneNumber the new phone number of the user
      */
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Indicates whether the user wants to receive organizer notifications.
-     *
-     * @return true if organizer notifications are enabled, false otherwise
-     */
-    public boolean isOrganizerNotifications() {
-        return organizerNotifications;
-    }
-
-    /**
-     * Sets the user's preference for organizer notifications.
-     *
-     * @param organizerNotifications true to enable organizer notifications, false to disable
-     */
-    public void setOrganizerNotifications(boolean organizerNotifications) {
-        this.organizerNotifications = organizerNotifications;
-    }
-
-    /**
-     * Indicates whether the user wants to receive admin notifications.
-     *
-     * @return true if admin notifications are enabled, false otherwise
-     */
-    public boolean isAdminNotifications() {
-        return adminNotifications;
-    }
-
-    /**
-     * Sets the user's preference for admin notifications.
-     *
-     * @param adminNotifications true to enable admin notifications, false to disable
-     */
-    public void setAdminNotifications(boolean adminNotifications) {
-        this.adminNotifications = adminNotifications;
-    }
 
     /**
      * Returns the unique ID associated with this profile.
@@ -164,5 +126,21 @@ public class Profile {
      */
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public String getPfpURI() {
+        return pfpURI;
+    }
+
+    public void setPfpURI(String pfpURI) {
+        this.pfpURI = pfpURI;
+    }
+
+    public boolean isCustomPFP() {
+        return customPFP;
+    }
+
+    public void setCustomPFP(boolean customPFP) {
+        this.customPFP = customPFP;
     }
 }

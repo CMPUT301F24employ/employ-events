@@ -42,14 +42,17 @@
         android:label="@string/menu_facility"
         tools:layout="@layout/fragment_facility">
         <action
-            android:id="@+id/action_facility_to_addEvent"
-            app:destination="@id/addEventFragment" />
+            android:id="@+id/action_facilityFragment_to_eventListFragment"
+            app:destination="@id/eventListFragment" />
         <action
             android:id="@+id/action_nav_facility_to_nav_create_facility"
             app:destination="@id/nav_create_facility" />
         <action
             android:id="@+id/action_nav_facility_to_nav_home"
             app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_nav_facility_to_nav_edit_facility"
+            app:destination="@id/nav_edit_facility" />
     </fragment>
 
     <fragment
@@ -68,18 +71,21 @@
         android:label="@string/edit_profile"
         tools:layout="@layout/fragment_edit_profile" >
         <action
-            android:id="@+id/action_nav_edit_profile_to_nav_upload_image"
-            app:destination="@id/nav_upload_image" />
-        <action
-            android:id="@+id/action_nav_edit_profile_pop"
-            app:popUpTo="@id/nav_edit_profile"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_nav_edit_profile_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
+
     <fragment
-        android:id="@+id/nav_upload_image"
-        android:name="com.example.employ_events.ui.profile.UploadImageFragment"
-        android:label="Upload Image"
-        tools:layout="@layout/upload_image" />
+        android:id="@+id/nav_edit_facility"
+        android:name="com.example.employ_events.ui.facility.EditFacilityFragment"
+        android:label="Edit Facility"
+        tools:layout="@layout/fragment_edit_facility" >
+        <action
+            android:id="@+id/action_nav_edit_facility_to_nav_facility"
+            app:destination="@id/nav_facility">
+        </action>
+    </fragment>
+
 
     <fragment
         android:id="@+id/addEventFragment"
@@ -88,8 +94,8 @@
         tools:layout="@layout/add_event">
 
         <action
-            android:id="@+id/action_addEventFragment_to_nav_facility"
-            app:destination="@id/nav_facility" />
+            android:id="@+id/action_addEventFragment_to_eventListFragment"
+            app:destination="@id/eventListFragment" />
     </fragment>
 
 
@@ -98,6 +104,19 @@
         android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
         android:label="Registered Events"
         tools:layout="@layout/fragment_registered_events" />
+    <fragment
+        android:id="@+id/eventListFragment"
+        android:name="com.example.employ_events.ui.events.EventListFragment"
+        android:label="Event List"
+        tools:layout="@layout/fragment_event_list">
+
+        <!-- Action to navigate to AddEventFragment -->
+        <action
+            android:id="@+id/action_eventListFragment_to_addEventFragment"
+            app:destination="@id/addEventFragment" />
+    </fragment>
+
+
 
 
 </navigation>

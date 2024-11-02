@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel;
  * This class holds the data related to the user's profile and provides it to the UI.
  */
 public class ProfileViewModel extends ViewModel {
-
     private final MutableLiveData<String> mText;
+
 
     /**
      * Initializes the ProfileViewModel and its LiveData.

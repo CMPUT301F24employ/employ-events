@@ -4,8 +4,7 @@ package com.example.employ_events.ui.facility;
  * Represents a facility with a name and an owner ID.
  */
 public class Facility {
-    String name, organizer_id, email, address;
-    int phone_number;
+    String name, organizer_id, email, address, phone_number, facilityPfpUri;
 
     /**
      * Constructs a Facility with the specified name and owner ID.
@@ -20,7 +19,7 @@ public class Facility {
         this.organizer_id = organizer_id;
     }
 
-    public Facility(String name, String email, String address, String organizer_id, int phone_number) {
+    public Facility(String name, String email, String address, String organizer_id, String phone_number) {
         this.name = name;
         this.address = address;
         this.email = email;
@@ -75,12 +74,20 @@ public class Facility {
         this.address = address;
     }
 
-    public int getPhone_number() {
+    public String getPhone_number() {
         return phone_number;
     }
 
-    public void setPhone_number(int phone_number) {
+    public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
+    }
+
+    public String getFacilityPfpUri() {
+        return facilityPfpUri;
+    }
+
+    public void setFacilityPfpUri(String facilityPfpUri) {
+        this.facilityPfpUri = facilityPfpUri;
     }
 }
 

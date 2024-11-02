@@ -63,13 +63,8 @@ public class CreateFacilityFragment extends DialogFragment {
                     String name = editFacilityName.getText().toString().trim();
                     String address = editFacilityAddress.getText().toString().trim();
                     String email = editFacilityEmail.getText().toString().trim();
-                    int phone;
-                    if (editFacilityPhone.getText().toString().trim().isEmpty()) {
-                        phone = 0;
-                    }
-                    else {
-                        phone = Integer.parseInt(editFacilityPhone.getText().toString().trim());
-                    }
+                    String phone = editFacilityPhone.getText().toString().trim();
+                    phone = phone.isEmpty() ? null : phone;
                     Facility facility;
                     facility = new Facility(name, email, address, uniqueID, phone);
                     listener.createFacility(facility, uniqueID);

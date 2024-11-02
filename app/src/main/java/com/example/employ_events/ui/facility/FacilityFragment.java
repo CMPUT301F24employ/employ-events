@@ -2,11 +2,14 @@ package com.example.employ_events.ui.facility;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,42 +18,34 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
-import com.example.employ_events.ui.events.Event;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
-import java.util.Date;
-
 /**
- * FacilityFragment is a Fragment that displays events associated with a facility.
- * It allows users to create events and shows a list of existing events for a facility.
+ * FacilityFragment displays facility profile information without listing events.
  */
-public class FacilityFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
+public class FacilityFragment extends Fragment {
 
     private FragmentFacilityBinding binding;
     private FirebaseFirestore db;
-    private ArrayList<Event> eventList;
-    private FacilityEventsAdapter eventsAdapter;
     private TextView name, email, phone_number, address;
+    private ImageView facilityPFP;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        FacilityViewModel facilityViewModel =
-                new ViewModelProvider(this).get(FacilityViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        FacilityViewModel facilityViewModel = new ViewModelProvider(this).get(FacilityViewModel.class);
 
         binding = FragmentFacilityBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -59,42 +54,22 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
         String uniqueID = sharedPreferences.getString("uniqueID", null);
         db = FirebaseFirestore.getInstance();
 
-        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (Objects.equals(document.getBoolean("organizer"), false)) {
-                    new CreateFacilityFragment().show(requireActivity().getSupportFragmentManager(), "Create Facility");
-                    NavHostFragment.findNavController(FacilityFragment.this)
-                            .navigate(R.id.action_nav_facility_to_nav_home);
-                }
-            } else {
-                Log.e("MainActivity", "Error getting documents: ", task.getException());
-            }
-        });
+        setupUserProfile(uniqueID, facilityViewModel);
 
         name = binding.facilityNameTV;
         email = binding.facilityEmailTV;
         phone_number = binding.facilityPhoneTV;
         address = binding.facilityAddressTV;
+        facilityPFP = binding.facilityPFP;
 
-        binding.createEventButton.setOnClickListener(view ->
-                Navigation.findNavController(view).navigate(R.id.action_facility_to_addEvent)
+        // Button to navigate to EventListFragment to view events
+        binding.viewEventButton.setOnClickListener(view ->
+                Navigation.findNavController(view).navigate(R.id.action_facilityFragment_to_eventListFragment)
         );
 
-        RecyclerView eventsRecyclerView = binding.eventsRecyclerView;
-        DividerItemDecoration d = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        eventsRecyclerView.addItemDecoration(d);
-        eventList = new ArrayList<>();
-        eventsAdapter = new FacilityEventsAdapter(getContext(), eventList, this);
-        eventsRecyclerView.setAdapter(eventsAdapter);
-        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Fetch the facility ID and then query events, display profile.
+        // Fetch the facility ID and display profile.
         getFacilityID(uniqueID, facilityID -> {
             if (facilityID != null) {
-                queryEvents(facilityID);
-
                 DocumentReference facilityRef = db.collection("facilities").document(facilityID);
                 facilityRef.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -102,11 +77,14 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
                         displayProfile(document, facilityViewModel);
                     }
                 });
-
             } else {
                 Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        binding.editFacilityButton.setOnClickListener(view ->
+                        Navigation.findNavController(view).navigate(R.id.action_nav_facility_to_nav_edit_facility)
+                );
 
         return root;
     }
@@ -129,68 +107,60 @@ public class FacilityFragment extends Fragment implements FacilityEventsAdapter.
             listener.onFacilityIDFetched(null); // No match found
         });
     }
-
-
     private void displayProfile(DocumentSnapshot document, FacilityViewModel facilityViewModel) {
-
         name.setText(Objects.requireNonNull(document.get("name")).toString());
         facilityViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
-
         email.setText(Objects.requireNonNull(document.get("email")).toString());
         facilityViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
-
         address.setText(Objects.requireNonNull(document.get("address")).toString());
         facilityViewModel.getText().observe(getViewLifecycleOwner(), address::setText);
-
-        if (document.get("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
-            phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
+        if (document.get("phone_number") != null) {
+            phone_number.setText(Objects.requireNonNull(document.get("phone_number")).toString());
             facilityViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
+        }
+        if (document.get("facilityPfpUri") != null) {
+            String uri = document.getString("facilityPfpUri");
+            loadImageFromUrl(uri);
         }
     }
 
-    /**
-     * Queries the events associated with the given facility ID.
-     *
-     * @param facilityID The ID of the facility.
-     */
-    private void queryEvents(String facilityID) {
-        db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (DocumentSnapshot eventDocument : task.getResult()) {
-                    Event e = new Event();
-                    e.setEventTitle(eventDocument.getString("eventTitle"));
-                    Timestamp timestamp = eventDocument.getTimestamp("eventDate");
-
-                    if (timestamp == null) {
-                        e.setEventDate(null);
-                    } else {
-                        Date eDate = timestamp.toDate();
-                        e.setEventDate(eDate);
-                    }
-                    eventList.add(e);
-                }
-                eventsAdapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(getContext(), "Error loading events or no events found!", Toast.LENGTH_SHORT).show();
+    private void loadImageFromUrl(String url) {
+        new Thread(() -> {
+            try {
+                URL imageUrl = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                getActivity().runOnUiThread(() -> facilityPFP.setImageBitmap(bitmap));
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
             }
-        });
+        }).start();
     }
-
-    /**
-     * Handles click events on items in the event list.
-     *
-     * @param event The event that was clicked.
-     */
-    @Override
-    public void onItemClick(Event event) {
-        Toast.makeText(getContext(), "Event Clicked", Toast.LENGTH_SHORT).show();
-    }
-
     /**
      * Callback interface for fetching facility ID.
      */
     public interface OnFacilityIDFetchedListener {
         void onFacilityIDFetched(String facilityID);
+    }
+
+    private void setupUserProfile(String uniqueID, FacilityViewModel facilityViewModel) {
+        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && !document.getBoolean("organizer")) {
+                    new CreateFacilityFragment().show(requireActivity().getSupportFragmentManager(), "Create Facility");
+                    NavHostFragment.findNavController(FacilityFragment.this)
+                            .navigate(R.id.action_nav_facility_to_nav_home);
+                }
+            } else {
+                Log.e("FacilityFragment", "Error fetching user profile: ", task.getException());
+            }
+        });
     }
 
     @Override
