@@ -114,9 +114,29 @@
         <action
             android:id="@+id/action_eventListFragment_to_addEventFragment"
             app:destination="@id/addEventFragment" />
+
+        <!-- New action to navigate to EventDetailsFragment -->
+        <action
+            android:id="@+id/action_eventListFragment_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment">
+            <argument
+                android:name="EVENT_ID"
+                app:argType="string" />
+        </action>
     </fragment>
 
+    <fragment
+        android:id="@+id/eventDetailsFragment"
+        android:name="com.example.employ_events.ui.registeredEvents.EventDetailsFragment"
+        android:label="Event Details"
+        tools:layout="@layout/event_details">
 
+        <!-- Add a back action if needed -->
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_eventListFragment"
+            app:destination="@id/eventListFragment" />
+
+    </fragment>
 
 
 </navigation>

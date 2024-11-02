@@ -127,14 +127,17 @@ public class AddEventFragment extends Fragment {
                     return;
                 }
 
+                // Generate a unique ID for the event
+                String id = db.collection("events").document().getId(); // Generate a new ID
+
                 Event newEvent;
                 Integer eventCapacity = Integer.parseInt(eventCapacityString);
                 if (registrationStartDeadline != null) {
                     newEvent = new Event(
-                            eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID, eventCapacity
+                            id, eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID, eventCapacity
                     );
                 } else {
-                    newEvent = new Event(eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID, eventCapacity);
+                    newEvent = new Event(id, eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID, eventCapacity);
                 }
                 if (!limitString.isEmpty()) {
                     Integer limit = Integer.parseInt(limitString);

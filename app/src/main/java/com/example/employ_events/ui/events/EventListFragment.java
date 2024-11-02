@@ -85,6 +85,7 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot eventDocument : task.getResult()) {
                     Event event = new Event();
+                    event.setId(eventDocument.getId());
                     event.setEventTitle(eventDocument.getString("eventTitle"));
                     event.setEventDate(eventDocument.getDate("eventDate"));
                     eventList.add(event);
@@ -98,7 +99,12 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
 
     @Override
     public void onItemClick(Event event) {
-        Toast.makeText(getContext(), "Clicked on event: " + event.getEventTitle(), Toast.LENGTH_SHORT).show();
+        // Pass the event ID to the EventDetailsFragment
+        if (getView() != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("EVENT_ID", event.getId()); // Pass event ID
+            Navigation.findNavController(getView()).navigate(R.id.action_eventListFragment_to_eventDetailsFragment, bundle);
+        }
     }
 
     @Override

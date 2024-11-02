@@ -18,6 +18,7 @@ import java.util.Random;
  */
 public class Event {
     //Constructors -> may not need all of them depending on AddEventFragment implementation
+    private String id;
     private String eventTitle;
     private Date eventDate;
     private Date registrationDateDeadline;
@@ -32,7 +33,7 @@ public class Event {
     private Integer eventCapacity;
     private String facilityID;
     private String bannerUri;
-    private ArrayList<Entrant> entrantsList;
+    private ArrayList<Entrant> entrantsList = new ArrayList<>();
 
     /**
      * Empty constructor for displaying only some details of an event.
@@ -44,6 +45,7 @@ public class Event {
     /**
      * Constructs an Event with the specified details.
      *
+     * @param id                     The unique identifier for the event.
      * @param eventTitle             The title of the event.
      * @param eventDate              The date of the event.
      * @param registrationDateDeadline The registration deadline date.
@@ -51,8 +53,9 @@ public class Event {
      * @param geoLocation            Indicates if geolocation is enabled.
      * @param organizerID            The ID of the organizer.
      */
-    public Event(String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID, Integer eventCapacity){
+    public Event(String id, String eventTitle, Date eventDate, Date registrationDateDeadline, Date registrationStartDate, Boolean geoLocation,   String organizerID, Integer eventCapacity){
 
+        this.id = id;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
@@ -63,6 +66,14 @@ public class Event {
     }
 
     //Getters and setters
+    // Getter and setter for the ID
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     // Getter and setter for bannerUrl
     public String getBannerUri() {

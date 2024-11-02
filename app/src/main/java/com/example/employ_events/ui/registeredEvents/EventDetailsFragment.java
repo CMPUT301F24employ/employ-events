@@ -37,24 +37,23 @@ public class EventDetailsFragment extends Fragment {
         binding = EventDetailsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        assert getArguments() != null;
-        String eventId = getArguments().getString("EVENT_ID");
         db = FirebaseFirestore.getInstance();
-        //eventsRef = db.collection("waitinglist");
-
-
         initializeViews();
 
-        if (eventId != null) {
-            DocumentReference eventRef = db.collection("events").document(eventId);
-            eventRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        displayDetails(document, galleryViewModel);
+        if (getArguments() != null) {
+            String eventId = getArguments().getString("EVENT_ID");
+            //eventsRef = db.collection("waitinglist");
+            if (eventId != null) {
+                DocumentReference eventRef = db.collection("events").document(eventId);
+                eventRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            displayDetails(document, galleryViewModel);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
@@ -95,10 +94,10 @@ public class EventDetailsFragment extends Fragment {
             galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
         }
 
-        if (document.get("registrationDateDeadline") != null) {
-            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
-        }
+//        if (document.get("registrationDateDeadline") != null) {
+//            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
+//            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
+//        }
 
         if (document.get("geoLocation") != null) {
             geolocation.setText(Objects.requireNonNull(document.get("geoLocation")).toString());
