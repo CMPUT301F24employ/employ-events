@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,7 +33,8 @@ import java.util.Objects;
 
 /**
  * A fragment that displays the user's profile information.
- * It retrieves the profile data from Firestore based on a unique identifier.
+ * It retrieves the profile data from Firestore based on a unique identifier and
+ * populates the UI elements with the fetched data.
  */
 public class ProfileFragment extends Fragment{
 
@@ -52,26 +52,31 @@ public class ProfileFragment extends Fragment{
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Grab uniqueID and initialize the firebase.
+        // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
-        uniqueID = sharedPreferences.getString("uniqueID", null);
+        String uniqueID = sharedPreferences.getString("uniqueID", null);
+
+        // Initialize Firestore database instance and set reference to "userProfiles" collection
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference profilesRef = db.collection("userProfiles");
 
+        // Initialize the UI components for the fragment
         initializeViews();
 
-        // Display the profile information.
+        // Display the profile information if uniqueID is available
+        assert uniqueID != null;
         DocumentReference docRef = profilesRef.document(uniqueID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
+                    // Populate UI with profile information
                     displayProfile(document, profileViewModel);
                 }
             }
         });
 
+        // Navigate to the edit profile screen when the button is clicked
         editProfileButton.setOnClickListener(v->
                 NavHostFragment.findNavController(ProfileFragment.this)
                         .navigate(R.id.action_nav_profile_to_nav_edit_profile));
@@ -80,10 +85,9 @@ public class ProfileFragment extends Fragment{
     }
 
     /**
-     * Initializes the views for the fragment.
+     * Initializes the views for the fragment by binding UI elements to variables.
      */
     private void initializeViews() {
-
         name = binding.profileName;
         phone_number = binding.profilePhoneNumber;
         email = binding.profileEmail;
@@ -97,9 +101,7 @@ public class ProfileFragment extends Fragment{
      * @param profileViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, ProfileViewModel profileViewModel) {
-        //organizer_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("organizerNotifications")));
-        //admin_notifications.setChecked(Boolean.TRUE.equals(document.getBoolean("adminNotifications")));
-        // if NULL, it will be blank. Otherwise, display the users info.
+        // Set views for each field if available.
         if (document.getString("name") != null) {
             name.setText(Objects.requireNonNull(document.get("name")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
@@ -109,7 +111,7 @@ public class ProfileFragment extends Fragment{
             profileViewModel.getText().observe(getViewLifecycleOwner(), email::setText);
         }
 
-        if (document.getString("phoneNumber") != null && !document.get("phoneNumber").toString().equals("0")) {
+        if (document.getString("phoneNumber") != null && !Objects.requireNonNull(document.get("phoneNumber")).toString().equals("0")) {
             phone_number.setText(Objects.requireNonNull(document.get("phoneNumber")).toString());
             profileViewModel.getText().observe(getViewLifecycleOwner(), phone_number::setText);
         }
@@ -120,6 +122,10 @@ public class ProfileFragment extends Fragment{
 
     }
 
+    /**
+     * Loads an image from a URL and displays it in the ImageView.
+     * @param url The URL of the image to be loaded.
+     */
     private void loadImageFromUrl(String url) {
         new Thread(() -> {
             try {
@@ -129,14 +135,12 @@ public class ProfileFragment extends Fragment{
                 connection.connect();
                 InputStream input = connection.getInputStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(input);
-                getActivity().runOnUiThread(() -> pfp.setImageBitmap(bitmap));
+                requireActivity().runOnUiThread(() -> pfp.setImageBitmap(bitmap));
             } catch (IOException e) {
-                e.printStackTrace();
                 Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
-
 
     @Override
     public void onDestroyView() {

@@ -55,5 +55,4 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     implementation(libs.material.v130alpha02)
-    implementation("com.google.android.libraries.places:places:4.0.0")
 }
