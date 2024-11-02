@@ -168,9 +168,19 @@ public class Event {
     public void setEventCapacity(Integer eventCapacity) {
         this.eventCapacity = eventCapacity;
     }
-    public void addEntrant(Entrant entrant){
-        entrantsList.add(entrant);
+    public Boolean addEntrant(Entrant entrant){
+        if (this.limited != null){
+            if (entrantsList.size() < this.limited){
+                entrantsList.add(entrant);
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
+        } else{
+          entrantsList.add(entrant);
+          return Boolean.TRUE;
+        }
     }
+
     public void generateSample(){
         Random random = new Random();
         ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<Integer>();
@@ -191,6 +201,9 @@ public class Event {
         for (k =0; k<randomlyGeneratedNumbers.size(); k++){
             selectedIndex = randomlyGeneratedNumbers.get(k);
             selected = entrantsList.get(selectedIndex);
+            if (selected.getOnCancelledList() == Boolean.TRUE || selected.getOnWaitingList() == Boolean.FALSE){
+                continue;
+            }
             selected.setOnAcceptedList(Boolean.TRUE);
         }
 
