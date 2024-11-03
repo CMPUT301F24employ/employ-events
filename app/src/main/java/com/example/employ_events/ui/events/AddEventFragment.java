@@ -18,8 +18,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -32,11 +34,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
 /**
  * AddEventFragment is a Fragment that allows organizers to create an new event
  * by providing details such as title, description, dates, time, fee, capacity and location.
@@ -45,12 +47,12 @@ public class AddEventFragment extends Fragment {
 
     private AddEventBinding binding;
     private Date eventDate, registrationDeadline, registrationStartDeadline;
-    private Time eventStartTime, eventEndTime;
     private FirebaseFirestore db;
     private String facilityID; // Variable to hold the facility ID
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int STORAGE_PERMISSION_CODE = 100;
     private Uri bannerUri;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,8 +69,6 @@ public class AddEventFragment extends Fragment {
         Button eventDateButton = binding.eventDate;
         Button registrationDeadlineButton = binding.registrationDateDeadline;
         Button registrationStartDeadlineButton = binding.registrationStartDeadline;
-        Button startTimeButton = binding.eventStartTime;
-        Button endTimeButton = binding.eventEndTime;
         Button saveButton = binding.saveEventButton;
         CheckBox geoLocation = binding.geolocationStatus;
         Button uploadBannerButton = binding.uploadBannerButton;
@@ -79,26 +79,47 @@ public class AddEventFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
 
+        // Initialize the ActivityResultLauncher for requesting permission
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permission was granted
+                        Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Permission was denied
+                        Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        // Initialize the ActivityResultLauncher for picking an image.
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // Handle the image selection
+                        bannerUri = result.getData().getData();
+                        bannerImageView.setImageURI(bannerUri);
+                        bannerImageView.setVisibility(View.VISIBLE);
+                        removeBannerButton.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
+
         // Fetch the facility ID
         fetchFacilityID(uniqueID);
 
         // Date picker dialogs
-        eventDateButton.setOnClickListener(view -> showDatePicker(eventDateButton, true));
-        registrationDeadlineButton.setOnClickListener(view -> showDatePicker(registrationDeadlineButton, false));
-        registrationStartDeadlineButton.setOnClickListener(view -> showDatePicker(registrationStartDeadlineButton, false));
-
-        // Time picker dialogs
-        startTimeButton.setOnClickListener(view -> showTimePicker(startTimeButton, true));
-        endTimeButton.setOnClickListener(view -> showTimePicker(endTimeButton, false));
-
-        // Check for storage permission
-        checkStoragePermission();
+        eventDateButton.setOnClickListener(view -> showDateTimePicker(eventDateButton, "eventDate"));
+        registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "endDate"));
+        registrationStartDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationStartDeadlineButton, "startDate"));
 
         // Initially hide the remove button
         removeBannerButton.setVisibility(View.GONE);
 
         // Set click listener for the upload banner button
-        uploadBannerButton.setOnClickListener(v -> openImageChooser());
+        uploadBannerButton.setOnClickListener(v -> pickImage());
 
         // Set click listener for the remove banner button
         removeBannerButton.setOnClickListener(v -> {
@@ -120,54 +141,69 @@ public class AddEventFragment extends Fragment {
                 String description = descriptionInput.getText().toString();
                 String limitString = limitInput.getText().toString();
                 String feeString = feeInput.getText().toString();
-                String eventCapacityString = eventCapacityInput.getText().toString();
+                String eventCapacity = eventCapacityInput.getText().toString();
 
-                if (eventDate == null || registrationDeadline == null || eventCapacityString.isEmpty()) {
-                    Toast.makeText(getContext(), "Please select all required fields", Toast.LENGTH_SHORT).show();
-                    return;
+                if (eventTitle.trim().isEmpty()) {
+                    eventTitleInput.setError("Event title required");
+                    eventTitleInput.requestFocus();
                 }
+                else if (description.trim().isEmpty()) {
+                    descriptionInput.setError("Event description required");
+                    descriptionInput.requestFocus();
+                }
+                else if (eventDate == null) {
+                    eventDateButton.setError("Event date required");
+                    eventDateButton.requestFocus();
+                }
+                /*else if (eventTime == null) {
+                    eventTimeButton.setError("Event time required");
+                    eventTimeButton.requestFocus();
+                }*/
+                else if (registrationStartDeadline == null) {
+                    registrationStartDeadlineButton.setError("Registration opening date required");
+                    registrationStartDeadlineButton.requestFocus();
+                }
+                /*else if (eventStartTime == null) {
+                    startTimeButton.setError("Registration opening time required");
+                    startTimeButton.requestFocus();
+                }*/
+                else if (registrationDeadline == null) {
+                    registrationDeadlineButton.setError("Registration deadline date required");
+                    registrationDeadlineButton.requestFocus();
+                }
+                /*else if (eventEndTime == null) {
+                    endTimeButton.setError("Registration deadline time required");
+                    endTimeButton.requestFocus();
+                }*/
+                else if (eventCapacity.trim().isEmpty()) {
+                    eventCapacityInput.setError("Event capacity required");
+                    eventCapacityInput.requestFocus();
+                }
+                else {
+                    // Generate a unique ID for the event
+                    String id = db.collection("events").document().getId(); // Generate a new ID
+                    Event newEvent = new Event();
 
-                // Generate a unique ID for the event
-                String id = db.collection("events").document().getId(); // Generate a new ID
-
-                Event newEvent;
-                Integer eventCapacity = Integer.parseInt(eventCapacityString);
-                if (registrationStartDeadline != null) {
-                    newEvent = new Event(
-                            id, eventTitle, eventDate, registrationDeadline, registrationStartDeadline, false, facilityID, eventCapacity
-                    );
-                } else {
-                    newEvent = new Event(id, eventTitle, eventDate, registrationDeadline, new Date(), false, facilityID, eventCapacity);
-                }
-                if (!limitString.isEmpty()) {
-                    Integer limit = Integer.parseInt(limitString);
-                    newEvent.setLimited(limit);
-                }
-                if (!feeString.isEmpty()) {
-                    Integer fee = Integer.parseInt(feeString);
-                    newEvent.setFee(fee);
-                }
-                if (eventStartTime != null) {
-                    newEvent.setStartTime(eventStartTime);
-                }
-                if (eventEndTime != null) {
-                    newEvent.setEndTime(eventEndTime);
-                }
-                if (geoLocation.isChecked()) {
-                    newEvent.setGeoLocation(true);
-                }
-                if (!description.isEmpty()) {
+                    newEvent.setId(id);
+                    newEvent.setFacilityID(facilityID);
+                    newEvent.setEventTitle(eventTitle);
                     newEvent.setDescription(description);
+                    newEvent.setEventDate(eventDate);
+                    //newEvent.setEventTime(eventTime);
+                    newEvent.setRegistrationStartDate(registrationStartDeadline);
+                    //newEvent.setStartTime(eventStartTime);
+                    newEvent.setRegistrationDateDeadline(registrationDeadline);
+                    //newEvent.setEndTime(eventEndTime);
+                    newEvent.setEventCapacity(Integer.valueOf(eventCapacity));
+                    newEvent.setLimited(limitString.isEmpty() ? null : Integer.valueOf(limitString));
+                    newEvent.setFee(feeString.isEmpty() ? null : Integer.valueOf(feeString));
+                    newEvent.setGeoLocation(geoLocation.isChecked());
+                    if (bannerUri != null) {
+                        uploadBannerAndSaveEvent(newEvent, view);
+                    } else {
+                        saveEvent(newEvent, view);
+                    }
                 }
-
-                newEvent.setFacilityID(facilityID);
-
-                if (bannerUri != null) {
-                    uploadBannerAndSaveEvent(newEvent, view);
-                } else {
-                    saveEvent(newEvent, view);
-                }
-
 
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
@@ -177,66 +213,61 @@ public class AddEventFragment extends Fragment {
         return root;
     }
 
-    /**
-     * Displays a date picker dialog and updates the associated button and date variables.
-     *
-     * @param button      The button to update with the selected date.
-     * @param isEventDate Indicates if the date is for the event date or registration deadline.
-     */
-    private void showDatePicker(Button button, boolean isEventDate) {
+    private void showDateTimePicker(Button button, String filter) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
 
+        // Step 1: Show DatePickerDialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(
-                getContext(),
+                requireContext(),
                 (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // After the date is selected, show TimePickerDialog
                     Calendar selectedDate = Calendar.getInstance();
                     selectedDate.set(selectedYear, selectedMonth, selectedDay);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                    button.setText(sdf.format(selectedDate.getTime()));
-                    if (isEventDate) {
-                        eventDate = selectedDate.getTime();
-                    } else {
-                        registrationDeadline = selectedDate.getTime();
-                    }
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(
+                            getContext(),
+                            (timeView, selectedHour, selectedMinute) -> {
+                                // Set the hour and minute after selecting the time
+                                selectedDate.set(Calendar.HOUR_OF_DAY, selectedHour);
+                                selectedDate.set(Calendar.MINUTE, selectedMinute);
+
+                                // Format the combined date and time
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                                String formattedDateTime = sdf.format(selectedDate.getTime());
+                                button.setText(formattedDateTime);
+
+                                // Save the combined date and time into respective variables
+                                if (filter.equals("eventDate")) {
+                                    eventDate = selectedDate.getTime();
+                                } else if (filter.equals("startDate")) {
+                                    registrationStartDeadline = selectedDate.getTime();
+                                } else {
+                                    registrationDeadline = selectedDate.getTime();
+                                }
+                            },
+                            hour, minute, true // Use 24-hour format
+                    );
+
+                    timePickerDialog.show();
                 },
                 year, month, day
         );
 
+        // Set the minimum date based on filter type
+        if (filter.equals("eventDate") || filter.equals("startDate")) {
+            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+        } else {
+            // Set minimum date to registration open date and maximum date to event date
+            datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
+            datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+        }
+
         datePickerDialog.show();
-    }
-
-    /**
-     * Displays a time picker dialog and updates the associated button and time variables.
-     *
-     * @param button     The button to update with the selected time.
-     * @param isStartTime Indicates if the time is for the event start time or end time.
-     */
-    private void showTimePicker(Button button, boolean isStartTime) {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(
-                getContext(),
-                (view, selectedHour, selectedMinute) -> {
-                    String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
-                    button.setText(formattedTime);
-
-                    Time time = new Time(selectedHour, selectedMinute, 0);
-                    if (isStartTime) {
-                        eventStartTime = time;
-                    } else {
-                        eventEndTime = time;
-                    }
-                },
-                hour, minute, true
-        );
-
-        timePickerDialog.show();
     }
 
     /**
@@ -276,22 +307,16 @@ public class AddEventFragment extends Fragment {
         void onFacilityIDFetched(String facilityID);
     }
 
-    private void openImageChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Banner"), PICK_IMAGE_REQUEST);
-    }
+    /**
+     * Launches the image picker intent to select a profile picture.
+     */
+    private void pickImage() {
+        // Check for storage permission
+        checkAndRequestStoragePermission();
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            bannerUri = data.getData();
-            binding.bannerImage.setImageURI(bannerUri);
-            binding.bannerImage.setVisibility(View.VISIBLE);
-            binding.removeBannerButton.setVisibility(View.VISIBLE);
-        }
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
     }
 
     private void uploadBannerAndSaveEvent(Event newEvent, View view) {
@@ -315,23 +340,17 @@ public class AddEventFragment extends Fragment {
 
     }
 
-    private void checkStoragePermission() {
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_CODE);
-        }
+    /**
+     * Checks if storage permission is granted and requests it if necessary.
+     */
+    private void checkAndRequestStoragePermission() {
+        String permission = PERMISSION_READ_MEDIA_IMAGES;
 
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
-            }
+        if (ContextCompat.checkSelfPermission(requireContext(), permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted; request permission
+            requestPermissionLauncher.launch(permission);
         }
     }
 

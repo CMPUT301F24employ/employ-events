@@ -18,21 +18,10 @@ import java.util.Random;
  */
 public class Event {
     //Constructors -> may not need all of them depending on AddEventFragment implementation
-    private String id;
-    private String eventTitle;
-    private Date eventDate;
-    private Date registrationDateDeadline;
-    private Date registrationStartDate;
+    private String id, eventTitle, description, facilityID, bannerUri;
+    private Date eventDate, registrationDateDeadline, registrationStartDate;
     private Boolean geoLocation;
-    private String description;
-    private Integer limited;
-    private Time endTime;
-    private Time startTime;
-    private String organizerID;
-    private Integer fee;
-    private Integer eventCapacity;
-    private String facilityID;
-    private String bannerUri;
+    private Integer fee, eventCapacity, limited;
     private ArrayList<Entrant> entrantsList = new ArrayList<>();
 
     /**
@@ -61,7 +50,7 @@ public class Event {
         this.registrationStartDate = registrationStartDate;
         this.registrationDateDeadline = registrationDateDeadline;
         this.geoLocation = geoLocation;
-        this.organizerID = organizerID;
+        this.facilityID = organizerID;
         this.eventCapacity = eventCapacity;
     }
 
@@ -140,22 +129,6 @@ public class Event {
         this.limited = limited;
     }
 
-    public Time getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Time endTime) {
-        this.endTime = endTime;
-    }
-
-    public Time getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Time startTime) {
-        this.startTime = startTime;
-    }
-
     public Integer getFee() {
         return fee;
     }
@@ -179,6 +152,7 @@ public class Event {
     public void setEventCapacity(Integer eventCapacity) {
         this.eventCapacity = eventCapacity;
     }
+
     public Boolean addEntrant(Entrant entrant){
         if (this.limited != null){
             if (entrantsList.size() < this.limited){

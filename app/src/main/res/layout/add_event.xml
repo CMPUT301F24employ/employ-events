@@ -21,24 +21,34 @@
             android:layout_marginBottom="5dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_camera"
-            android:contentDescription="Event Image" />
+            android:contentDescription="@string/event_image" />
+
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/white_card_background"
             android:padding="5dp"
             android:layout_marginBottom="5dp"
             android:elevation="4dp">
-        <Button
-            android:id="@+id/uploadBannerButton"
-            android:layout_width="wrap_content"
+
+            <Button
+                android:id="@+id/uploadBannerButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/upload_banner" />
+
+            <Button
+                android:id="@+id/removeBannerButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload Banner" />
-        <Button
-            android:id="@+id/removeBannerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remove Banner"
+            android:layout_margin="5dp"
+            android:text="@string/remove_banner"
             android:visibility="gone" /> <!-- Initially hidden -->
         </LinearLayout>
 
@@ -53,14 +63,12 @@
             android:layout_marginBottom="16dp"
             android:elevation="4dp">
 
-
-
             <!-- Event Title Input -->
             <EditText
                 android:id="@+id/event_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter Event Title"
+                android:hint="@string/enter_title"
                 android:background="@drawable/input_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
@@ -71,10 +79,11 @@
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter Description"
+                android:hint="@string/enter_description"
                 android:background="@drawable/input_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
+                android:inputType="text"
                 android:singleLine="true" />
 
             <!-- Event Date Button -->
@@ -82,48 +91,30 @@
                 android:id="@+id/event_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Event Date"
+                android:text="@string/select_event_date"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
 
-            <!-- Registration Deadline Button -->
+            <!-- Registration Buttons -->
             <Button
                 android:id="@+id/registration_start_deadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Registration Start Date (Optional)"
+                android:text="@string/select_registration_opening_date"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
+
             <Button
                 android:id="@+id/registration_date_deadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Select Registration Deadline"
+                android:text="@string/select_registration_deadline_date"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/button_background"
                 android:textColor="@android:color/white" />
 
-            <!-- Start Time Button -->
-            <Button
-                android:id="@+id/event_start_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select Start Time (Optional)"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/button_background"
-                android:textColor="@android:color/white" />
-
-            <!-- End Time Button -->
-            <Button
-                android:id="@+id/event_end_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select End Time (Optional)"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/button_background"
-                android:textColor="@android:color/white" />
             <EditText
                 android:id="@+id/event_capacity"
                 android:layout_width="match_parent"
@@ -134,12 +125,13 @@
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"
                 android:singleLine="true" />
+
             <!-- Capacity Limit Input -->
             <EditText
                 android:id="@+id/limit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter Waiting List Limit (Optional)"
+                android:hint="Enter Waiting List Capacity (Optional)"
                 android:inputType="number"
                 android:background="@drawable/input_background"
                 android:padding="12dp"
@@ -163,7 +155,7 @@
                 android:id="@+id/geolocation_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Geolocation"
+                android:text="Set Geolocation Requirement"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -172,7 +164,7 @@
             android:id="@+id/save_event_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
+            android:text="Create Event"
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background"
             android:textColor="@android:color/white" />

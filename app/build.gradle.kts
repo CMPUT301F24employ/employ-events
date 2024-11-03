@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.employ_events"
-        minSdk = 24
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -55,4 +55,8 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     implementation(libs.material.v130alpha02)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
+
+
 }

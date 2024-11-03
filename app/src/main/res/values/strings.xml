@@ -38,4 +38,15 @@
     <string name="enter_facility_phone_number_optional">Enter Facility Phone Number (Optional)</string>
     <string name="search_for_facility_address_above">Search for Facility Address Above</string>
     <string name="enter_facility_address">Enter Facility Address</string>
+    <string name="upload_banner">Upload Banner</string>
+    <string name="remove_banner">Remove Banner</string>
+    <string name="enter_title">Enter Title</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="select_event_date">Select Event Date</string>
+    <string name="select_event_time">Select Event Time</string>
+    <string name="select_registration_opening_date">Select Registration Opening Date</string>
+    <string name="select_registration_deadline_date">Select Registration Deadline Date</string>
+    <string name="select_registration_opening_time">Select Registration Opening Time</string>
+    <string name="event_image">Event Image</string>
+    <string name="select_registration_deadline_time">Select Registration Deadline Time</string>
 </resources>
