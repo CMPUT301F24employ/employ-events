@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -29,14 +31,30 @@ import com.example.employ_events.databinding.AddEventBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+
 /**
  * AddEventFragment is a Fragment that allows organizers to create an new event
  * by providing details such as title, description, dates, time, fee, capacity and location.
@@ -51,6 +69,7 @@ public class AddEventFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int STORAGE_PERMISSION_CODE = 100;
     private Uri bannerUri;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -302,15 +321,134 @@ public class AddEventFragment extends Fragment {
         Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
     }
 
+
+    // NEEDED FOR QR CODE GENERATION
     private void saveEvent(Event newEvent, View view) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
+
+                    String theID = documentReference.getId();
+                    try {
+                        Bitmap qrCodeBitmap = makeQRBitmap(theID);
+                        uploadAndSaveQR(qrCodeBitmap, theID);
+
+//
+//                        Bitmap qrCodebmap = generateEventQR(theID);
+//                        uploadQR(qrCodebmap, theID);
+                    } catch (WriterException e) {
+                        throw new RuntimeException(e);
+                    }
                     Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
-
     }
+
+    /*
+    QR CODE GENERATION:
+    - making a bitmap (pixel image map) to store the qr code image
+    - saving the image in the firebase storage
+    - storing a url link in the event document in the database so the storage image can be accessed
+     */
+
+    private Bitmap makeQRBitmap(String eventDocumentID) throws WriterException {
+        QRCodeWriter writer = new QRCodeWriter();
+        int size = 300;
+        Bitmap bMap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+        BitMatrix bMatrix = writer.encode(eventDocumentID, BarcodeFormat.QR_CODE, size, size);
+
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                bMap.setPixel(x, y, bMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+        return bMap;
+    }
+
+    private void uploadAndSaveQR(Bitmap bMap, String eventDocumentID) {
+        StorageReference storageReference = storage.getReference().child("QRCodes/" + eventDocumentID + ".png");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean compressed = bMap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+
+        if (!compressed) {
+            Toast.makeText(getContext(), "Failed to compress QR code. Couldn't save image!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        byte[] data = baos.toByteArray();
+
+        StorageMetadata metadata = new StorageMetadata.Builder().setContentType("image/png").build();
+
+        UploadTask uploadTask = storageReference.putBytes(data, metadata);
+        uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+            String downloadurl = uri.toString();
+
+            // Creating the field the event will have to find the image in the firebase storage
+            Map<String, Object> qrData = new HashMap<>();
+            qrData.put("QRCodeUrl", downloadurl);
+
+            db.collection("events").document(eventDocumentID).set(qrData, SetOptions.merge())
+                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Your QR Code was succesfully generated!", Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: Couldn't set event data to store qr code url!", Toast.LENGTH_SHORT).show());
+
+            })
+        ).addOnFailureListener(e -> Toast.makeText(getContext(), "Error retrieving event qr url!", Toast.LENGTH_SHORT).show());
+    }
+
+
+//    // QR CODE GENERATION AND SAVING
+//    private Bitmap generateEventQR(String documentID) throws WriterException {
+//        QRCodeWriter writer = new QRCodeWriter();
+//        int size = 300;
+//        Bitmap bmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+//        BitMatrix bmatrix = writer.encode(documentID, BarcodeFormat.QR_CODE, size, size);
+//
+//        for (int x = 0; x < size; x++) {
+//            for (int y = 0; y < size; y++) {
+//                bmap.setPixel(x, y, bmatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+//            }
+//        }
+//        return bmap;
+//    }
+//
+//    private void uploadQR(Bitmap bmap, String x) {
+//        StorageReference sref = storage.getReference().child("QRCodes/" + x + ".png");
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//
+//        boolean compressed = bmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+//
+//        if (!compressed) {
+//            Toast.makeText(getContext(), "Failed to compress QR code", Toast.LENGTH_SHORT).show();
+//            return;
+//        } else {
+//            Toast.makeText(getContext(), "Compress worked", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        byte[] data = baos.toByteArray();
+//
+//        StorageMetadata metadata = new StorageMetadata.Builder()
+//                .setContentType("image/png")
+//                .build();
+//
+//        UploadTask uploadTask = sref.putBytes(data, metadata);
+//        uploadTask.addOnSuccessListener(taskSnapshot -> sref.getDownloadUrl().addOnSuccessListener(uri -> {
+//            String downloadurl = uri.toString();
+//            Toast.makeText(getContext(), downloadurl, Toast.LENGTH_SHORT).show();
+//            saveQR(x, downloadurl);
+//        })
+//        ).addOnFailureListener(e -> Toast.makeText(getContext(), "Bruh", Toast.LENGTH_SHORT).show());
+//    }
+//
+//    private void saveQR(String x, String downloadurl) {
+//        Map<String, Object> qrData = new HashMap<>();
+//        qrData.put("QRCodeUrl", downloadurl);
+//
+//        db.collection("events").document(x).set(qrData, SetOptions.merge())
+//                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Saved succesfully", Toast.LENGTH_SHORT).show())
+//                .addOnFailureListener(e -> Toast.makeText(getContext(), "It failed", Toast.LENGTH_SHORT).show());
+//    }
+
+
 
     private void checkStoragePermission() {
 

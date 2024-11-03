@@ -56,4 +56,6 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     implementation(libs.material.v130alpha02)
     implementation("com.google.android.libraries.places:places:4.0.0")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation("com.github.bumptech.glide:compiler:4.12.0")
 }

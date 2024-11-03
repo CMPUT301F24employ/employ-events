@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -17,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentHomeBinding;
 import com.google.firebase.firestore.CollectionReference;
@@ -93,6 +96,18 @@ public class HomeFragment extends Fragment {
     chatgpt: I want to create a scanqrcode fragment in android studio using zxming. In
     the fragment there is a button and I click on it to start scanning
     */
+
+    private void loadEvent(String eventID, ImageView view) {
+        db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Toast.makeText(getContext(), eventID, Toast.LENGTH_SHORT).show();
+                String url = documentSnapshot.getString("QRCodeUrl");
+                if (url != null) {
+                    Glide.with(this).load(url).into(view);
+                }
+            }
+        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Didn't work", Toast.LENGTH_SHORT).show());
+    }
 
     private void navigateToEventDetailsFrag(String eventID) {
         Bundle args = new Bundle();
