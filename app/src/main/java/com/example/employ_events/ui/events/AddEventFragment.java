@@ -10,8 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -46,17 +44,12 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 
 
@@ -349,9 +342,6 @@ public class AddEventFragment extends Fragment {
                         Bitmap qrCodeBitmap = makeQRBitmap(theID);
                         uploadAndSaveQR(qrCodeBitmap, theID);
 
-//
-//                        Bitmap qrCodebmap = generateEventQR(theID);
-//                        uploadQR(qrCodebmap, theID);
                     } catch (WriterException e) {
                         throw new RuntimeException(e);
                     }
