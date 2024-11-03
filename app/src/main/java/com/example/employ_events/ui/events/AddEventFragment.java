@@ -155,26 +155,14 @@ public class AddEventFragment extends Fragment {
                     eventDateButton.setError("Event date required");
                     eventDateButton.requestFocus();
                 }
-                /*else if (eventTime == null) {
-                    eventTimeButton.setError("Event time required");
-                    eventTimeButton.requestFocus();
-                }*/
                 else if (registrationStartDeadline == null) {
                     registrationStartDeadlineButton.setError("Registration opening date required");
                     registrationStartDeadlineButton.requestFocus();
                 }
-                /*else if (eventStartTime == null) {
-                    startTimeButton.setError("Registration opening time required");
-                    startTimeButton.requestFocus();
-                }*/
                 else if (registrationDeadline == null) {
                     registrationDeadlineButton.setError("Registration deadline date required");
                     registrationDeadlineButton.requestFocus();
                 }
-                /*else if (eventEndTime == null) {
-                    endTimeButton.setError("Registration deadline time required");
-                    endTimeButton.requestFocus();
-                }*/
                 else if (eventCapacity.trim().isEmpty()) {
                     eventCapacityInput.setError("Event capacity required");
                     eventCapacityInput.requestFocus();
@@ -189,11 +177,8 @@ public class AddEventFragment extends Fragment {
                     newEvent.setEventTitle(eventTitle);
                     newEvent.setDescription(description);
                     newEvent.setEventDate(eventDate);
-                    //newEvent.setEventTime(eventTime);
                     newEvent.setRegistrationStartDate(registrationStartDeadline);
-                    //newEvent.setStartTime(eventStartTime);
                     newEvent.setRegistrationDateDeadline(registrationDeadline);
-                    //newEvent.setEndTime(eventEndTime);
                     newEvent.setEventCapacity(Integer.valueOf(eventCapacity));
                     newEvent.setLimited(limitString.isEmpty() ? null : Integer.valueOf(limitString));
                     newEvent.setFee(feeString.isEmpty() ? null : Integer.valueOf(feeString));
