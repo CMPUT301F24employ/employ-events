@@ -103,7 +103,7 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
         if (getView() != null) {
             Bundle bundle = new Bundle();
             bundle.putString("EVENT_ID", event.getId()); // Pass event ID
-            Navigation.findNavController(getView()).navigate(R.id.action_eventListFragment_to_eventDetailsFragment, bundle);
+            Navigation.findNavController(getView()).navigate(R.id.action_eventListFragment_to_manageEventFragment, bundle);
         }
     }
 

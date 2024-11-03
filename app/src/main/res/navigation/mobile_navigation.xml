@@ -123,6 +123,9 @@
                 android:name="EVENT_ID"
                 app:argType="string" />
         </action>
+        <action
+            android:id="@+id/action_eventListFragment_to_manageEventFragment"
+            app:destination="@id/manageEventFragment" />
     </fragment>
 
     <fragment
@@ -137,6 +140,19 @@
             app:destination="@id/eventListFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/manageEventFragment"
+        android:name="com.example.employ_events.ui.events.ManageEventFragment"
+        android:label="Manage Event"
+        tools:layout="@layout/fragment_manage_event">
+
+
+        <action
+            android:id="@+id/action_manageEventFragment_to_eventListFragment"
+            app:destination="@id/eventListFragment" />
+    </fragment>
+
 
 
 </navigation>
