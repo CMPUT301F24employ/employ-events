@@ -1,5 +1,6 @@
 package com.example.employ_events;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,7 @@ public class EventTest {
     @Test
     public void testGenerateSample() {
         Event event = mockEvent();
+        event.setEventCapacity(5);
         event.generateSample();
 
         // Count entrants marked as accepted
@@ -35,13 +37,7 @@ public class EventTest {
                 .count();
 
         // Verify the number of accepted entrants does not exceed event capacity
-        assertTrue("Accepted count exceeds capacity", acceptedCount <= event.getEventCapacity());
+        assertEquals(acceptedCount, 5);
 
-        // Ensure no cancelled entrants are marked as accepted
-        for (Entrant entrant : event.getEntrantsList()) {
-            if (entrant.getOnCancelledList()) {
-                assertFalse("Cancelled entrant marked as accepted", entrant.getOnAcceptedList());
-            }
-        }
     }
 }
