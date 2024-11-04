@@ -40,7 +40,8 @@ public class EventDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
-        String eventId = db.collection("events").document().getId();
+        String eventId = getArguments().getString("eventId");
+        //String eventId = db.collection("events").document().getId();
         DocumentReference eventRef = db.collection("events").document(eventId);
         eventRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
