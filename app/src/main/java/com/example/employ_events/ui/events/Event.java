@@ -165,6 +165,9 @@ public class Event {
           return Boolean.TRUE;
         }
     }
+    public ArrayList<Entrant> getEntrantsList() {
+        return entrantsList;
+    }
 
     public void generateSample(){
         Random random = new Random();
