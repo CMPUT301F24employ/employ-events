@@ -102,7 +102,7 @@
 
             <!-- Fee Input -->
             <TextView
-                android:id="@+id/fee"
+                android:id="@+id/feeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"

@@ -55,26 +55,28 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView2">
 
         <TextView
-            android:id="@+id/faciltyName"
+            android:id="@+id/faciltyNameText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Facilty"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <Space
+        <TextView
+            android:id="@+id/facilityName"
             android:layout_width="match_parent"
             android:layout_height="26dp" />
 
         <TextView
-            android:id="@+id/eventDescription"
+            android:id="@+id/eventDescriptionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Event Description"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <Space
+        <TextView
+            android:id="@+id/eventDescription"
             android:layout_width="match_parent"
             android:layout_height="72dp" />
 
@@ -84,7 +86,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/eventLocation"
+                android:id="@+id/eventLocationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Location"
@@ -95,7 +97,7 @@
                 android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/registrationDeadline"
+                android:id="@+id/registrationDeadlineText"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:text="Registration Deadline"
@@ -110,7 +112,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/address"
+                android:id="@+id/eventLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint=" Address"
@@ -121,7 +123,7 @@
                 android:layout_height="24dp" />
 
             <TextView
-                android:id="@+id/deadline"
+                android:id="@+id/registrationDeadline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint=" MM/DD/YYYY"
@@ -134,7 +136,7 @@
             android:layout_height="22dp" />
 
         <TextView
-            android:id="@+id/eventDates"
+            android:id="@+id/eventDatesText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Event Start-End Dates"
@@ -142,7 +144,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/eventDates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint=" MM/DD/YYYY - MM/DD/YYYY"
@@ -163,7 +165,7 @@
                 android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/fee"
+                android:id="@+id/feeText"
                 android:layout_width="111dp"
                 android:layout_height="match_parent"
                 android:text="Fee"
@@ -189,7 +191,7 @@
                 android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/eventCost"
+                android:id="@+id/fee"
                 android:layout_width="111dp"
                 android:layout_height="40dp"
                 android:hint="Cost"

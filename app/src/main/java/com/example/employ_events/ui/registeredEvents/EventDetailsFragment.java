@@ -18,7 +18,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.example.employ_events.ui.events.ManageEventViewModel;
 
 import java.util.Objects;
 
@@ -41,21 +40,17 @@ public class EventDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
-        if (getArguments() != null) {
-            String eventId = getArguments().getString("EVENT_ID");
-            //eventsRef = db.collection("waitinglist");
-            if (eventId != null) {
-                DocumentReference eventRef = db.collection("events").document(eventId);
-                eventRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            displayDetails(document, galleryViewModel);
-                        }
-                    }
-                });
+        String eventId = db.collection("events").document().getId();
+        DocumentReference eventRef = db.collection("events").document(eventId);
+        eventRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    displayDetails(document, galleryViewModel);
+                }
             }
-        }
+        });
+
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
         joinButton.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +68,7 @@ public class EventDetailsFragment extends Fragment {
         description = binding.eventDescription;
         fee = binding.fee;
         date = binding.eventDates;
-        facility = binding.faciltyName;
+        facility = binding.facilityName; // do this and location separately
         location = binding.eventLocation;
         deadline = binding.registrationDeadline;
         geolocation = binding.geolocationStatus;
@@ -94,11 +89,6 @@ public class EventDetailsFragment extends Fragment {
             deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
             galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
         }
-
-//        if (document.get("registrationDateDeadline") != null) {
-//            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
-//            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
-//        }
 
         if (document.get("geoLocation") != null) {
             geolocation.setText(Objects.requireNonNull(document.get("geoLocation")).toString());

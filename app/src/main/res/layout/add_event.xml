@@ -140,7 +140,7 @@
 
             <!-- Fee Input -->
             <EditText
-                android:id="@+id/fee"
+                android:id="@+id/feeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter Fee (Optional)"
