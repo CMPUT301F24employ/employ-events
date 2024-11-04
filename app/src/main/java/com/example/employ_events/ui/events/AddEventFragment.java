@@ -30,6 +30,7 @@ import androidx.navigation.Navigation;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -338,6 +339,7 @@ public class AddEventFragment extends Fragment {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
 
                     String theID = documentReference.getId();
+                    createEntrantListSubcollection(documentReference);
                     try {
                         Bitmap qrCodeBitmap = makeQRBitmap(theID);
                         uploadAndSaveQR(qrCodeBitmap, theID);
@@ -349,7 +351,15 @@ public class AddEventFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
     }
-
+    /**
+     * Prepares an entrantList subcollection under the event document.
+     * (No documents are added to it initially.)
+     *
+     * @param eventDocumentReference The reference to the newly created event document.
+     */
+    private void createEntrantListSubcollection(DocumentReference eventDocumentReference) {
+        // No initial data or document is added here; the subcollection is simply available for future use.
+    }
     /*
     QR CODE GENERATION:
     - making a bitmap (pixel image map) to store the qr code image
