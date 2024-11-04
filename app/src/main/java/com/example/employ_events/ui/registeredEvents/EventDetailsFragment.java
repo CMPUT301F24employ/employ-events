@@ -13,10 +13,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
+import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.employ_events.ui.events.ManageEventViewModel;
 
 import java.util.Objects;
 
