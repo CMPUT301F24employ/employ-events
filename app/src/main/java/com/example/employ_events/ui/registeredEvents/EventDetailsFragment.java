@@ -1,7 +1,6 @@
 package com.example.employ_events.ui.registeredEvents;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,7 @@ public class EventDetailsFragment extends Fragment {
     private Button joinButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        DetailsViewModel galleryViewModel = new ViewModelProvider(this).get(DetailsViewModel.class);
+        ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
 
         binding = EventDetailsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -78,7 +77,7 @@ public class EventDetailsFragment extends Fragment {
         geolocation = binding.geolocationStatus;
     }
 
-    private void displayDetails(DocumentSnapshot document, DetailsViewModel galleryViewModel) {
+    private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
         if (document.get("eventTitle") != null) {
             name.setText(Objects.requireNonNull(document.get("eventTitle")).toString());
             galleryViewModel.getText().observe(getViewLifecycleOwner(), name::setText);

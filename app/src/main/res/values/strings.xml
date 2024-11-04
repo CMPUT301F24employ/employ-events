@@ -49,4 +49,7 @@
     <string name="select_registration_opening_time">Select Registration Opening Time</string>
     <string name="event_image">Event Image</string>
     <string name="select_registration_deadline_time">Select Registration Deadline Time</string>
+    <string name="update_banner">Update Banner</string>
+    <string name="qr_code">QR Code</string>
+    <string name="manage_entrants">Manage Entrants</string>
 </resources>

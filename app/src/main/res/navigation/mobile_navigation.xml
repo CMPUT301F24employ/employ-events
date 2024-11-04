@@ -151,6 +151,22 @@
         <action
             android:id="@+id/action_manageEventFragment_to_eventListFragment"
             app:destination="@id/eventListFragment" />
+        <action
+            android:id="@+id/action_manageEventFragment_to_editEventFragment"
+            app:destination="@id/editEventFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/editEventFragment"
+        android:name="com.example.employ_events.ui.events.EditEventFragment"
+        android:label="Edit Event"
+        tools:layout="@layout/edit_event">
+
+        <action
+            android:id="@+id/action_editEventFragment_to_manageEventFragment"
+            app:destination="@id/manageEventFragment" />
     </fragment>
 
 
