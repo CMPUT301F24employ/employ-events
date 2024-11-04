@@ -40,4 +40,14 @@ public class EventTest {
         assertEquals(acceptedCount, 5);
 
     }
+    @Test
+    public void testGenerateSampleIfWaitlistLessThanCapacity(){
+        Event event = mockEvent();
+        event.setEventCapacity(15);
+        event.generateSample();
+        long acceptedCount = event.getEntrantsList().stream()
+                .filter(Entrant::getOnAcceptedList)
+                .count();
+        assertEquals(acceptedCount,10);
+    }
 }
