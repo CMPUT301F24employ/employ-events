@@ -16,12 +16,12 @@
         <!-- Event Image -->
         <ImageView
             android:id="@+id/bannerImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_width="320dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="5dp"
+            android:contentDescription="@string/event_image"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_camera"
-            android:contentDescription="@string/event_image" />
+            android:src="@drawable/ic_menu_camera" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -75,75 +75,83 @@
                 android:id="@+id/registration_period"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Registration Period: Registration Open - Registration Close"
+                android:layout_marginBottom="12dp"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp" />
+                android:text="Registration Period: Registration Open - Registration Close"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <TextView
                 android:id="@+id/event_capacity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Event Capacity: "
+                android:layout_marginBottom="12dp"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp" />
+                android:text="Event Capacity: "
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <!-- Capacity Limit Input -->
             <TextView
                 android:id="@+id/waiting_list_capacity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Waiting List Capacity:"
-                android:padding="12dp"
                 android:layout_marginBottom="12dp"
-                android:visibility="visible"
-                 />
+                android:padding="12dp"
+                android:text="Waiting List Capacity:"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:visibility="visible" />
 
             <!-- Fee Input -->
             <TextView
                 android:id="@+id/fee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fee:"
+                android:layout_marginBottom="12dp"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp" />
+                android:text="Fee:"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <!-- Geolocation Checkbox -->
             <TextView
                 android:id="@+id/geolocation_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="8dp"
                 android:text="Geolocation Requirement: "
-                android:padding="8dp" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="fill_vertical"
+            android:layout_gravity="fill_horizontal"
             android:orientation="horizontal" >
-            <Button
-                android:id="@+id/qr_code_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="@drawable/button_background"
-                android:text="QR Code" />
-
-            <Button
-                android:id="@+id/view_entrants_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="@drawable/button_background"
-                android:text="View Entrants"/>
 
             <Button
                 android:id="@+id/edit_event_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Edit Event"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
                 android:background="@drawable/button_background"
-                android:layout_margin="3dp" />
+                android:text="@string/update_banner"/>
+
+            <Button
+                android:id="@+id/qr_code_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:background="@drawable/button_background"
+                android:text="@string/qr_code" />
+
+            <Button
+                android:id="@+id/view_entrants_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:background="@drawable/button_background"
+                android:text="@string/manage_entrants" />
 
         </LinearLayout>
     </LinearLayout>

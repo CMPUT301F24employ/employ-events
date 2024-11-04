@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class DetailsViewModel extends ViewModel {
+public class ManageEventViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
-    public DetailsViewModel() {
+    public ManageEventViewModel() {
         mText = new MutableLiveData<>();
 
     }
