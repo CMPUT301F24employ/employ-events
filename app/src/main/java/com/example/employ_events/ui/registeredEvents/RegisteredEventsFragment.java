@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.employ_events.databinding.FragmentRegisteredEventsBinding;
 import com.example.employ_events.ui.events.Event;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -50,8 +52,22 @@ public class RegisteredEventsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(registeredArrayAdapter);
 
+        loadRegisteredEvents();
 
         return root;
+    }
+
+    private void loadRegisteredEvents() {
+        eventsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                eventDataList.clear();
+                for (DocumentSnapshot document : task.getResult()) {
+                    Event event = document.toObject(Event.class);
+                    eventDataList.add(event);
+                }
+                registeredArrayAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
 

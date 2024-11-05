@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
+import com.example.employ_events.ui.entrants.Entrant;
+import com.example.employ_events.ui.events.Event;
 import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -43,6 +46,7 @@ public class EventDetailsFragment extends Fragment {
     private CollectionReference eventsRef;
 
     private Button joinButton;
+    private Event currentEvent;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
@@ -61,6 +65,16 @@ public class EventDetailsFragment extends Fragment {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document != null && document.exists()) {
+                            currentEvent = new Event(
+                                    document.getId(),
+                                    document.getString("eventTitle"),
+                                    document.getString("facilityID"),
+                                    document.getDate("eventDate"),
+                                    document.getDate("registrationDateDeadline"),
+                                    document.getDate("registrationStartDate"),
+                                    document.getBoolean("geoLocation"),
+                                    document.getLong("eventCapacity").intValue()
+                            );
                             displayDetails(document, galleryViewModel);
                         }
                     }
@@ -70,12 +84,21 @@ public class EventDetailsFragment extends Fragment {
 
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
-        joinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        joinButton.setOnClickListener(view -> {
+            if (currentEvent != null) {
+                Entrant entrant = new Entrant();
+
+                if (currentEvent.addEntrant(entrant)) {
+                    entrant.setOnWaitingList(true);
+                    Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
+                    eventsRef.add(currentEvent);
+                }
+                else {
+                    entrant.setOnWaitingList(false);
+                    Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
 
         return root;
     }
@@ -126,8 +149,7 @@ public class EventDetailsFragment extends Fragment {
         eventCapacity.setText(event_capacity);
         galleryViewModel.getText().observe(getViewLifecycleOwner(), eventCapacity::setText);
 
-        String geoLocation = "Geolocation required: " +
-                Objects.requireNonNull(document.getBoolean("geoLocation"));
+        String geoLocation = "Geolocation required: " + Objects.requireNonNull(document.getBoolean("geoLocation"));
         geolocation.setText(geoLocation);
         galleryViewModel.getText().observe(getViewLifecycleOwner(), geolocation::setText);
 
