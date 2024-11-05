@@ -80,7 +80,7 @@ public class AddEventFragment extends Fragment {
         EditText eventTitleInput = binding.eventTitle;
         EditText descriptionInput = binding.description;
         EditText limitInput = binding.limit;
-        EditText feeInput = binding.fee;
+        EditText feeInput = binding.feeText;
         EditText eventCapacityInput = binding.eventCapacity;
         Button eventDateButton = binding.eventDate;
         Button registrationDeadlineButton = binding.registrationDateDeadline;

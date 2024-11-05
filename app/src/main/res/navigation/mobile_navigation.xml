@@ -154,6 +154,9 @@
         <action
             android:id="@+id/action_manageEventFragment_to_editEventFragment"
             app:destination="@id/editEventFragment" />
+        <action
+            android:id="@+id/action_manageEventFragment_to_manageEventEntrantsFragment"
+            app:destination="@id/manageEventEntrantsFragment" />
 
 
     </fragment>
@@ -168,6 +171,16 @@
             android:id="@+id/action_editEventFragment_to_manageEventFragment"
             app:destination="@id/manageEventFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/manageEventEntrantsFragment"
+        android:name="com.example.employ_events.ui.events.ManageEventEntrants"
+        android:label="event entrants"
+        tools:layout="@layout/fragment_manage_event_entrants">
+    </fragment>
+
+
+
 
 
 

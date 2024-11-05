@@ -21,6 +21,7 @@ public class EventTest {
             Entrant entrant = new Entrant();
             entrant.setOnWaitingList(true); // Set initial waiting list status
             entrant.setOnCancelledList(false); // Ensure they are not cancelled
+            entrant.setOnAcceptedList(false);
             event.addEntrant(entrant);
         }
         return event;
@@ -39,5 +40,15 @@ public class EventTest {
         // Verify the number of accepted entrants does not exceed event capacity
         assertEquals(acceptedCount, 5);
 
+    }
+    @Test
+    public void testGenerateSampleIfWaitlistLessThanCapacity(){
+        Event event = mockEvent();
+        event.setEventCapacity(15);
+        event.generateSample();
+        long acceptedCount = event.getEntrantsList().stream()
+                .filter(Entrant::getOnAcceptedList)
+                .count();
+        assertEquals(acceptedCount,10);
     }
 }
