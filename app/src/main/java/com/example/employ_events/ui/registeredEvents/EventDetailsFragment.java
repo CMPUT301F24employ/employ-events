@@ -1,5 +1,7 @@
 package com.example.employ_events.ui.registeredEvents;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -40,7 +42,7 @@ public class EventDetailsFragment extends Fragment {
     private TextView name, fee, description, date, facility, location,
             geolocation, period, waitingListCapacity, eventCapacity;
     private ImageView bannerImage;
-    private String bannerUri;
+    private String bannerUri, uniqueID;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -53,6 +55,10 @@ public class EventDetailsFragment extends Fragment {
 
         binding = EventDetailsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        // Retrieve uniqueID from SharedPreferences for Firestore lookup
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        uniqueID = sharedPreferences.getString("uniqueID", null);
+
 
         db = FirebaseFirestore.getInstance();
         eventsRef = db.collection("events");
@@ -93,14 +99,16 @@ public class EventDetailsFragment extends Fragment {
             }
 
             Entrant entrant = new Entrant();
-            entrant.setOnWaitingList(Boolean.FALSE);
+            entrant.setOnWaitingList(false);
             entrant.setOnAcceptedList(Boolean.FALSE);
             entrant.setOnCancelledList(Boolean.FALSE);
+            entrant.setOnRegisteredList(false);
 
             if (currentEvent.addEntrant(entrant)) {
                 entrant.setOnWaitingList(Boolean.TRUE);
                 Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-                eventsRef.add(currentEvent);
+                String eventID = getArguments().getString("EVENT_ID");
+                eventsRef.document(eventID).collection("entrantsList").document("uniqueID").set(entrant);
             } else {
                 Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
             }
