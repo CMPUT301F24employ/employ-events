@@ -180,11 +180,11 @@ public class AddEventFragment extends Fragment {
                 }
                 else {
                     // Generate a unique ID for the event
-                    String id = db.collection("events").document().getId(); // Generate a new ID
+                    //String id = db.collection("events").document().getId(); // Generate a new ID
                     Event newEvent = new Event();
 
                     // Set event details
-                    newEvent.setId(id);
+                    //newEvent.setId(id);
                     newEvent.setFacilityID(facilityID);
                     newEvent.setEventTitle(eventTitle);
                     newEvent.setDescription(description);
@@ -438,6 +438,7 @@ public class AddEventFragment extends Fragment {
             // Creating the field the event will have to find the image in the firebase storage
             Map<String, Object> qrData = new HashMap<>();
             qrData.put("QRCodeUrl", downloadurl);
+            qrData.put("id", eventDocumentID);
 
             // Save the QR code URL to the corresponding event document
             db.collection("events").document(eventDocumentID).set(qrData, SetOptions.merge())

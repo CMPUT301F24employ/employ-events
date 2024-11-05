@@ -26,7 +26,6 @@ public class Event {
     /**
      * Constructs an Event with the specified details.
      *
-     * @param id                     The unique identifier for the event.
      * @param eventTitle             The title of the event.
      * @param eventDate              The date when the event will occur.
      * @param registrationDateDeadline The date by which registration must be completed.
@@ -35,10 +34,10 @@ public class Event {
      * @param organizerID            The ID of the facility organizing the event.
      * @param eventCapacity          The maximum number of entrants allowed for the event.
      */
-    public Event(String id, String eventTitle, String organizerID,
+    public Event(String eventTitle, String organizerID,
                  Date eventDate, Date registrationDateDeadline, Date registrationStartDate,
                  Boolean geoLocation, Integer eventCapacity){
-        this.id = id;
+        //this.id = id;
         this.eventDate = eventDate;
         this.eventTitle = eventTitle;
         this.registrationStartDate = registrationStartDate;
