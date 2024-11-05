@@ -157,11 +157,13 @@ public class Event {
         if (this.limited != null){
             if (entrantsList.size() < this.limited){
                 entrantsList.add(entrant);
+                entrant.setOnWaitingList(Boolean.TRUE);
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;
         } else{
           entrantsList.add(entrant);
+          entrant.setOnWaitingList(Boolean.TRUE);
           return Boolean.TRUE;
         }
     }
