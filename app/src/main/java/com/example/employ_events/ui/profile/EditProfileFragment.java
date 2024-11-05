@@ -139,7 +139,7 @@ public class EditProfileFragment extends Fragment {
 
         // Navigate to the profile screen when the changes are confirmed.
         confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(EditProfileFragment.this)
-                .navigate(R.id.action_nav_edit_profile_to_nav_profile)));
+                .popBackStack(R.id.nav_profile, false)));
 
         return root;
     }
@@ -163,7 +163,6 @@ public class EditProfileFragment extends Fragment {
      * @param editProfileViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, EditProfileViewModel editProfileViewModel) {
-
         // if NULL, it will be blank. Otherwise, display the users info.
         if (document.get("name") != null) {
             editName.setText(Objects.requireNonNull(document.get("name")).toString());
@@ -179,7 +178,6 @@ public class EditProfileFragment extends Fragment {
         }
 
         boolean isCustomPFP = document.getBoolean("customPFP") != null && Boolean.TRUE.equals(document.getBoolean("customPFP"));
-
         if (isCustomPFP && document.get("pfpURI") != null) {
             // Load custom profile picture
             String uri = Objects.requireNonNull(document.get("pfpURI")).toString();
@@ -190,14 +188,12 @@ public class EditProfileFragment extends Fragment {
             String name = document.get("name") != null ? Objects.requireNonNull(document.get("name")).toString() : "-";
             loadDefaultProfileImage(name);
         }
-
     }
 
     /**
      * Loads a default profile picture based on the initial of the user's name.
      * If the initial is not a letter, or if an image is not found for that initial, a fallback image is used.
      * The image is retrieved from Firebase Storage and displayed in the UI.
-     *
      * @param name The name of the user, used to determine the initial for the profile picture.
      */
     private void loadDefaultProfileImage(String name) {
@@ -294,7 +290,6 @@ public class EditProfileFragment extends Fragment {
     /**
      * Uploads a custom profile picture to Firebase Storage and updates the user's profile with the image URI.
      * After successfully uploading, the `saveProfile` method is called to update the profile data in Firestore.
-     *
      * @param editProfile The Profile object representing the user's profile.
      * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
      */
@@ -311,7 +306,6 @@ public class EditProfileFragment extends Fragment {
     /**
      * Saves the user's profile information in Firestore.
      * The data is saved under the document ID `uniqueID`, with fields for name, email, phone number, profile picture URI, and custom profile picture flag.
-     *
      * @param editProfile The Profile object representing the user's profile.
      * @param uniqueID    The unique identifier for the user's document in Firestore.
      * @param onComplete  A callback to execute after successfully saving the profile data in Firestore.
