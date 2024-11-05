@@ -10,6 +10,8 @@
     <string name="menu_home">Home</string>
     <string name="menu_facility">Facility</string>
     <string name="menu_profile">Profile</string>
+    <string name="menu_notifications">Notification</string>
+    <string name="edit_n_setting">Notification Setting</string>
     <string name="organizer_notification_status">Organizer Notifications</string>
     <string name="admin_notification_status">Administrator Notifications</string>
     <string name="user_phone_number">User Phone Number</string>
