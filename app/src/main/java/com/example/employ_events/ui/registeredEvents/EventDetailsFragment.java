@@ -1,10 +1,14 @@
 package com.example.employ_events.ui.registeredEvents;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,12 +23,21 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 public class EventDetailsFragment extends Fragment {
 
     private EventDetailsBinding binding;
-    private TextView name, fee, description, date, facility, location, geolocation, deadline;
+    private TextView name, fee, description, date, facility, location,
+            geolocation, period, waitingListCapacity, eventCapacity;
+    private ImageView bannerImage;
+    private String bannerUri;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -56,7 +69,6 @@ public class EventDetailsFragment extends Fragment {
         }
 
 
-
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,43 +84,94 @@ public class EventDetailsFragment extends Fragment {
         name = binding.eventName;
         description = binding.eventDescription;
         fee = binding.fee;
-        date = binding.eventDates;
-        facility = binding.facilityName; // do this and location separately
+        date = binding.eventDate;
+        facility = binding.faciltyName; // do this and location separately
         location = binding.eventLocation;
-        deadline = binding.registrationDeadline;
+        period = binding.registrationPeriod;
         geolocation = binding.geolocationStatus;
+        bannerImage = binding.bannerImage;
+        waitingListCapacity = binding.waitingListCapacity;
+        eventCapacity = binding.eventCapacity;
+
     }
 
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
-        if (document.get("eventTitle") != null) {
-            name.setText(Objects.requireNonNull(document.get("eventTitle")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
-        }
+        // Set optional fields to invisible until it is determined to be non-null.
+        waitingListCapacity.setVisibility(View.GONE);
+        fee.setVisibility(View.GONE);
+        bannerImage.setVisibility(View.GONE);
 
-        if (document.get("eventDate") != null) {
-            date.setText(Objects.requireNonNull(document.get("eventDate")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), date::setText);
-        }
+        // Set fields to corresponding views.
 
-        if (document.get("registrationDateDeadline") != null) {
-            deadline.setText(Objects.requireNonNull(document.get("registrationDateDeadline")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), deadline::setText);
-        }
+        name.setText(Objects.requireNonNull(document.get("eventTitle")).toString());
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
 
-        if (document.get("geoLocation") != null) {
-            geolocation.setText(Objects.requireNonNull(document.get("geoLocation")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), geolocation::setText);
-        }
+        // To format dates in user friendly format using month abbreviations and 12 hour clock with am/pm.
+        Format formatter = new SimpleDateFormat("MMM-dd-yyyy hh:mm aa");
+        String eventDate = formatter.format(document.getDate("eventDate"));
+        String regOpenDate = formatter.format(document.getDate("registrationStartDate"));
+        String regCloseDate = formatter.format(document.getDate("registrationDateDeadline"));
 
-        if (document.get("description") != null) {
-            description.setText(Objects.requireNonNull(document.get("description")).toString());
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), description::setText);
+        date.setText(Objects.requireNonNull(eventDate));
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), date::setText);
+
+        description.setText(Objects.requireNonNull(document.get("description")).toString());
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), description::setText);
+
+        String registrationPeriod = "Registration Period: " + regOpenDate + " - " + regCloseDate;
+        period.setText(registrationPeriod);
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), period::setText);
+
+        String event_capacity = "Event Capacity: " + Objects.requireNonNull(document.get("eventCapacity"));
+        eventCapacity.setText(event_capacity);
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), eventCapacity::setText);
+
+        String geoLocation = "Geolocation required: " +
+                Objects.requireNonNull(document.getBoolean("geoLocation"));
+        geolocation.setText(geoLocation);
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), geolocation::setText);
+
+        // Check the non required fields and set visible if it is not null.
+
+        if (document.get("limited") != null) {
+            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited")).toString();
+            waitingListCapacity.setVisibility(View.VISIBLE);
+            waitingListCapacity.setText(waitingList);
+            galleryViewModel.getText().observe(getViewLifecycleOwner(), waitingListCapacity::setText);
         }
 
         if (document.get("fee") != null) {
-            fee.setText(Objects.requireNonNull(document.get("fee")).toString());
+            String fee_ = "Fee: " + Objects.requireNonNull(document.get("fee"));
+            fee.setVisibility(View.VISIBLE);
+            fee.setText(fee_);
             galleryViewModel.getText().observe(getViewLifecycleOwner(), fee::setText);
         }
+
+        if (document.get("bannerUri") != null) {
+            bannerImage.setVisibility(View.VISIBLE);
+            bannerUri = Objects.requireNonNull(document.get("bannerUri")).toString();
+            loadImageFromUrl(bannerUri);
+        }
+    }
+
+    /**
+     * Loads an image from a URL and displays it in the ImageView.
+     * @param url The URL of the image to be loaded.
+     */
+    private void loadImageFromUrl(String url) {
+        new Thread(() -> {
+            try {
+                URL imageUrl = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                requireActivity().runOnUiThread(() -> bannerImage.setImageBitmap(bitmap));
+            } catch (IOException e) {
+                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
+            }
+        }).start();
     }
 
     @Override
