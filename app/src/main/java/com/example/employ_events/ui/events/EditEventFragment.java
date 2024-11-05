@@ -21,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
@@ -39,6 +38,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A Fragment for editing event details, including uploading and displaying a banner image.
+ * This fragment allows users to select an image from their device, upload it to Firebase Storage,
+ * and save the image URI to Firestore.
+ */
 public class EditEventFragment extends Fragment {
 
     private EditEventBinding binding;
@@ -53,12 +57,14 @@ public class EditEventFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        EditEventViewModel editEventViewModel =
-                new ViewModelProvider(this).get(EditEventViewModel.class);
+
         binding = EditEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // Initialize Firestore instance
         db = FirebaseFirestore.getInstance();
+
+        // Initialize UI components
         initializeViews();
 
         // Initialize the ActivityResultLauncher for requesting permission
@@ -104,9 +110,11 @@ public class EditEventFragment extends Fragment {
             isInitialized = false;
         });
 
-        String eventId = getArguments().getString("EVENT_ID");
+        // Get the event ID from the arguments
+        String eventId = requireArguments().getString("EVENT_ID");
 
-        DocumentReference eventRef = db.collection("events").document(eventId);
+        // Load the event's current banner from Firestore
+        DocumentReference eventRef = db.collection("events").document(Objects.requireNonNull(eventId));
         eventRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -118,6 +126,7 @@ public class EditEventFragment extends Fragment {
                         bannerImageView.setVisibility(View.VISIBLE);
                     }
                     else {
+                        // Mark as uninitialized if no URI found
                         isInitialized = false;
                     }
                 }
@@ -135,20 +144,17 @@ public class EditEventFragment extends Fragment {
                     NavHostFragment.findNavController(EditEventFragment.this)
                         .popBackStack(R.id.manageEventFragment, false);
                 }
-
             } else {
                 saveBannerOnly(eventId, null, () -> NavHostFragment.findNavController(EditEventFragment.this)
                         .popBackStack(R.id.manageEventFragment, false)); // Returns to ManageEventFragment
             }
         });
 
-
         return root;
     }
 
-
     /**
-     * Launches the image picker intent to select a profile picture.
+     * Launches the image picker intent to select a banner.
      */
     private void pickImage() {
         // Check for storage permission
@@ -161,6 +167,8 @@ public class EditEventFragment extends Fragment {
 
     /**
      * Uploads the banner image to Firebase Storage and saves the URI to Firestore.
+     * @param eventId The ID of the event to which the banner belongs.
+     * @param onComplete A Runnable to be executed after the upload completes.
      */
     private void uploadBannerAndSaveOnly(String eventId, Runnable onComplete) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
@@ -176,6 +184,9 @@ public class EditEventFragment extends Fragment {
 
     /**
      * Saves only the banner URI to Firestore.
+     * @param eventId The ID of the event to update.
+     * @param bannerUrl The URL of the uploaded banner image, or null if no new banner was uploaded.
+     * @param onComplete A Runnable to be executed after the update completes.
      */
     private void saveBannerOnly(String eventId, String bannerUrl, Runnable onComplete) {
         Map<String, Object> data = new HashMap<>();
@@ -194,8 +205,10 @@ public class EditEventFragment extends Fragment {
                 );
     }
 
+    /**
+     * Initializes UI components by getting references from the binding object.
+     */
     private void initializeViews() {
-        // Get references to views and buttons
         saveButton = binding.saveEventButton;
         uploadBannerButton = binding.uploadBannerButton;
         bannerImageView = binding.bannerImage;
@@ -231,12 +244,9 @@ public class EditEventFragment extends Fragment {
         }).start();
     }
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
-
-
 }

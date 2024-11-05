@@ -55,45 +55,40 @@ import java.util.Map;
 
 
 /**
- * AddEventFragment is a Fragment that allows organizers to create an new event
- * by providing details such as title, description, dates, time, fee, capacity and location.
+ * AddEventFragment is a Fragment that allows organizers to create a new event
+ * by providing details such as title, description, dates, time, fee, capacity, and location.
  */
 public class AddEventFragment extends Fragment {
 
     private AddEventBinding binding;
+    private EditText eventTitleInput, descriptionInput, limitInput, feeInput, eventCapacityInput;
+    private CheckBox geoLocation;
+    private Button uploadBannerButton, removeBannerButton, saveButton,  registrationStartDeadlineButton, registrationDeadlineButton, eventDateButton;
+    private ImageView bannerImageView;
     private Date eventDate, registrationDeadline, registrationStartDeadline;
     private FirebaseFirestore db;
-    private String facilityID; // Variable to hold the facility ID
+    private String facilityID;
     private Uri bannerUri;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
-    FirebaseStorage storage = FirebaseStorage.getInstance();
+    private FirebaseStorage storage;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = AddEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Initialize Firestore database instance
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
 
-        // Get references to input fields and buttons
-        EditText eventTitleInput = binding.eventTitle;
-        EditText descriptionInput = binding.description;
-        EditText limitInput = binding.limit;
-        EditText feeInput = binding.feeText;
-        EditText eventCapacityInput = binding.eventCapacity;
-        Button eventDateButton = binding.eventDate;
-        Button registrationDeadlineButton = binding.registrationDateDeadline;
-        Button registrationStartDeadlineButton = binding.registrationStartDeadline;
-        Button saveButton = binding.saveEventButton;
-        CheckBox geoLocation = binding.geolocationStatus;
-        Button uploadBannerButton = binding.uploadBannerButton;
-        ImageView bannerImageView = binding.bannerImage;
-        Button removeBannerButton = binding.removeBannerButton;
-
-        // Unique ID
+        // Unique ID retrieval
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
+
+        // Initialize the UI components for the fragment
+        initializeViews();
 
         // Initialize the ActivityResultLauncher for requesting permission
         requestPermissionLauncher = registerForActivityResult(
@@ -126,7 +121,7 @@ public class AddEventFragment extends Fragment {
         // Fetch the facility ID
         fetchFacilityID(uniqueID);
 
-        // Date picker dialogs
+        // Set up date picker dialogs
         eventDateButton.setOnClickListener(view -> showDateTimePicker(eventDateButton, "eventDate"));
         registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "endDate"));
         registrationStartDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationStartDeadlineButton, "startDate"));
@@ -144,7 +139,6 @@ public class AddEventFragment extends Fragment {
             removeBannerButton.setVisibility(View.GONE); // Hide the remove button
         });
 
-
         // Save event button click listener
         saveButton.setOnClickListener(view -> {
             if (facilityID == null) {
@@ -159,6 +153,7 @@ public class AddEventFragment extends Fragment {
                 String feeString = feeInput.getText().toString();
                 String eventCapacity = eventCapacityInput.getText().toString();
 
+                // Validate inputs
                 if (eventTitle.trim().isEmpty()) {
                     eventTitleInput.setError("Event title required");
                     eventTitleInput.requestFocus();
@@ -188,6 +183,7 @@ public class AddEventFragment extends Fragment {
                     String id = db.collection("events").document().getId(); // Generate a new ID
                     Event newEvent = new Event();
 
+                    // Set event details
                     newEvent.setId(id);
                     newEvent.setFacilityID(facilityID);
                     newEvent.setEventTitle(eventTitle);
@@ -199,13 +195,13 @@ public class AddEventFragment extends Fragment {
                     newEvent.setLimited(limitString.isEmpty() ? null : Integer.valueOf(limitString));
                     newEvent.setFee(feeString.isEmpty() ? null : Integer.valueOf(feeString));
                     newEvent.setGeoLocation(geoLocation.isChecked());
+                    // Upload banner and/or save event
                     if (bannerUri != null) {
                         uploadBannerAndSaveEvent(newEvent, view);
                     } else {
                         saveEvent(newEvent, view);
                     }
                 }
-
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error creating event!", Toast.LENGTH_SHORT).show();
             }
@@ -214,6 +210,30 @@ public class AddEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Initializes the views for the fragment.
+     */
+    private void initializeViews() {
+        eventTitleInput = binding.eventTitle;
+        descriptionInput = binding.description;
+        limitInput = binding.limit;
+        feeInput = binding.feeText;
+        eventCapacityInput = binding.eventCapacity;
+        eventDateButton = binding.eventDate;
+        registrationDeadlineButton = binding.registrationDateDeadline;
+        registrationStartDeadlineButton = binding.registrationStartDeadline;
+        saveButton = binding.saveEventButton;
+        geoLocation = binding.geolocationStatus;
+        uploadBannerButton = binding.uploadBannerButton;
+        bannerImageView = binding.bannerImage;
+        removeBannerButton = binding.removeBannerButton;
+    }
+
+    /**
+     * Displays a DatePicker and TimePicker for selecting event dates and times.
+     * @param button The button that triggers the date and time picker.
+     * @param filter The type of date being set (event date, registration start date, or registration deadline).
+     */
     private void showDateTimePicker(Button button, String filter) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -253,12 +273,10 @@ public class AddEventFragment extends Fragment {
                             },
                             hour, minute, true // Use 24-hour format
                     );
-
                     timePickerDialog.show();
                 },
                 year, month, day
         );
-
         // Set the minimum date based on filter type
         if (filter.equals("eventDate") || filter.equals("startDate")) {
             datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
@@ -267,13 +285,11 @@ public class AddEventFragment extends Fragment {
             datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
             datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
         }
-
         datePickerDialog.show();
     }
 
     /**
      * Retrieves the facility ID associated with the given unique ID.
-     *
      * @param uniqueID The unique ID of the user.
      * @param listener Callback to return the facility ID.
      */
@@ -292,7 +308,6 @@ public class AddEventFragment extends Fragment {
 
     /**
      * Fetches the facility ID for the current user and stores it in the facilityID variable.
-     *
      * @param uniqueID The unique ID of the user.
      */
     public void fetchFacilityID(String uniqueID) {
@@ -320,6 +335,11 @@ public class AddEventFragment extends Fragment {
         pickImageLauncher.launch(intent);
     }
 
+    /**
+     * Uploads the event banner to Firebase Storage and saves the event details in Firestore.
+     * @param newEvent The Event object containing event details.
+     * @param view The view from which the operation is triggered.
+     */
     private void uploadBannerAndSaveEvent(Event newEvent, View view) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(bannerUri)
@@ -331,8 +351,11 @@ public class AddEventFragment extends Fragment {
 
     }
 
-
-    // NEEDED FOR QR CODE GENERATION
+    /**
+     * Saves the event details to Firestore.
+     * @param newEvent The Event object to be saved.
+     * @param view The view from which the operation is triggered.
+     */
     private void saveEvent(Event newEvent, View view) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
@@ -351,6 +374,7 @@ public class AddEventFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
     }
+
     /**
      * Prepares an entrantList subcollection under the event document.
      * (No documents are added to it initially.)
@@ -360,13 +384,19 @@ public class AddEventFragment extends Fragment {
     private void createEntrantListSubcollection(DocumentReference eventDocumentReference) {
         // No initial data or document is added here; the subcollection is simply available for future use.
     }
+
     /*
     QR CODE GENERATION:
     - making a bitmap (pixel image map) to store the qr code image
     - saving the image in the firebase storage
     - storing a url link in the event document in the database so the storage image can be accessed
      */
-
+    /**
+     * Generates a QR code bitmap for the given event document ID.
+     * @param eventDocumentID The unique identifier for the event.
+     * @return A Bitmap object representing the QR code.
+     * @throws WriterException If there is an error in generating the QR code.
+     */
     private Bitmap makeQRBitmap(String eventDocumentID) throws WriterException {
         QRCodeWriter writer = new QRCodeWriter();
         int size = 300;
@@ -381,20 +411,25 @@ public class AddEventFragment extends Fragment {
         return bMap;
     }
 
+    /**
+     * Uploads the QR code bitmap to Firebase Storage and saves the URL in Firestore.
+     * @param bMap The Bitmap object representing the QR code.
+     * @param eventDocumentID The unique identifier for the event associated with the QR code.
+     */
     private void uploadAndSaveQR(Bitmap bMap, String eventDocumentID) {
         StorageReference storageReference = storage.getReference().child("QRCodes/" + eventDocumentID + ".png");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // Compress the bitmap to PNG format
         boolean compressed = bMap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-
         if (!compressed) {
             Toast.makeText(getContext(), "Failed to compress QR code. Couldn't save image!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         byte[] data = baos.toByteArray();
-
         StorageMetadata metadata = new StorageMetadata.Builder().setContentType("image/png").build();
 
+        // Start uploading the QR code image to Firebase Storage
         UploadTask uploadTask = storageReference.putBytes(data, metadata);
         uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
             String downloadurl = uri.toString();
@@ -403,14 +438,13 @@ public class AddEventFragment extends Fragment {
             Map<String, Object> qrData = new HashMap<>();
             qrData.put("QRCodeUrl", downloadurl);
 
+            // Save the QR code URL to the corresponding event document
             db.collection("events").document(eventDocumentID).set(qrData, SetOptions.merge())
                     .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Your QR Code was succesfully generated!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: Couldn't set event data to store qr code url!", Toast.LENGTH_SHORT).show());
-
             })
         ).addOnFailureListener(e -> Toast.makeText(getContext(), "Error retrieving event qr url!", Toast.LENGTH_SHORT).show());
     }
-
 
     /**
      * Checks if storage permission is granted and requests it if necessary.

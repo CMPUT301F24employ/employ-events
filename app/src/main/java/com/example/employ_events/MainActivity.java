@@ -8,6 +8,7 @@ import android.view.Menu;
 
 import com.example.employ_events.ui.facility.CreateFacilityFragment;
 import com.example.employ_events.ui.facility.Facility;
+import com.example.employ_events.ui.facility.FacilityFragment;
 import com.example.employ_events.ui.profile.NewProfileFragment;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
@@ -31,18 +32,12 @@ import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
-        implements CreateFacilityFragment.CreateFacilityDialogListener, NewProfileFragment.NewProfileDialogListener{
+        implements NewProfileFragment.NewProfileDialogListener{
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseFirestore db;
 
-    @Override
-    public void createFacility(Facility facility, String uniqueID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("organizer", true);
-        db.collection("facilities").add(facility);
-        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
-    }
+
 
     @Override
     public void provideInfo(String name, String email, String uniqueID) {
