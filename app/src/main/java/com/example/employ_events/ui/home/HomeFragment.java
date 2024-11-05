@@ -119,8 +119,8 @@ public class HomeFragment extends Fragment {
 
     private void navigateToEventDetailsFrag(String eventID) {
         Bundle args = new Bundle();
-        args.putString("eventData", eventID);
-        NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_nav_home_to_entrantEventDetails, args);
+        args.putString("EVENT_ID", eventID);
+        NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_homeFragment_to_eventDetailsFragment, args);
     }
 
     private void scanInfo() {
