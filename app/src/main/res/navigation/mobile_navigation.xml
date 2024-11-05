@@ -141,6 +141,9 @@
         <action
             android:id="@+id/action_manageEventFragment_to_manageEventEntrantsFragment"
             app:destination="@id/manageEventEntrantsFragment" />
+        <action
+            android:id="@+id/action_manageEventFragment_to_download_qr_code"
+            app:destination="@id/download_qr_code" />
     </fragment>
 
     <fragment
@@ -181,6 +184,13 @@
         android:label="Send Notification Screen"
         tools:layout="@layout/fragment_send_notification_screen">
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/download_qr_code"
+        android:name="com.example.employ_events.ui.events.DownloadQRCode"
+        android:label="Download QR Code"
+        tools:layout="@layout/download_qr_code">
     </fragment>
 
 </navigation>
