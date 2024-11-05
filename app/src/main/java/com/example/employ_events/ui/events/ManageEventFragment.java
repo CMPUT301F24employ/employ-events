@@ -81,6 +81,19 @@ public class ManageEventFragment extends Fragment {
             }
         });
 
+        qrCodeButton.setOnClickListener(view -> {
+            if (getView() != null) {
+                Bundle bundle = new Bundle();
+                if (getArguments() != null) {
+                    String eventId = getArguments().getString("EVENT_ID");
+                    if (eventId != null) {
+                        bundle.putString("EVENT_ID", eventId); // Pass event ID
+                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_download_qr_code, bundle);
+                    }
+                }
+            }
+        });
+
         // Manage Entrants
         viewEntrantsButton.setOnClickListener(view -> {
             if (getView() != null) {
