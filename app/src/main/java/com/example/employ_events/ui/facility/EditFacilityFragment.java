@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -44,18 +46,19 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A fragment that allows users to edit their profile information.
- * This fragment interacts with Firestore to retrieve and update user profiles.
+ * A fragment that allows users to edit their facility's profile information.
+ * This fragment interacts with Firestore to retrieve and update facility profiles.
  */
 public class EditFacilityFragment extends Fragment {
     private FragmentEditFacilityBinding binding;
     private EditText editName, editEmail, editPhone, editAddress;
     private Button confirmButton, uploadButton, removeButton;
     private ImageView facilityPFP;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int STORAGE_PERMISSION_CODE = 100;
     private Uri facilityPfpUri;
     private FirebaseFirestore db;
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,14 +68,45 @@ public class EditFacilityFragment extends Fragment {
 
         binding = FragmentEditFacilityBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        db = FirebaseFirestore.getInstance();
 
-        initializeViews();
-
+        // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID;
         uniqueID = sharedPreferences.getString("uniqueID", null);
 
+        // Initialize Firestore database instance
+        db = FirebaseFirestore.getInstance();
+
+        // Initialize the UI components for the fragment
+        initializeViews();
+
+        // Initialize the ActivityResultLauncher for requesting permission
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permission was granted
+                        Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Permission was denied
+                        Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        // Initialize the ActivityResultLauncher for picking an image.
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // Handle the image selection
+                        facilityPfpUri = result.getData().getData();
+                        facilityPFP.setImageURI(facilityPfpUri);
+                        facilityPFP.setVisibility(View.VISIBLE);
+                        removeButton.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
 
 
         // Fetch the facility ID and display profile.
@@ -84,14 +118,11 @@ public class EditFacilityFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         displayProfile(document, editFacilityViewModel);
 
-                        // Check for storage permission
-                        checkStoragePermission();
-
                         // Initially hide the remove button
                         removeButton.setVisibility(View.GONE);
 
                         // Set click listener for the upload banner button
-                        uploadButton.setOnClickListener(v -> openImageChooser());
+                        uploadButton.setOnClickListener(v -> pickImage());
 
                         // Set click listener for the remove banner button
                         removeButton.setOnClickListener(v -> {
@@ -108,12 +139,14 @@ public class EditFacilityFragment extends Fragment {
                 Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
         return root;
     }
 
+    /**
+     * Retrieves the facility ID associated with the given unique ID.
+     * @param uniqueID The unique ID of the user.
+     * @param listener Callback to return the facility ID.
+     */
     private void getFacilityID(String uniqueID, FacilityFragment.OnFacilityIDFetchedListener listener) {
         Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
         facility.get().addOnCompleteListener(task -> {
@@ -142,13 +175,12 @@ public class EditFacilityFragment extends Fragment {
     }
 
     /**
-     * Displays the user's profile information in the UI.
-     * @param document            The Firestore document containing the user's profile data.
+     * Displays the facility's profile information in the UI.
+     * @param document            The Firestore document containing the facility's profile data.
      * @param editFacilityViewModel The ViewModel associated with this fragment.
      */
     private void displayProfile(DocumentSnapshot document, EditFacilityViewModel editFacilityViewModel) {
-
-        // if NULL, it will be blank. Otherwise, display the users info.
+        // if NULL, it will be blank. Otherwise, display the facility's info.
         if (document.get("name") != null) {
             editName.setText(Objects.requireNonNull(document.get("name")).toString());
             editFacilityViewModel.getText().observe(getViewLifecycleOwner(), editName::setText);
@@ -161,38 +193,38 @@ public class EditFacilityFragment extends Fragment {
             editPhone.setText(Objects.requireNonNull(document.get("phone_number")).toString());
             editFacilityViewModel.getText().observe(getViewLifecycleOwner(), editPhone::setText);
         }
-
         if (document.get("address") != null) {
             editAddress.setText(Objects.requireNonNull(document.get("address")).toString());
             editFacilityViewModel.getText().observe(getViewLifecycleOwner(), editAddress::setText);
         }
-
         if (document.get("facilityPfpUri") != null) {
             String uri = Objects.requireNonNull(document.get("facilityPfpUri")).toString();
             loadImageFromUrl(uri);
             removeButton.setVisibility(View.VISIBLE);
         }
-
     }
 
-
+    /**
+     * Loads an image from a URL and displays it in the ImageView.
+     * @param url The URL of the image to be loaded.
+     */
     private void loadImageFromUrl(String url) {
         new Thread(() -> {
             try {
                 URL imageUrl = new URL(url);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-                getActivity().runOnUiThread(() -> facilityPFP.setImageBitmap(bitmap));
+                requireActivity().runOnUiThread(() -> facilityPFP.setImageBitmap(bitmap));
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("EditFacilityFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
 
     /**
-     * Edits the user's profile based on the input fields and updates the Firestore database.
-     *
-     *
+     * Edits the facility's profile based on the input fields and updates the Firestore database.
      * @param uniqueID The unique identifier for the user's device.
+     * @param facilityID The unique identifier for the facility.
+     * @param onComplete A callback to execute after successfully updating the profile in Firestore.
      */
     private void editProfile(String uniqueID, String facilityID, Runnable onComplete) {
         String name = editName.getText().toString().trim();
@@ -223,29 +255,17 @@ public class EditFacilityFragment extends Fragment {
             } else {
                 saveProfile(profile, facilityID, onComplete); // Save profile data to Firestore
             }
-
-        }
-
-    }
-
-    private void openImageChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select PFP"), PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            facilityPfpUri = data.getData();
-            facilityPFP.setImageURI(facilityPfpUri);
-            facilityPFP.setVisibility(View.VISIBLE);
-            removeButton.setVisibility(View.VISIBLE);
         }
     }
 
+    /**
+     * Uploads a custom profile picture to Firebase Storage and updates the facility's profile with the image URI.
+     * After successfully uploading, the `saveProfile` method is called to update the profile data in Firestore.
+     *
+     * @param editProfile The Facility object representing the facility's profile.
+     * @param facilityID The unique identifier for the facility.
+     * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
+     */
     private void uploadPFPAndSaveProfile(Facility editProfile, String facilityID, Runnable onComplete) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(facilityPfpUri)
@@ -256,6 +276,13 @@ public class EditFacilityFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading pfp!", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Saves the facility's profile information in Firestore.
+     * The data is saved under the document ID `facilityID`, with fields for name, email, phone number, profile picture URI, and address.
+     * @param editProfile The Facility object representing the facility's profile.
+     * @param facilityID    The unique identifier for the facility's document in Firestore.
+     * @param onComplete  A callback to execute after successfully saving the profile data in Firestore.
+     */
     private void saveProfile(Facility editProfile, String facilityID, Runnable onComplete) {
         Map<String, Object> data = new HashMap<>();
         data.put("name", editProfile.getName());
@@ -269,30 +296,32 @@ public class EditFacilityFragment extends Fragment {
                         onComplete.run(); // Call the callback after successful update
                     }
                 })
-                .addOnFailureListener(e -> {
-                    // Handle errors here
-                    Toast.makeText(getContext(), "Error updating profile!", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating profile!", Toast.LENGTH_SHORT).show());
     }
 
-    private void checkStoragePermission() {
+    /**
+     * Checks if storage permission is granted and requests it if necessary.
+     */
+    private void checkAndRequestStoragePermission() {
+        String permission = PERMISSION_READ_MEDIA_IMAGES;
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_CODE);
+        if (ContextCompat.checkSelfPermission(requireContext(), permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted; request permission
+            requestPermissionLauncher.launch(permission);
         }
-
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
-            }
-        }
+    /**
+     * Launches the image picker intent to select a profile picture.
+     */
+    private void pickImage() {
+        // Check for storage permission
+        checkAndRequestStoragePermission();
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
     }
 
     /**
