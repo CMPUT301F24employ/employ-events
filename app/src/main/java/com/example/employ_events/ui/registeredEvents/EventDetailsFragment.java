@@ -87,14 +87,16 @@ public class EventDetailsFragment extends Fragment {
         joinButton.setOnClickListener(view -> {
             if (currentEvent != null) {
                 Entrant entrant = new Entrant();
+                entrant.setOnWaitingList(Boolean.FALSE);
+                entrant.setOnAcceptedList(Boolean.FALSE);
+                entrant.setOnCancelledList(Boolean.FALSE);
 
                 if (currentEvent.addEntrant(entrant)) {
-                    entrant.setOnWaitingList(true);
+                    entrant.setOnWaitingList(Boolean.TRUE);
                     Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
                     eventsRef.add(currentEvent);
                 }
                 else {
-                    entrant.setOnWaitingList(false);
                     Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
                 }
             }
