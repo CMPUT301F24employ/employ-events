@@ -3,6 +3,7 @@ package com.example.employ_events.ui.events;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.Button;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventEntrantsBinding;
+import com.example.employ_events.ui.entrants.WaitinglistFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ManageEventEntrants extends Fragment {
@@ -34,12 +36,7 @@ public class ManageEventEntrants extends Fragment {
 //                        .addOnSuccessListener()
             }
         }
-
-
-
-
-
-
+        sampleEntrants.setOnClickListener(v -> loadFragment(new WaitinglistFragment()));
 
         return root;
     }
@@ -49,6 +46,13 @@ public class ManageEventEntrants extends Fragment {
         sampleEntrants = binding.sampleEntrants;
         removeEntrant = binding.removeEntrant;
         viewEntrantMap = binding.viewEntrantMap;
+    }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
