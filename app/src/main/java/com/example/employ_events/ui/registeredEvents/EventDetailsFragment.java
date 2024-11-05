@@ -40,17 +40,21 @@ public class EventDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
-        String eventId = getArguments().getString("eventId");
-        //String eventId = db.collection("events").document().getId();
-        DocumentReference eventRef = db.collection("events").document(eventId);
-        eventRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    displayDetails(document, galleryViewModel);
-                }
+        if (getArguments() != null) {
+            String eventID = getArguments().getString("EVENT_ID");
+            if (eventID != null) {
+                DocumentReference eventRef = db.collection("events").document(eventID);
+                eventRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            displayDetails(document, galleryViewModel);
+                        }
+                    }
+                });
             }
-        });
+        }
+
 
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
