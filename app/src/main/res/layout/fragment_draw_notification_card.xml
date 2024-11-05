@@ -21,41 +21,46 @@
             android:padding="16dp">
 
             <TextView
+                android:id="@+id/notification_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Invitation"
-                android:textSize="24sp"
-                android:textStyle="bold"
                 android:gravity="center"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:text="Status"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/notification_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 android:text="Congratulations! You have been selected to register for the following event:"
-                android:textSize="16sp"
-                android:paddingBottom="8dp" />
+                android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/event_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
                 android:text="Event Title"
-                android:textSize="16sp"
-                android:paddingBottom="4dp" />
+                android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/event_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
                 android:text="Event Date"
-                android:textSize="16sp"
-                android:paddingBottom="16dp" />
+                android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/confirm_or_decline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
                 android:text="Please confirm or decline your invitation below."
-                android:textSize="16sp"
-                android:paddingBottom="16dp" />
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
