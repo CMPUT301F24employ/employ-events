@@ -81,6 +81,20 @@ public class ManageEventFragment extends Fragment {
             }
         });
 
+        // Manage Entrants
+        viewEntrantsButton.setOnClickListener(view -> {
+            if (getView() != null) {
+                Bundle bundle = new Bundle();
+                if (getArguments() != null) {
+                    String eventId = getArguments().getString("EVENT_ID");
+                    if (eventId != null) {
+                        bundle.putString("EVENT_ID", eventId); // Pass event ID
+                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_manageEventEntrantsFragment, bundle);
+                    }
+                }
+            }
+        });
+
 
         return root;
     }
@@ -93,7 +107,7 @@ public class ManageEventFragment extends Fragment {
         registrationPeriodTV = binding.registrationPeriod;
         eventCapacityTV = binding.eventCapacity;
         waitingListCapacityTV = binding.waitingListCapacity;
-        eventFeeTV = binding.fee;
+        eventFeeTV = binding.feeText;
         geolocationRequiredTV = binding.geolocationStatus;
         editEventButton = binding.editEventButton;
         qrCodeButton = binding.qrCodeButton;

@@ -21,6 +21,7 @@ public class EventTest {
             Entrant entrant = new Entrant();
             entrant.setOnWaitingList(true); // Set initial waiting list status
             entrant.setOnCancelledList(false); // Ensure they are not cancelled
+            entrant.setOnAcceptedList(false);
             event.addEntrant(entrant);
         }
         return event;
