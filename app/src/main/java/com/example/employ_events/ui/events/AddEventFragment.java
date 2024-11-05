@@ -383,6 +383,7 @@ public class AddEventFragment extends Fragment {
      */
     private void createEntrantListSubcollection(DocumentReference eventDocumentReference) {
         // No initial data or document is added here; the subcollection is simply available for future use.
+
     }
 
     /*
