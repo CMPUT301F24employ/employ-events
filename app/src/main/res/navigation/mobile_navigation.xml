@@ -179,6 +179,12 @@
         tools:layout="@layout/fragment_manage_event_entrants">
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_notifications"
+        android:name="com.example.employ_events.ui.entrants.entrantNotifications"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notification">
+    </fragment>
 
 
 
