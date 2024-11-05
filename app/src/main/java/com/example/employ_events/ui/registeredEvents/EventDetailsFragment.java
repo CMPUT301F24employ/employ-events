@@ -66,7 +66,6 @@ public class EventDetailsFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         if (document != null && document.exists()) {
                             currentEvent = new Event(
-                                    document.getId(),
                                     document.getString("eventTitle"),
                                     document.getString("facilityID"),
                                     document.getDate("eventDate"),
