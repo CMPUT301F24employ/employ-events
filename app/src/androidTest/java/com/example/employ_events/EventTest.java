@@ -56,12 +56,15 @@ public class EventTest {
         event.setLimited(10);
         Entrant entrant = new Entrant();
         assertFalse(event.addEntrant(entrant));
+        assertEquals(event.getEntrantsList().size(), 10);
     }
     @Test
     public void testAddingToList(){
         Event event = mockEvent();
         Entrant entrant = new Entrant();
         assertTrue(event.addEntrant(entrant));
+        assertTrue(entrant.getOnWaitingList());
         assertEquals(event.getEntrantsList().size(), 11);
     }
+
 }
