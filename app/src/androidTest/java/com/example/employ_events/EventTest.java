@@ -57,4 +57,11 @@ public class EventTest {
         Entrant entrant = new Entrant();
         assertFalse(event.addEntrant(entrant));
     }
+    @Test
+    public void testAddingToList(){
+        Event event = mockEvent();
+        Entrant entrant = new Entrant();
+        assertTrue(event.addEntrant(entrant));
+        assertEquals(event.getEntrantsList().size(), 11);
+    }
 }
