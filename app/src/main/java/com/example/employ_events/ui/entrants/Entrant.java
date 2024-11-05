@@ -5,6 +5,7 @@ public class Entrant {
     private Boolean onWaitingList;
     private Boolean onCancelledList;
     private Boolean onAcceptedList;
+    private Boolean onRegisteredList;
     public Entrant() {
 
     }
@@ -43,5 +44,13 @@ public class Entrant {
 
     public void setOnAcceptedList(Boolean onAcceptedList) {
         this.onAcceptedList = onAcceptedList;
+    }
+
+    public Boolean getOnRegisteredList() {
+        return onRegisteredList;
+    }
+
+    public void setOnRegisteredList(Boolean onRegisteredList) {
+        this.onRegisteredList = onRegisteredList;
     }
 }
