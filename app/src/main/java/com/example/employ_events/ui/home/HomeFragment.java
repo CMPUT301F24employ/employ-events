@@ -88,6 +88,14 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        Button notificationsButton = binding.notificationsButton;
+        notificationsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                NavHostFragment.findNavController(HomeFragment.this).navigate();
+            }
+        });
+
         return root;
     }
 

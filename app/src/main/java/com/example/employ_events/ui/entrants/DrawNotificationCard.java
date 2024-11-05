@@ -30,7 +30,7 @@ public class DrawNotificationCard extends Fragment {
     private TextView notificationStatus, notificationMessage, eventTitle, eventDate, confirmOrDecline;
     private boolean invited;
 
-    // We will receive as an argument the event the notifcation is referring to and a boolean for if it's an invitation or a rejection
+    // We will receive as an argument the event the notification is referring to and a boolean for if it's an invitation or a rejection
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
