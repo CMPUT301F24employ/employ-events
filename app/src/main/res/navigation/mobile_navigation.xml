@@ -19,9 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment" />
-<!--        <action-->
-<!--            android:id="@+id/action_nav_home_to_entrantEventDetails"-->
-<!--            app:destination="@id/entrantEventDetails" />-->
+        <action
+            android:id="@+id/action_homeFragment_to_entrantNotifications"
+            app:destination="@+id/entrantNotifications" />
     </fragment>
 
     <fragment
@@ -73,7 +73,6 @@
             app:destination="@id/nav_facility">
         </action>
     </fragment>
-
 
     <fragment
         android:id="@+id/addEventFragment"
@@ -159,13 +158,29 @@
         android:name="com.example.employ_events.ui.events.ManageEventEntrants"
         android:label="event entrants"
         tools:layout="@layout/fragment_manage_event_entrants">
+        <action
+            android:id="@+id/action_manageEventEntrantsFragment_to_sendNotificationsScreen"
+            app:destination="@+id/sendNotificationScreen" />
     </fragment>
 
     <fragment
-        android:id="@+id/nav_notifications"
+        android:id="@+id/entrantNotifications"
         android:name="com.example.employ_events.ui.entrants.entrantNotifications"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_notification">
+        android:label="Entrant Notifications Page"
+        tools:layout="@layout/fragment_entrant_notifications">
+    </fragment>
+
+    <fragment
+        android:id="@+id/drawNotificationCard"
+        android:name="com.example.employ_events.ui.entrants.DrawNotificationCard">
+    </fragment>
+
+    <fragment
+        android:id="@+id/sendNotificationScreen"
+        android:name="com.example.employ_events.ui.notifications.SendNotificationScreen"
+        android:label="Send Notification Screen"
+        tools:layout="@layout/fragment_send_notification_screen">
+
     </fragment>
 
 </navigation>
