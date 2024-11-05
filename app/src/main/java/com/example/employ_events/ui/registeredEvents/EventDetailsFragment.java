@@ -55,6 +55,7 @@ public class EventDetailsFragment extends Fragment {
         View root = binding.getRoot();
 
         db = FirebaseFirestore.getInstance();
+        eventsRef = db.collection("events");
         initializeViews();
 
         if (getArguments() != null) {
@@ -85,21 +86,25 @@ public class EventDetailsFragment extends Fragment {
 
         joinButton = binding.getRoot().findViewById(R.id.joinButton);
         joinButton.setOnClickListener(view -> {
-            if (currentEvent != null) {
-                Entrant entrant = new Entrant();
-                entrant.setOnWaitingList(Boolean.FALSE);
-                entrant.setOnAcceptedList(Boolean.FALSE);
-                entrant.setOnCancelledList(Boolean.FALSE);
 
-                if (currentEvent.addEntrant(entrant)) {
-                    entrant.setOnWaitingList(Boolean.TRUE);
-                    Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-                    eventsRef.add(currentEvent);
-                }
-                else {
-                    Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
-                }
+            if (currentEvent == null) {
+                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            Entrant entrant = new Entrant();
+            entrant.setOnWaitingList(Boolean.FALSE);
+            entrant.setOnAcceptedList(Boolean.FALSE);
+            entrant.setOnCancelledList(Boolean.FALSE);
+
+            if (currentEvent.addEntrant(entrant)) {
+                entrant.setOnWaitingList(Boolean.TRUE);
+                Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
+                eventsRef.add(currentEvent);
+            } else {
+                Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
+            }
+
         });
 
         return root;
