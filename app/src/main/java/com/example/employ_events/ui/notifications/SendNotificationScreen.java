@@ -22,6 +22,13 @@ public class SendNotificationScreen extends Fragment {
         binding = FragmentSendNotificationScreenBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        if (getArguments() != null) {
+            String eventId = getArguments().getString("EVENT_ID");
+            if (eventId != null) {
+                // use the event ID here
+
+            }
+        }
 
         return root;
     }

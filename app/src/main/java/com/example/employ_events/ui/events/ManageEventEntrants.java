@@ -33,12 +33,18 @@ public class ManageEventEntrants extends Fragment {
         if (getArguments() != null) {
             String eventId = getArguments().getString("EVENT_ID");
             if (eventId != null) {
-//                db.collection("events").document(eventId).get()
-//                        .addOnSuccessListener()
+                // Button functionality
+                sendNotification.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Bundle args = new Bundle();
+                        args.putString("EVENT_ID", eventId);
+                        NavHostFragment.findNavController(ManageEventEntrants.this).navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
+                    }
+                });
             }
         }
         sampleEntrants.setOnClickListener(v -> loadFragment(new WaitinglistFragment()));
-        sendNotification.setOnClickListener(v -> NavHostFragment.findNavController(ManageEventEntrants.this).navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen));
 
         return root;
     }
