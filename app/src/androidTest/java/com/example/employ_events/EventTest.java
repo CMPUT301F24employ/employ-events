@@ -50,4 +50,11 @@ public class EventTest {
                 .count();
         assertEquals(acceptedCount,10);
     }
+    @Test
+    public void testWaitingListLimit(){
+        Event event = mockEvent();
+        event.setLimited(10);
+        Entrant entrant = new Entrant();
+        assertFalse(event.addEntrant(entrant));
+    }
 }
