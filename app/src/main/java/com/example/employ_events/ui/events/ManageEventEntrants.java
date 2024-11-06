@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventEntrantsBinding;
-import com.example.employ_events.ui.entrants.WaitinglistFragment;
 import com.example.employ_events.ui.events.Event;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -94,7 +93,7 @@ public class ManageEventEntrants extends Fragment {
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
+        //transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
