@@ -69,8 +69,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Generate a new UUID and save it
             uniqueID = UUID.randomUUID().toString();
-            sharedPreferences.edit().putString("uniqueID", uniqueID).apply();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("uniqueID", uniqueID);
+            editor.apply();  // Commit changes asynchronously
         }
+
 
         // Create an empty profile using their Unique ID (will not need to sign in).
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);

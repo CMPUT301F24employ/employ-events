@@ -63,6 +63,7 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
         Map<String, Object> data = new HashMap<>();
         data.put("name", name);
         data.put("email", email);
+        data.put("entrant", true);
         db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
     }
 
@@ -120,8 +121,6 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
                 });
             }
         }
-
-
 
         joinButton.setOnClickListener(view -> {
             if (currentEvent == null) {
