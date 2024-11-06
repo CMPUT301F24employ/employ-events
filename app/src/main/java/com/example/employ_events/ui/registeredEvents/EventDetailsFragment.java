@@ -43,6 +43,7 @@ public class EventDetailsFragment extends Fragment {
             geolocation, period, waitingListCapacity, eventCapacity;
     private ImageView bannerImage;
     private String bannerUri, uniqueID;
+    private GeolocationRequiredDialog.GeolocationRequiredDialogListener listener;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -97,6 +98,17 @@ public class EventDetailsFragment extends Fragment {
                 return;
             }
 
+            /*
+            // Warn user if geolocation is required.
+            if (currentEvent.getGeoLocation()) {
+                new GeolocationRequiredDialog().show(
+                        getChildFragmentManager(), GeolocationRequiredDialog.TAG);
+                if (listener.equals(true)) {
+                    
+                }
+            }
+
+*/
             Entrant entrant = new Entrant();
             entrant.setOnWaitingList(false);
             entrant.setOnAcceptedList(Boolean.FALSE);
@@ -208,6 +220,20 @@ public class EventDetailsFragment extends Fragment {
                 Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // Verify that the host activity implements the callback interface
+        try {
+            listener = (GeolocationRequiredDialog.GeolocationRequiredDialogListener) context;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(context.toString()
+                    + " must implement GeolocationRequiredDialogListener");
+        }
     }
 
     @Override
