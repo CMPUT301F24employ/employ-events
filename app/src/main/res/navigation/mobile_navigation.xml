@@ -159,7 +159,7 @@
     <fragment
         android:id="@+id/manageEventEntrantsFragment"
         android:name="com.example.employ_events.ui.events.ManageEventEntrants"
-        android:label="event entrants"
+        android:label="Manage Entrants"
         tools:layout="@layout/fragment_manage_event_entrants">
         <action
             android:id="@+id/action_manageEventEntrantsFragment_to_sendNotificationsScreen"
