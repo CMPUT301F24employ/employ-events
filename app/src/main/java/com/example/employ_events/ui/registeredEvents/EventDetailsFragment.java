@@ -19,14 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
 import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.example.employ_events.ui.profile.NewProfileFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -49,8 +46,8 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
     private EventDetailsBinding binding;
     private TextView name, fee, description, date, facility, location,
             geolocation, period, waitingListCapacity, eventCapacity;
-    private ImageView bannerImage, facilityPFP;
-    private String bannerUri, uniqueID, facilityUri;
+    private ImageView bannerImage;
+    private String bannerUri, uniqueID;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -130,20 +127,17 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
 
             // Checks if the required profile info exists, if not user must create their profile.
             DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            if (document.getString("name") == null || document.getString("email") == null) {
-                                new NewProfileFragment().show(requireActivity().getSupportFragmentManager(), "Create Profile");
-                            }
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        if (document.getString("name") == null || document.getString("email") == null) {
+                            new NewProfileFragment().show(requireActivity().getSupportFragmentManager(), "Create Profile");
                         }
-                    } else {
-                        // Handle the error, e.g., log it
-                        Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
                     }
+                } else {
+                    // Handle the error, e.g., log it
+                    Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
                 }
             });
 
@@ -180,6 +174,7 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
             String eventID = getArguments().getString("EVENT_ID");
             eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();
             leaveButton.setVisibility(View.GONE);
+            joinButton.setVisibility(View.VISIBLE);
     }
 
     private void joinEvent(Event currentEvent) {
@@ -193,7 +188,7 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
         if (currentEvent.addEntrant(entrant)) {
             entrant.setOnWaitingList(Boolean.TRUE);
             Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-            String eventID = getArguments().getString("EVENT_ID");
+            String eventID = requireArguments().getString("EVENT_ID");
             eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
             leaveButton.setVisibility(View.VISIBLE);
             joinButton.setVisibility(View.GONE);
@@ -207,7 +202,7 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
         description = binding.eventDescription;
         fee = binding.fee;
         date = binding.eventDate;
-        facility = binding.faciltyName; // do this and location separately
+        facility = binding.facilityName; // do this and location separately
         location = binding.eventLocation;
         period = binding.registrationPeriod;
         geolocation = binding.geolocationStatus;
@@ -216,7 +211,6 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
         eventCapacity = binding.eventCapacity;
         joinButton = binding.joinButton;
         leaveButton = binding.leaveButton;
-        facilityPFP = binding.facilityImage;
     }
 
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
@@ -289,11 +283,6 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
                     String name = document1.getString("name");
                     facility.setText(name);
                     galleryViewModel.getText().observe(getViewLifecycleOwner(), facility::setText);
-                    if (document1.get("facilityPfpUri") != null) {
-                        facilityPFP.setVisibility(View.VISIBLE);
-                        facilityUri = Objects.requireNonNull(document1.get("facilityPfpUri")).toString();
-                        loadImageFromUrl(facilityUri);
-                    }
                 }
             }
         });
