@@ -107,7 +107,7 @@ public class EventDetailsFragment extends Fragment {
                 entrant.setOnWaitingList(Boolean.TRUE);
                 Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
                 String eventID = getArguments().getString("EVENT_ID");
-                eventsRef.document(eventID).collection("entrantsList").document("uniqueID").set(entrant);
+                eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
             } else {
                 Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
             }
