@@ -4,13 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Entrant {
-    private String name;
+    private String name, uniqueID;
     private Boolean onWaitingList;
     private Boolean onCancelledList;
     private Boolean onAcceptedList;
     private Boolean onRegisteredList;
     public Entrant() {
+    }
 
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
+    public void setUniqueID(String uniqueID) {
+        this.uniqueID = uniqueID;
     }
 
     public Entrant(String name) {
