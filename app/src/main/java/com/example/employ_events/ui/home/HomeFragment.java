@@ -80,22 +80,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Button manageFacilityButton = binding.manageFacilityButton;
-        manageFacilityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "Manage facility button pressed", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Button notificationsButton = binding.notificationsButton;
-        notificationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                NavHostFragment.findNavController(HomeFragment.this).navigate();
-            }
-        });
-
         return root;
     }
 

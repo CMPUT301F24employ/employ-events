@@ -20,13 +20,12 @@ import java.util.List;
 public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.EntrantViewHolder> {
    // private final Context context;
     private final ArrayList<Entrant> entrantList;
-    Context context;
+    private final Context context;
 
     public EntrantsAdapter(Context context, ArrayList<Entrant> entrantList) {
         this.context = context;
-        this.entrantList = entrantList;
+        this.entrantList = new ArrayList<>(entrantList); // Initialize with a copy of the list to avoid side effects
     }
-
 
     @NonNull
     @Override
@@ -43,8 +42,9 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
     @Override
     public void onBindViewHolder(@NonNull EntrantViewHolder holder, int position) {
         Entrant entrant = entrantList.get(position);
-        holder.nameTextView.setText(entrant.getName());
-        holder.emailTextView.setText(entrant.getEmail());
+        // Check for null values to avoid crashes
+        holder.nameTextView.setText(entrant.getName() != null ? entrant.getName() : "N/A");
+        holder.emailTextView.setText(entrant.getEmail() != null ? entrant.getEmail() : "N/A");
     }
 
     @Override

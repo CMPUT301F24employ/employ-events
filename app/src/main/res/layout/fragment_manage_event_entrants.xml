@@ -15,25 +15,21 @@
         app:tabMode="scrollable">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabWaitlisted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Waitlisted" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabSelected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Selected" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabCancelled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancelled" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabRegistered"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Registered" />

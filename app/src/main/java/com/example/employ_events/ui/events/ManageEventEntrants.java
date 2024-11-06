@@ -2,10 +2,11 @@ package com.example.employ_events.ui.events;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TableLayout;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,13 +19,9 @@ import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventEntrantsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.entrants.EntrantsAdapter;
-import com.example.employ_events.ui.events.Event;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-//import com.google.firebase.firestore.Task;
-//import com.google.firebase.firestore.TaskCompletionSource;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -38,9 +35,10 @@ public class ManageEventEntrants extends Fragment {
     private String eventId;
     private RecyclerView entrantsList;
     private EntrantsAdapter entrantsAdapter;
+    private TabLayout tabLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentManageEventEntrantsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -49,18 +47,20 @@ public class ManageEventEntrants extends Fragment {
 
         if (getArguments() != null) {
             eventId = getArguments().getString("EVENT_ID");
-            if (eventId != null) {
-                // Fetch the entrants for the event
-                fetchEntrants(eventId);
-                // Button functionality
-                sendNotification.setOnClickListener(view -> {
-                    Bundle args = new Bundle();
-                    args.putString("EVENT_ID", eventId);
-                    NavHostFragment.findNavController(ManageEventEntrants.this)
-                            .navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
-                });
-            }
         }
+
+        if (eventId != null) {
+            // Fetch the entrants for the event
+            fetchEntrants(eventId);
+            // Button functionality
+            sendNotification.setOnClickListener(view -> {
+                Bundle args = new Bundle();
+                args.putString("EVENT_ID", eventId);
+                NavHostFragment.findNavController(ManageEventEntrants.this)
+                        .navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
+            });
+        }
+
 
         sampleEntrants.setOnClickListener(v -> {
             if (eventId != null) {
@@ -79,6 +79,7 @@ public class ManageEventEntrants extends Fragment {
         removeEntrant = binding.removeEntrant;
         viewEntrantMap = binding.viewEntrantMap;
         entrantsList = binding.entrantsList;
+        tabLayout = binding.tabLayout;
 
         // Initialize the adapter with an empty list for now
         entrantsAdapter = new EntrantsAdapter(getContext(), new ArrayList<>());
@@ -95,23 +96,17 @@ public class ManageEventEntrants extends Fragment {
                     if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
                         List<Entrant> entrants = new ArrayList<>();
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            String userId = document.getId();  // Assuming the document ID is the user ID
+                            String userId = document.getId();
                             Entrant entrant = document.toObject(Entrant.class);
 
-                            // Fetch the user's profile (name) using their userID
                             db.collection("userProfiles").document(userId)
                                     .get()
                                     .addOnSuccessListener(userDocument -> {
                                         if (userDocument.exists()) {
-                                            String name = userDocument.getString("name");
-                                            entrant.setName(name);
-                                            String email = userDocument.getString("email");
-                                            entrant.setEmail(email);
-
-                                            // After setting the name, add the entrant to the list
+                                            entrant.setName(userDocument.getString("name"));
+                                            entrant.setEmail(userDocument.getString("email"));
                                             entrants.add(entrant);
 
-                                            // If this is the last entrant, update the RecyclerView
                                             if (entrants.size() == queryDocumentSnapshots.size()) {
                                                 entrantsAdapter.updateEntrantsList(entrants);
                                             }
@@ -119,15 +114,14 @@ public class ManageEventEntrants extends Fragment {
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e("ManageEventEntrants", "Error fetching user profile: " + e.getMessage());
+                                        Toast.makeText(getContext(), "Error fetching some profiles", Toast.LENGTH_SHORT).show();
                                     });
                         }
                     } else {
                         Toast.makeText(getContext(), "No entrants found", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error fetching entrants: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error fetching entrants: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
 
@@ -154,13 +148,6 @@ public class ManageEventEntrants extends Fragment {
         }).addOnFailureListener(e ->
                 Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show()
         );
-    }
-
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        //transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
     }
 
     @Override
