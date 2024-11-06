@@ -133,9 +133,6 @@
         android:label="Manage Event"
         tools:layout="@layout/fragment_manage_event">
         <action
-            android:id="@+id/action_manageEventFragment_to_eventListFragment"
-            app:destination="@id/eventListFragment" />
-        <action
             android:id="@+id/action_manageEventFragment_to_editEventFragment"
             app:destination="@id/editEventFragment" />
         <action

@@ -35,7 +35,7 @@ import java.util.Objects;
 public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
     private FirebaseFirestore db;
-    private String bannerUri;
+    private String bannerUri, eventId;
     private Button editEventButton, viewEntrantsButton, qrCodeButton;
     private TextView titleTV, descriptionTV, eventDateTV, registrationPeriodTV,
             eventCapacityTV, waitingListCapacityTV, eventFeeTV, geolocationRequiredTV;
@@ -54,29 +54,26 @@ public class ManageEventFragment extends Fragment {
         initializeViews();
 
         if (getArguments() != null) {
-            String eventId = getArguments().getString("EVENT_ID");
-            if (eventId != null) {
-                DocumentReference eventRef = db.collection("events").document(eventId);
-                eventRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            displayDetails(document, manageEventViewModel);
-                        }
+            eventId = getArguments().getString("EVENT_ID");
+        }
+        if (eventId != null) {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+            eventRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        displayDetails(document, manageEventViewModel);
                     }
-                });
-            }
+                }
+            });
         }
 
         editEventButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_editEventFragment, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_editEventFragment, bundle);
                 }
             }
         });
@@ -84,12 +81,9 @@ public class ManageEventFragment extends Fragment {
         qrCodeButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_download_qr_code, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_download_qr_code, bundle);
                 }
             }
         });
@@ -98,12 +92,9 @@ public class ManageEventFragment extends Fragment {
         viewEntrantsButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_manageEventEntrantsFragment, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_manageEventEntrantsFragment, bundle);
                 }
             }
         });
@@ -167,7 +158,7 @@ public class ManageEventFragment extends Fragment {
         // Check the non required fields and set visible if it is not null.
 
         if (document.get("limited") != null) {
-            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited")).toString();
+            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited"));
             waitingListCapacityTV.setVisibility(View.VISIBLE);
             waitingListCapacityTV.setText(waitingList);
             galleryViewModel.getText().observe(getViewLifecycleOwner(), waitingListCapacityTV::setText);
