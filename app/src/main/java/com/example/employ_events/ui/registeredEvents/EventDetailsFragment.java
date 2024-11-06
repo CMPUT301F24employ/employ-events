@@ -28,6 +28,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +49,7 @@ public class EventDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
 
-    private Button joinButton;
+    private Button joinButton, leaveButton;
     private Event currentEvent;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,6 +84,23 @@ public class EventDetailsFragment extends Fragment {
                                     document.getLong("eventCapacity").intValue()
                             );
                             displayDetails(document, galleryViewModel);
+
+                            db.collection("events").document(eventID).collection("entrantsList")
+                                    .whereEqualTo("uniqueID", uniqueID)
+                                    .get()
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            QuerySnapshot querySnapshot = task1.getResult();
+                                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                                leaveButton.setVisibility(View.VISIBLE);
+                                            } else {
+                                                joinButton.setVisibility(View.VISIBLE);
+                                            }
+                                        } else {
+                                            // Handle the error
+                                            Log.w("Firestore", "Error getting documents.", task.getException());
+                                        }
+                                    });
                         }
                     }
                 });
@@ -90,32 +108,46 @@ public class EventDetailsFragment extends Fragment {
         }
 
 
-        joinButton = binding.getRoot().findViewById(R.id.leaveButton);
+
         joinButton.setOnClickListener(view -> {
+            if (currentEvent == null) {
+                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                    if (currentEvent == null) {
-                        Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+            // Warn user if geolocation is required.
+            if (currentEvent.getGeoLocation()) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Warning! Geolocation Required")
+                        .setMessage("Are you sure you want to join the waiting list?")
+                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                        .setPositiveButton("Proceed", (dialog, which) -> joinEvent(currentEvent))
+                        .show();
+            }
+            else {
+                joinEvent(currentEvent);
+            }
+        });
 
-                    // Warn user if geolocation is required.
-                    if (currentEvent.getGeoLocation()) {
-                        new AlertDialog.Builder(requireContext())
-                                .setTitle("Warning! Geolocation Required")
-                                .setMessage("Are you sure you want to join the waiting list?")
-                                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                                .setPositiveButton("Proceed", (dialog, which) -> joinEvent(currentEvent))
-                                .show();
-                    }
-                    else {
-                        joinEvent(currentEvent);
-                    }
-                });
-
-        //need to handle if they try to join the waitlist twice
-
-
+        leaveButton.setOnClickListener(view -> {
+            if (currentEvent == null) {
+                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Warning! Rejoining is not guaranteed.")
+                    .setMessage("Are you sure you want to leave the waiting list?")
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent(currentEvent))
+                    .show();
+        });
         return root;
+    }
+    private void leaveEvent(Event currentEvent) {
+            Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
+            String eventID = getArguments().getString("EVENT_ID");
+            eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();
+            leaveButton.setVisibility(View.GONE);
     }
 
     private void joinEvent(Event currentEvent) {
@@ -124,12 +156,15 @@ public class EventDetailsFragment extends Fragment {
         entrant.setOnAcceptedList(Boolean.FALSE);
         entrant.setOnCancelledList(Boolean.FALSE);
         entrant.setOnRegisteredList(false);
+        entrant.setUniqueID(uniqueID);
 
         if (currentEvent.addEntrant(entrant)) {
             entrant.setOnWaitingList(Boolean.TRUE);
             Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
             String eventID = getArguments().getString("EVENT_ID");
             eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
+            leaveButton.setVisibility(View.VISIBLE);
+            joinButton.setVisibility(View.GONE);
         } else {
             Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
         }
@@ -147,7 +182,8 @@ public class EventDetailsFragment extends Fragment {
         bannerImage = binding.bannerImage;
         waitingListCapacity = binding.waitingListCapacity;
         eventCapacity = binding.eventCapacity;
-
+        joinButton = binding.joinButton;
+        leaveButton = binding.leaveButton;
     }
 
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {

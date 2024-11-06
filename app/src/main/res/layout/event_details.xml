@@ -152,7 +152,21 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:backgroundTint="#3D5AFE"
-            android:text="Join Waitlist" />
+            android:text="Leave Waitlist"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/joinButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="#3D5AFE"
+            android:text="Join Waitlist"
+            android:visibility="gone" />
+
+
+
+
 
     </LinearLayout>
 
