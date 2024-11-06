@@ -4,14 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class EventTest {
     public Event mockEvent(){

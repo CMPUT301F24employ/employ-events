@@ -27,21 +27,25 @@ public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArray
     @NonNull
     @Override
     public RegisteredArrayAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_registered_events, parent, false);
 
-        // Passing view to ViewHolder
-        //RegisteredArrayAdapter.ViewHolder viewHolder = new RegisteredArrayAdapter(view);
-        //return viewHolder;
-        return null;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_registered_events, parent, false);
+        return new ViewHolder(view);
+        //return null;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RegisteredArrayAdapter.ViewHolder holder, int position) {
 
+        Event event = registeredEvents.get(position);
+        holder.name.setText(event.getEventTitle());
+        holder.itemView.setOnClickListener(v -> {
+        });
+
     }
 
     @Override
     public int getItemCount() {
+
         return registeredEvents.size();
     }
 

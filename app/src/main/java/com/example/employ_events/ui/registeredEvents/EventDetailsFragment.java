@@ -89,7 +89,7 @@ public class EventDetailsFragment extends Fragment {
         }
 
 
-        joinButton = binding.getRoot().findViewById(R.id.joinButton);
+        joinButton = binding.getRoot().findViewById(R.id.leaveButton);
         joinButton.setOnClickListener(view -> {
 
             if (currentEvent == null) {
@@ -113,6 +113,8 @@ public class EventDetailsFragment extends Fragment {
             }
 
         });
+
+        //need to handle if they try to join the waitlist twice
 
         return root;
     }

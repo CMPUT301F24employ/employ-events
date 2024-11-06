@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -25,14 +24,14 @@
             android:src="@drawable/ic_menu_camera" />
 
         <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/white_card_background"
-        android:padding="5dp"
-        android:layout_marginBottom="5dp"
-        android:elevation="4dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/white_card_background"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp"
+            android:elevation="4dp">
 
             <TextView
                 android:id="@+id/eventName"
@@ -71,13 +70,13 @@
             android:layout_marginBottom="5dp"
             android:elevation="4dp">
 
-                <TextView
-                    android:id="@+id/faciltyName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Facilty"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            <TextView
+                android:id="@+id/faciltyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Facilty"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <TextView
                 android:id="@+id/eventLocation"
@@ -86,7 +85,7 @@
                 android:text="Location"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -144,7 +143,7 @@
                 android:text="Geolocation Requirement: "
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    </LinearLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/leaveButton"
@@ -152,7 +151,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:backgroundTint="#3D5AFE"
-            android:text="Join Waitlist" />
+            android:text="Leave Waitlist" />
 
     </LinearLayout>
 
