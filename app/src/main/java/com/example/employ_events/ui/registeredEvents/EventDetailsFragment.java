@@ -24,11 +24,15 @@ import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
 import com.example.employ_events.ui.events.ManageEventViewModel;
+import com.example.employ_events.ui.profile.NewProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,21 +40,31 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public class EventDetailsFragment extends Fragment {
+public class EventDetailsFragment extends Fragment implements NewProfileFragment.NewProfileDialogListener{
 
     private EventDetailsBinding binding;
     private TextView name, fee, description, date, facility, location,
             geolocation, period, waitingListCapacity, eventCapacity;
-    private ImageView bannerImage;
-    private String bannerUri, uniqueID;
+    private ImageView bannerImage, facilityPFP;
+    private String bannerUri, uniqueID, facilityUri;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
 
     private Button joinButton, leaveButton;
     private Event currentEvent;
+
+    @Override
+    public void provideInfo(String name, String email, String uniqueID) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("email", email);
+        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
@@ -114,6 +128,25 @@ public class EventDetailsFragment extends Fragment {
                 Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Checks if the required profile info exists, if not user must create their profile.
+            DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            if (document.getString("name") == null || document.getString("email") == null) {
+                                new NewProfileFragment().show(requireActivity().getSupportFragmentManager(), "Create Profile");
+                            }
+                        }
+                    } else {
+                        // Handle the error, e.g., log it
+                        Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
+                    }
+                }
+            });
 
             // Warn user if geolocation is required.
             if (currentEvent.getGeoLocation()) {
@@ -184,6 +217,7 @@ public class EventDetailsFragment extends Fragment {
         eventCapacity = binding.eventCapacity;
         joinButton = binding.joinButton;
         leaveButton = binding.leaveButton;
+        facilityPFP = binding.facilityImage;
     }
 
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
@@ -244,9 +278,7 @@ public class EventDetailsFragment extends Fragment {
         }
 
         String facilityID = document.getString("facilityID");
-        facility.setText(facilityID);
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), facility::setText);
-
+        // Obtain facility name, pfp, and location and update correlating views.
         db.collection("facilities").document(Objects.requireNonNull(facilityID))
         .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -255,11 +287,17 @@ public class EventDetailsFragment extends Fragment {
                     String location_ = document1.getString("address");
                     location.setText(location_);
                     galleryViewModel.getText().observe(getViewLifecycleOwner(), location::setText);
-
+                    String name = document1.getString("name");
+                    facility.setText(name);
+                    galleryViewModel.getText().observe(getViewLifecycleOwner(), facility::setText);
+                    if (document1.get("facilityPfpUri") != null) {
+                        facilityPFP.setVisibility(View.VISIBLE);
+                        facilityUri = Objects.requireNonNull(document1.get("facilityPfpUri")).toString();
+                        loadImageFromUrl(facilityUri);
+                    }
                 }
             }
         });
-
     }
 
     /**

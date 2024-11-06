@@ -32,20 +32,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
-        implements NewProfileFragment.NewProfileDialogListener{
+        {
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseFirestore db;
 
-
-
-    @Override
-    public void provideInfo(String name, String email, String uniqueID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", name);
-        data.put("email", email);
-        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,26 +86,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // Use this to check if the required INFO exists - move to waiting list.
 
-        /*
-        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && !document.exists()) {
-                        new NewProfileFragment().show(getSupportFragmentManager(), "Create Profile");
-                    }
-                } else {
-                    // Handle the error, e.g., log it
-                    Log.e("MainActivity", "Error getting documents: ", task.getException());
-                }
-            }
-        });
-
-         */
     }
 
     @Override
