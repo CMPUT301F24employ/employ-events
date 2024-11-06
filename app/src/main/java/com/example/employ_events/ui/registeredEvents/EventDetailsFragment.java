@@ -1,5 +1,6 @@
 package com.example.employ_events.ui.registeredEvents;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -43,7 +44,6 @@ public class EventDetailsFragment extends Fragment {
             geolocation, period, waitingListCapacity, eventCapacity;
     private ImageView bannerImage;
     private String bannerUri, uniqueID;
-    private GeolocationRequiredDialog.GeolocationRequiredDialogListener listener;
 
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
@@ -93,42 +93,46 @@ public class EventDetailsFragment extends Fragment {
         joinButton = binding.getRoot().findViewById(R.id.leaveButton);
         joinButton.setOnClickListener(view -> {
 
-            if (currentEvent == null) {
-                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                    if (currentEvent == null) {
+                        Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-            /*
-            // Warn user if geolocation is required.
-            if (currentEvent.getGeoLocation()) {
-                new GeolocationRequiredDialog().show(
-                        getChildFragmentManager(), GeolocationRequiredDialog.TAG);
-                if (listener.equals(true)) {
-                    
-                }
-            }
-
-*/
-            Entrant entrant = new Entrant();
-            entrant.setOnWaitingList(false);
-            entrant.setOnAcceptedList(Boolean.FALSE);
-            entrant.setOnCancelledList(Boolean.FALSE);
-            entrant.setOnRegisteredList(false);
-
-            if (currentEvent.addEntrant(entrant)) {
-                entrant.setOnWaitingList(Boolean.TRUE);
-                Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-                String eventID = getArguments().getString("EVENT_ID");
-                eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
-            } else {
-                Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
-            }
-
-        });
+                    // Warn user if geolocation is required.
+                    if (currentEvent.getGeoLocation()) {
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("Warning! Geolocation Required")
+                                .setMessage("Are you sure you want to join the waiting list?")
+                                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                                .setPositiveButton("Proceed", (dialog, which) -> joinEvent(currentEvent))
+                                .show();
+                    }
+                    else {
+                        joinEvent(currentEvent);
+                    }
+                });
 
         //need to handle if they try to join the waitlist twice
 
+
         return root;
+    }
+
+    private void joinEvent(Event currentEvent) {
+        Entrant entrant = new Entrant();
+        entrant.setOnWaitingList(false);
+        entrant.setOnAcceptedList(Boolean.FALSE);
+        entrant.setOnCancelledList(Boolean.FALSE);
+        entrant.setOnRegisteredList(false);
+
+        if (currentEvent.addEntrant(entrant)) {
+            entrant.setOnWaitingList(Boolean.TRUE);
+            Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
+            String eventID = getArguments().getString("EVENT_ID");
+            eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
+        } else {
+            Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initializeViews() {
@@ -184,7 +188,7 @@ public class EventDetailsFragment extends Fragment {
         // Check the non required fields and set visible if it is not null.
 
         if (document.get("limited") != null) {
-            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited")).toString();
+            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited"));
             waitingListCapacity.setVisibility(View.VISIBLE);
             waitingListCapacity.setText(waitingList);
             galleryViewModel.getText().observe(getViewLifecycleOwner(), waitingListCapacity::setText);
@@ -202,6 +206,24 @@ public class EventDetailsFragment extends Fragment {
             bannerUri = Objects.requireNonNull(document.get("bannerUri")).toString();
             loadImageFromUrl(bannerUri);
         }
+
+        String facilityID = document.getString("facilityID");
+        facility.setText(facilityID);
+        galleryViewModel.getText().observe(getViewLifecycleOwner(), facility::setText);
+
+        db.collection("facilities").document(Objects.requireNonNull(facilityID))
+        .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document1 = task.getResult();
+                if (document1 != null && document1.exists()) {
+                    String location_ = document1.getString("address");
+                    location.setText(location_);
+                    galleryViewModel.getText().observe(getViewLifecycleOwner(), location::setText);
+
+                }
+            }
+        });
+
     }
 
     /**
@@ -219,23 +241,9 @@ public class EventDetailsFragment extends Fragment {
                 Bitmap bitmap = BitmapFactory.decodeStream(input);
                 requireActivity().runOnUiThread(() -> bannerImage.setImageBitmap(bitmap));
             } catch (IOException e) {
-                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
+                Log.e("EventDetailsFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // Verify that the host activity implements the callback interface
-        try {
-            listener = (GeolocationRequiredDialog.GeolocationRequiredDialogListener) context;
-        } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(context.toString()
-                    + " must implement GeolocationRequiredDialogListener");
-        }
     }
 
     @Override
