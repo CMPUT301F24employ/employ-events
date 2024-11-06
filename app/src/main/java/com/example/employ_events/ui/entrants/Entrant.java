@@ -73,8 +73,10 @@ public class Entrant {
     }
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("name", this.name); // Replace with actual fields
-        map.put("email", this.email); // Replace with actual fieldsap.put("onAcceptedList", this.getOnAcceptedList());
+        map.put("name", this.name);
+        map.put("email", this.email);
+        map.put("onRegisteredList", this.getOnRegisteredList());
+        map.put("onAcceptedList", this.getOnAcceptedList());
         map.put("onCancelledList", this.getOnCancelledList());
         map.put("onWaitingList", this.getOnWaitingList());
         // Add other fields as needed
