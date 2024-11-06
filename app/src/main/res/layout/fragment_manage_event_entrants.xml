@@ -11,26 +11,29 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabMode="fixed"
-        app:tabGravity="fill">
+        app:tabGravity="start"
+        app:tabMode="scrollable">
 
         <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All" />
-        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabWaitlisted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Waitlisted" />
+
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabSelected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Selected" />
+
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabCancelled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancelled" />
+
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabRegistered"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Registered" />
@@ -38,7 +41,7 @@
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/entrant_list"
+        android:id="@+id/entrants_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -56,6 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
+            android:layout_margin="5dp"
             android:text="Sample Entrants" />
 
         <Button
@@ -63,6 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
+            android:layout_margin="5dp"
             android:text="Send Notification" />
 
         <Button
@@ -70,6 +75,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
+            android:layout_margin="5dp"
             android:text="Remove Entrant" />
 
         <Button
@@ -77,6 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
+            android:layout_margin="5dp"
             android:text="View Entrant Map" />
     </GridLayout>
 

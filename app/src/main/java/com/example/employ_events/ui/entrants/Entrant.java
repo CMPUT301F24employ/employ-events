@@ -4,12 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Entrant {
-    private String name, uniqueID;
+    private String name, uniqueID, email;
     private Boolean onWaitingList;
     private Boolean onCancelledList;
     private Boolean onAcceptedList;
     private Boolean onRegisteredList;
     public Entrant() {
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUniqueID() {
@@ -66,7 +74,7 @@ public class Entrant {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", this.name); // Replace with actual fields
-        map.put("onAcceptedList", this.getOnAcceptedList());
+        map.put("email", this.email); // Replace with actual fieldsap.put("onAcceptedList", this.getOnAcceptedList());
         map.put("onCancelledList", this.getOnCancelledList());
         map.put("onWaitingList", this.getOnWaitingList());
         // Add other fields as needed

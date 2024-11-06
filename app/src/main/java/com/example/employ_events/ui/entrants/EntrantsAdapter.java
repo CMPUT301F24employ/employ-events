@@ -34,11 +34,17 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
         View view = LayoutInflater.from(context).inflate(R.layout.entrant_item, parent, false);
         return new EntrantViewHolder(view);
     }
+    public void updateEntrantsList(List<Entrant> entrants) {
+        this.entrantList.clear();
+        this.entrantList.addAll(entrants);
+        notifyDataSetChanged();
+    }
 
     @Override
     public void onBindViewHolder(@NonNull EntrantViewHolder holder, int position) {
         Entrant entrant = entrantList.get(position);
         holder.nameTextView.setText(entrant.getName());
+        holder.emailTextView.setText(entrant.getEmail());
     }
 
     @Override
@@ -47,11 +53,12 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
     }
 
     public static class EntrantViewHolder extends RecyclerView.ViewHolder {
-        private final TextView nameTextView;
+        private final TextView nameTextView, emailTextView;
 
         public EntrantViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.entrant_name);
+            emailTextView = itemView.findViewById(R.id.entrant_email);
         }
     }
 }
