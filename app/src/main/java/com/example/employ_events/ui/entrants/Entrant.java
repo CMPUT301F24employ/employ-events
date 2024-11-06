@@ -1,5 +1,8 @@
 package com.example.employ_events.ui.entrants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Entrant {
     private String name;
     private Boolean onWaitingList;
@@ -52,5 +55,14 @@ public class Entrant {
 
     public void setOnRegisteredList(Boolean onRegisteredList) {
         this.onRegisteredList = onRegisteredList;
+    }
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", this.name); // Replace with actual fields
+        map.put("onAcceptedList", this.getOnAcceptedList());
+        map.put("onCancelledList", this.getOnCancelledList());
+        map.put("onWaitingList", this.getOnWaitingList());
+        // Add other fields as needed
+        return map;
     }
 }

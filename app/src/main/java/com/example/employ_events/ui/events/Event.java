@@ -1,8 +1,13 @@
 package com.example.employ_events.ui.events;
 
 import com.example.employ_events.ui.entrants.Entrant;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -16,12 +21,13 @@ public class Event {
     private Boolean geoLocation;
     private Integer fee, eventCapacity, limited;
     private ArrayList<Entrant> entrantsList = new ArrayList<>();
+    private FirebaseFirestore db;
 
     /**
      * Default constructor for creating an event without details.
      * This constructor can be useful for displaying only some details of an event.
      */
-    public Event() { }
+    public Event() { this.db = FirebaseFirestore.getInstance(); }
 
     /**
      * Constructs an Event with the specified details.
@@ -45,6 +51,8 @@ public class Event {
         this.geoLocation = geoLocation;
         this.facilityID = organizerID;
         this.eventCapacity = eventCapacity;
+        this.db = FirebaseFirestore.getInstance();
+
     }
 
     /**
@@ -265,32 +273,48 @@ public class Event {
      * Generates a random sample of entrants from the entrants list based on the event's capacity.
      * Entrants who are cancelled or not on the waiting list will be excluded from selection.
      */
-    public void generateSample(){
+    public void generateSample() {
         Random random = new Random();
-        ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<Integer>();
-        Integer i = 0;
-        Integer sampled;
+        ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<>();
         Integer capOfSample = Math.min(this.eventCapacity, this.entrantsList.size());
-        while (i < capOfSample){
-            sampled = random.nextInt(capOfSample);
-            if (randomlyGeneratedNumbers.contains(sampled)){
-                continue;
+        Integer i = 0;
+
+        // Randomly select entrants based on event capacity
+        while (i < capOfSample) {
+            int sampled = random.nextInt(this.entrantsList.size());
+            if (!randomlyGeneratedNumbers.contains(sampled)) {
+                randomlyGeneratedNumbers.add(sampled);
+                i++;
             }
-            randomlyGeneratedNumbers.add(sampled);
-            i +=1;
         }
-        Entrant selected;
-        Integer k;
-        Integer selectedIndex;
-        for (k =0; k<randomlyGeneratedNumbers.size(); k++){
-            selectedIndex = randomlyGeneratedNumbers.get(k);
-            selected = entrantsList.get(selectedIndex);
-            if (selected.getOnCancelledList() == Boolean.TRUE || selected.getOnWaitingList() == Boolean.FALSE){
+
+        // Mark selected entrants as accepted
+        for (Integer index : randomlyGeneratedNumbers) {
+            Entrant selected = entrantsList.get(index);
+            if (Boolean.TRUE.equals(selected.getOnCancelledList()) || Boolean.FALSE.equals(selected.getOnWaitingList())) {
                 continue;
             }
             selected.setOnAcceptedList(Boolean.TRUE);
         }
 
+        // Prepare data for Firebase update
+        Map<String, Object> data = new HashMap<>();
+
+        // Convert the updated entrants list to a map format
+        ArrayList<Map<String, Object>> entrantsMapList = new ArrayList<>();
+        for (Entrant entrant : entrantsList) {
+            entrantsMapList.add(entrant.toMap()); // Assumes Entrant has a `toMap` method
+        }
+        data.put("entrantsList", entrantsMapList);
+
+        // Update Firestore with merged data
+        db.collection("events").document(this.id).set(data, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> {
+                    // Handle successful update if needed
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failed update if needed
+                });
     }
 
 }
