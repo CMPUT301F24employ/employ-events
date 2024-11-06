@@ -27,6 +27,8 @@ import java.util.ArrayList;
 
 /**
  * EventListFragment displays a list of events for a specific facility.
+ * It fetches events from Firestore based on the facility ID and allows
+ * the user to view event details or add a new event.
  */
 public class EventListFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
@@ -35,6 +37,12 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
     private ArrayList<Event> eventList;
     private FacilityEventsAdapter eventsAdapter;
 
+    /**
+     * Called when the fragment's view is created. It initializes views,
+     * sets up the RecyclerView, fetches the facility ID, and sets a listener
+     * to add a new event.
+     *
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEventListBinding.inflate(inflater, container, false);
@@ -44,20 +52,25 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
         eventList = new ArrayList<>();
         eventsAdapter = new FacilityEventsAdapter(getContext(), eventList, this);
 
+        // Set up the RecyclerView to display the list of events
         setupRecyclerView();
 
+        // Retrieve the unique ID from SharedPreferences and fetch facility ID
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
         if (uniqueID != null) fetchFacilityID(uniqueID);
 
+        // Set up listener to add new event
         binding.addEventButton.setOnClickListener(view ->
                 Navigation.findNavController(view).navigate(R.id.action_eventListFragment_to_addEventFragment)
         );
 
-
         return root;
     }
 
+    /**
+     * Sets up the RecyclerView to display the events list with a vertical divider.
+     */
     private void setupRecyclerView() {
         RecyclerView recyclerView = binding.eventsRecyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -65,6 +78,12 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
         recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
     }
 
+    /**
+     * Fetches the facility ID associated with the given unique ID from Firestore.
+     * If the facility ID is found, it loads the events for that facility.
+     *
+     * @param uniqueID The unique ID of the current user (organizer).
+     */
     private void fetchFacilityID(String uniqueID) {
         Query facilityQuery = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
         facilityQuery.get().addOnCompleteListener(task -> {
@@ -80,6 +99,12 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
         });
     }
 
+    /**
+     * Loads the events associated with a given facility ID from Firestore.
+     * Updates the events list and notifies the adapter.
+     *
+     * @param facilityID The ID of the facility whose events are to be loaded.
+     */
     private void loadEvents(String facilityID) {
         db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -97,6 +122,12 @@ public class EventListFragment extends Fragment implements FacilityEventsAdapter
         });
     }
 
+    /**
+     * Handles item clicks in the event list. It navigates to the ManageEventFragment
+     * with the selected event ID passed as an argument.
+     *
+     * @param event The clicked event object.
+     */
     @Override
     public void onItemClick(Event event) {
         // Pass the event ID to the EventDetailsFragment

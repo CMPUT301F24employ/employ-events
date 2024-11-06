@@ -32,6 +32,9 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+/**
+ * Fragment to manage event details including editing, viewing entrants, and obtaining QR codes.
+ */
 public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
     private FirebaseFirestore db;
@@ -41,6 +44,10 @@ public class ManageEventFragment extends Fragment {
             eventCapacityTV, waitingListCapacityTV, eventFeeTV, geolocationRequiredTV;
     private ImageView bannerImage;
 
+    /**
+     * Inflates the layout, initializes views, fetches event details from Firestore,
+     * and sets up click listeners for various buttons.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,9 +60,12 @@ public class ManageEventFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
+        // Retrieve the event ID passed in the bundle arguments
         if (getArguments() != null) {
             eventId = getArguments().getString("EVENT_ID");
         }
+
+        // Fetch event details if eventId is available
         if (eventId != null) {
             DocumentReference eventRef = db.collection("events").document(eventId);
             eventRef.get().addOnCompleteListener(task -> {
@@ -103,6 +113,9 @@ public class ManageEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Initializes all view components (Buttons, TextViews, ImageViews).
+     */
     private void initializeViews() {
         bannerImage = binding.bannerImage;
         titleTV = binding.eventTitle;
@@ -118,7 +131,13 @@ public class ManageEventFragment extends Fragment {
         viewEntrantsButton = binding.viewEntrantsButton;
     }
 
-
+    /**
+     * Displays the event details in the UI based on the retrieved document from Firestore.
+     * Handles both required and optional fields (e.g., waiting list capacity, event fee, etc.).
+     *
+     * @param document The Firestore document containing event data.
+     * @param galleryViewModel The ViewModel for managing event data.
+     */
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
         // Set optional fields to invisible until it is determined to be non-null.
         waitingListCapacityTV.setVisibility(View.GONE);
@@ -179,7 +198,9 @@ public class ManageEventFragment extends Fragment {
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
+     * Loads an image from the specified URL and sets it in the banner ImageView.
+     * This method runs in a background thread to avoid blocking the main UI thread.
+     *
      * @param url The URL of the image to be loaded.
      */
     private void loadImageFromUrl(String url) {

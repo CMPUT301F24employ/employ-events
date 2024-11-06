@@ -2,7 +2,6 @@ package com.example.employ_events.ui.events;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TableLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +26,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment responsible for managing event entrants. This includes displaying entrants,
+ * filtering based on status, and generating sample data for event entrants.
+ */
 public class ManageEventEntrants extends Fragment {
 
     private FragmentManageEventEntrantsBinding binding;
@@ -36,15 +39,21 @@ public class ManageEventEntrants extends Fragment {
     private RecyclerView entrantsList;
     private EntrantsAdapter entrantsAdapter;
     private TabLayout tabLayout;
+    private List<Entrant> allEntrants = new ArrayList<>();
 
+    /**
+     * Inflates the view, initializes variables, fetches entrants and sets up tab layout.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentManageEventEntrantsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
+        // Retrieve eventId from arguments passed to the fragment
         if (getArguments() != null) {
             eventId = getArguments().getString("EVENT_ID");
         }
@@ -52,7 +61,8 @@ public class ManageEventEntrants extends Fragment {
         if (eventId != null) {
             // Fetch the entrants for the event
             fetchEntrants(eventId);
-            // Button functionality
+
+            // Button functionality to navigate to notification screen
             sendNotification.setOnClickListener(view -> {
                 Bundle args = new Bundle();
                 args.putString("EVENT_ID", eventId);
@@ -61,7 +71,7 @@ public class ManageEventEntrants extends Fragment {
             });
         }
 
-
+        // Sample entrants button functionality
         sampleEntrants.setOnClickListener(v -> {
             if (eventId != null) {
                 fetchEventAndGenerateSample(eventId);
@@ -70,9 +80,14 @@ public class ManageEventEntrants extends Fragment {
             }
         });
 
+        setupTabLayout();
+
         return root;
     }
 
+    /**
+     * Initializes the view elements.
+     */
     private void initializeViews() {
         sendNotification = binding.sendNotification;
         sampleEntrants = binding.sampleEntrants;
@@ -87,6 +102,10 @@ public class ManageEventEntrants extends Fragment {
         entrantsList.setAdapter(entrantsAdapter);
     }
 
+    /**
+     * Fetches the entrants for a given event and populates the entrant list.
+     * @param eventId The unique identifier of the event
+     */
     private void fetchEntrants(String eventId) {
         db.collection("events")
                 .document(eventId)
@@ -94,22 +113,26 @@ public class ManageEventEntrants extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
-                        List<Entrant> entrants = new ArrayList<>();
+                        List<Entrant> tempEntrants = new ArrayList<>(); // Temporarily store entrants
+
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             String userId = document.getId();
                             Entrant entrant = document.toObject(Entrant.class);
 
+                            // Fetch user profile for name and email
                             db.collection("userProfiles").document(userId)
                                     .get()
                                     .addOnSuccessListener(userDocument -> {
                                         if (userDocument.exists()) {
                                             entrant.setName(userDocument.getString("name"));
                                             entrant.setEmail(userDocument.getString("email"));
-                                            entrants.add(entrant);
+                                        }
+                                        tempEntrants.add(entrant);
 
-                                            if (entrants.size() == queryDocumentSnapshots.size()) {
-                                                entrantsAdapter.updateEntrantsList(entrants);
-                                            }
+                                        // When all entrants are processed, assign to allEntrants and filter
+                                        if (tempEntrants.size() == queryDocumentSnapshots.size()) {
+                                            allEntrants = new ArrayList<>(tempEntrants);
+                                            filterEntrantsByTab(tabLayout.getSelectedTabPosition());
                                         }
                                     })
                                     .addOnFailureListener(e -> {
@@ -124,7 +147,10 @@ public class ManageEventEntrants extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error fetching entrants: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-
+    /**
+     * Fetches event data and generates a sample list of entrants based on event capacity.
+     * @param eventId The unique identifier of the event
+     */
     private void fetchEventAndGenerateSample(String eventId) {
         DocumentReference eventRef = db.collection("events").document(eventId);
         eventRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -148,6 +174,60 @@ public class ManageEventEntrants extends Fragment {
         }).addOnFailureListener(e ->
                 Toast.makeText(getContext(), "Error fetching event: " + e.getMessage(), Toast.LENGTH_SHORT).show()
         );
+    }
+
+    /**
+     * Filters the entrants list based on the selected tab (status).
+     * @param tabPosition The position of the selected tab (0 - Waitlisted, 1 - Selected, 2 - Cancelled, 3 - Registered)
+     */
+    private void filterEntrantsByTab(int tabPosition) {
+        List<Entrant> filteredList = new ArrayList<>();
+
+        String filterStatus;
+        switch (tabPosition) {
+            case 0:
+                filterStatus = "Waitlisted";
+                break;
+            case 1:
+                filterStatus = "Selected";
+                break;
+            case 2:
+                filterStatus = "Cancelled";
+                break;
+            case 3:
+                filterStatus = "Registered";
+                break;
+            default:
+                filterStatus = "";
+        }
+
+        // Apply the filter based on entrant status
+        for (Entrant entrant : allEntrants) {
+            if ((filterStatus.equals("Waitlisted") && entrant.getOnWaitingList()) ||
+                    (filterStatus.equals("Selected") && entrant.getOnAcceptedList()) ||
+                    (filterStatus.equals("Registered") && entrant.getOnRegisteredList()) ||
+                    (filterStatus.equals("Cancelled") && entrant.getOnCancelledList())) {
+                filteredList.add(entrant);
+            }
+        }
+        entrantsAdapter.updateEntrantsList(filteredList);
+    }
+
+    /**
+     * Sets up the TabLayout and its tab selection listener for filtering entrants.
+     */
+    private void setupTabLayout() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                filterEntrantsByTab(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
     }
 
     @Override
