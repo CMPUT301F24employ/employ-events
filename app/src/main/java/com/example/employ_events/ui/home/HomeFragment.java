@@ -27,13 +27,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+/**
+ * Fragment representing the home screen, which includes the functionality to scan QR codes to retrieve data.
+ */
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private CollectionReference eventsRef;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Interprets the data obtained from scanning the QR code
+    /**
+     * Launcher to handle QR code scan results and process the scanned data
+     */
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), qrCodeResult -> {
         if (qrCodeResult.getData() != null && qrCodeResult.getResultCode() == getActivity().RESULT_OK) {
             // qrCodeResult: ActivityResult
@@ -64,6 +69,14 @@ public class HomeFragment extends Fragment {
         }
     });
 
+    /**
+     * Inflates the fragment layout and sets up event listeners for UI components.
+     *
+     * @param inflater           the LayoutInflater object to inflate views
+     * @param container          the parent view that contains the fragment's UI
+     * @param savedInstanceState the saved instance state for restoring fragment state
+     * @return the root view of the fragment
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -89,6 +102,12 @@ public class HomeFragment extends Fragment {
     the fragment there is a button and I click on it to start scanning
     */
 
+    /**
+     * Loads an event's QR code image into the specified ImageView using the event's ID.
+     *
+     * @param eventID the ID of the event to load
+     * @param view    the ImageView where the QR code image will be displayed
+     */
     private void loadEvent(String eventID, ImageView view) {
         db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -101,12 +120,20 @@ public class HomeFragment extends Fragment {
         }).addOnFailureListener(e -> Toast.makeText(getContext(), "Didn't work", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Navigates to the event details fragment, passing the event ID as an argument.
+     *
+     * @param eventID the ID of the event to be displayed in the details fragment
+     */
     private void navigateToEventDetailsFrag(String eventID) {
         Bundle args = new Bundle();
         args.putString("EVENT_ID", eventID);
         NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_homeFragment_to_eventDetailsFragment, args);
     }
 
+    /**
+     * Initiates the QR code scanning process using the IntentIntegrator
+     */
     private void scanInfo() {
         IntentIntegrator integrator = IntentIntegrator.forSupportFragment(HomeFragment.this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
@@ -117,6 +144,9 @@ public class HomeFragment extends Fragment {
         launcher.launch(data);
     }
 
+    /**
+     * Cleans up the binding when the fragment's view is destroyed
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

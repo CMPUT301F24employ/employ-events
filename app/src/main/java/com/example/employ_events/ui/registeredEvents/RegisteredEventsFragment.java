@@ -25,7 +25,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
-
+/**
+ * Fragment to display a list of registered events. Fetches data from Firestore and displays it in a RecyclerView.
+ */
 public class RegisteredEventsFragment extends Fragment {
 
     private FragmentRegisteredEventsBinding binding;
@@ -36,7 +38,14 @@ public class RegisteredEventsFragment extends Fragment {
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
 
-
+    /**
+     * Called to create and initialize the view for this fragment.
+     *
+     * @param inflater           the LayoutInflater object used to inflate views
+     * @param container          the parent view that the fragment’s UI is attached to
+     * @param savedInstanceState previously saved instance data
+     * @return the root view of the inflated fragment layout
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         EventViewModel galleryViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
@@ -57,6 +66,9 @@ public class RegisteredEventsFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Fetches registered events from the Firestore 'waitinglist' collection and updates the adapter with the data.
+     */
     private void loadRegisteredEvents() {
         eventsRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -70,7 +82,9 @@ public class RegisteredEventsFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Called when the view hierarchy associated with the fragment is being removed.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
