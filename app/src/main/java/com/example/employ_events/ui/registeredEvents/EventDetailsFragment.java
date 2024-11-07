@@ -18,12 +18,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
+import com.example.employ_events.ui.events.ManageEventEntrants;
 import com.example.employ_events.ui.events.ManageEventViewModel;
-import com.example.employ_events.ui.profile.NewProfileFragment;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -41,7 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class EventDetailsFragment extends Fragment implements NewProfileFragment.NewProfileDialogListener{
+public class EventDetailsFragment extends Fragment{
 
     private EventDetailsBinding binding;
     private TextView name, fee, description, date, facility, location,
@@ -55,14 +57,6 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
     private Button joinButton, leaveButton;
     private Event currentEvent;
 
-    @Override
-    public void provideInfo(String name, String email, String uniqueID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", name);
-        data.put("email", email);
-        data.put("entrant", true);
-        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
-    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
@@ -125,34 +119,41 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
                 return;
             }
 
-            // Checks if the required profile info exists, if not user must create their profile.
+            // Check if the required profile info exists; if not, navigate to edit profile.
             DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
                         if (document.getString("name") == null || document.getString("email") == null) {
-                            new NewProfileFragment().show(requireActivity().getSupportFragmentManager(), "Create Profile");
+                            Toast.makeText(getContext(), "Name and email required! Edit your profile and try again.", Toast.LENGTH_LONG).show();
+                            // Navigate to edit profile and exit the join logic
+                            NavHostFragment.findNavController(EventDetailsFragment.this)
+                                    .navigate(R.id.action_eventDetailsFragment_to_nav_edit_profile);
+                            return;  // Exit here to prevent further execution of join logic
+                        } else {
+                            // Profile is complete, proceed to join with geolocation warning if needed
+                            if (currentEvent.getGeoLocation()) {
+                                new AlertDialog.Builder(requireContext())
+                                        .setTitle("Warning! Geolocation Required")
+                                        .setMessage("Are you sure you want to join the waiting list?")
+                                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                                        .setPositiveButton("Proceed", (dialog, which) -> joinEvent(currentEvent))
+                                        .show();
+                            }
+                            else {
+                                joinEvent(currentEvent);
+                            }
                         }
+                    } else {
+                        Log.e("EventDetailsFragment", "User profile document does not exist");
                     }
                 } else {
-                    // Handle the error, e.g., log it
-                    Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
+                    Log.e("EventDetailsFragment", "Error getting user profile: ", task.getException());
                 }
             });
 
-            // Warn user if geolocation is required.
-            if (currentEvent.getGeoLocation()) {
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Warning! Geolocation Required")
-                        .setMessage("Are you sure you want to join the waiting list?")
-                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                        .setPositiveButton("Proceed", (dialog, which) -> joinEvent(currentEvent))
-                        .show();
-            }
-            else {
-                joinEvent(currentEvent);
-            }
+
         });
 
         leaveButton.setOnClickListener(view -> {

@@ -138,8 +138,7 @@ public class EditProfileFragment extends Fragment {
         });
 
         // Navigate to the profile screen when the changes are confirmed.
-        confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(EditProfileFragment.this)
-                .popBackStack(R.id.nav_profile, false)));
+        confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(this).popBackStack()));
 
         return root;
     }

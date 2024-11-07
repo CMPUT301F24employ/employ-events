@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.facility.CreateFacilityFragment;
-import com.example.employ_events.ui.facility.Facility;
-import com.example.employ_events.ui.facility.FacilityFragment;
-import com.example.employ_events.ui.profile.NewProfileFragment;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
@@ -25,10 +21,7 @@ import com.example.employ_events.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
