@@ -9,15 +9,18 @@ import java.util.Map;
  */
 public class Entrant {
     private String name, uniqueID, email;
-    private Boolean onWaitingList;
-    private Boolean onCancelledList;
-    private Boolean onAcceptedList;
-    private Boolean onRegisteredList;
+    private boolean onWaitingList, onCancelledList,
+            onAcceptedList, onRegisteredList;
 
     /**
      * Default constructor for creating an empty Entrant object.
      */
-    public Entrant() { }
+    public Entrant() {
+        this.onAcceptedList = false;
+        this.onCancelledList = false;
+        this.onWaitingList = false;
+        this.onRegisteredList = false;
+    }
 
     /**
      * Constructs an Entrant object with a specified name.
@@ -71,7 +74,7 @@ public class Entrant {
      * Gets the status of whether the entrant is on the waiting list.
      * @return True if the entrant is on the waiting list, false otherwise.
      */
-    public Boolean getOnWaitingList() {
+    public boolean getOnWaitingList() {
         return onWaitingList;
     }
 
@@ -79,7 +82,7 @@ public class Entrant {
      * Sets the status of whether the entrant is on the waiting list.
      * @param onWaitingList The status to set for the waiting list.
      */
-    public void setOnWaitingList(Boolean onWaitingList) {
+    public void setOnWaitingList(boolean onWaitingList) {
         this.onWaitingList = onWaitingList;
     }
 
@@ -87,7 +90,7 @@ public class Entrant {
      * Gets the status of whether the entrant is on the cancelled list.
      * @return True if the entrant is on the cancelled list, false otherwise.
      */
-    public Boolean getOnCancelledList() {
+    public boolean getOnCancelledList() {
         return onCancelledList;
     }
 
@@ -95,14 +98,14 @@ public class Entrant {
      * Sets the status of whether the entrant is on the cancelled list.
      * @param onCancelledList The status to set for the cancelled list.
      */
-    public void setOnCancelledList(Boolean onCancelledList) {
+    public void setOnCancelledList(boolean onCancelledList) {
         this.onCancelledList = onCancelledList; }
 
     /**
      * Gets the status of whether the entrant is on the accepted list.
      * @return True if the entrant is on the accepted list, false otherwise.
      */
-    public Boolean getOnAcceptedList() {
+    public boolean getOnAcceptedList() {
         return onAcceptedList;
     }
 
@@ -110,7 +113,7 @@ public class Entrant {
      * Sets the status of whether the entrant is on the accepted list.
      * @param onAcceptedList The status to set for the accepted list.
      */
-    public void setOnAcceptedList(Boolean onAcceptedList) {
+    public void setOnAcceptedList(boolean onAcceptedList) {
         this.onAcceptedList = onAcceptedList;
     }
 
@@ -118,7 +121,7 @@ public class Entrant {
      * Gets the status of whether the entrant is on the registered list.
      * @return True if the entrant is on the registered list, false otherwise.
      */
-    public Boolean getOnRegisteredList() {
+    public boolean getOnRegisteredList() {
         return onRegisteredList;
     }
 
@@ -126,7 +129,7 @@ public class Entrant {
      * Sets the status of whether the entrant is on the registered list.
      * @param onRegisteredList The status to set for the registered list.
      */
-    public void setOnRegisteredList(Boolean onRegisteredList) {
+    public void setOnRegisteredList(boolean onRegisteredList) {
         this.onRegisteredList = onRegisteredList;
     }
 
@@ -137,12 +140,12 @@ public class Entrant {
      */
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("name", this.name);
-        map.put("email", this.email);
-        map.put("onRegisteredList", this.getOnRegisteredList());
-        map.put("onAcceptedList", this.getOnAcceptedList());
-        map.put("onCancelledList", this.getOnCancelledList());
-        map.put("onWaitingList", this.getOnWaitingList());
+        map.put("name", getName());
+        map.put("email", getEmail());
+        map.put("onRegisteredList", getOnRegisteredList());
+        map.put("onAcceptedList", getOnAcceptedList());
+        map.put("onCancelledList", getOnCancelledList());
+        map.put("onWaitingList", getOnWaitingList());
         // Add other fields as needed
         return map;
     }
