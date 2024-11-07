@@ -294,7 +294,7 @@ public class EditProfileFragment extends Fragment {
      * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
      */
     private void uploadPFPAndSaveProfile(Profile editProfile, Runnable onComplete) {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".jpg");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".png");
         storageRef.putFile(pfpUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     editProfile.setPfpURI(uri.toString());

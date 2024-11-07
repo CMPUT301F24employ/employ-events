@@ -39,14 +39,15 @@
             android:id="@+id/uploadPFP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:text="Upload" />
 
         <Button
             android:id="@+id/removePFP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Remove"
-            android:visibility="gone" /> <!-- Initially hidden -->
+            android:layout_margin="5dp"
+            android:text="Remove" />
     </LinearLayout>
 
     <Button
