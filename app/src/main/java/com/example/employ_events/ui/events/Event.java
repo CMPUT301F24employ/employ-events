@@ -266,6 +266,9 @@ public class Event {
         }
     }
 
+    public void setEntrantsList(ArrayList<Entrant> entrantsList) {
+        this.entrantsList = entrantsList;
+    }
 
     /**
      * Returns the list of entrants for the event.
