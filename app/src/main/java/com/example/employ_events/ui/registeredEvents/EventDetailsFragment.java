@@ -179,11 +179,26 @@ public class EventDetailsFragment extends Fragment implements NewProfileFragment
 
     private void joinEvent(Event currentEvent) {
         Entrant entrant = new Entrant();
-        entrant.setOnWaitingList(false);
+        entrant.setOnWaitingList(Boolean.FALSE);
         entrant.setOnAcceptedList(Boolean.FALSE);
         entrant.setOnCancelledList(Boolean.FALSE);
-        entrant.setOnRegisteredList(false);
+        entrant.setOnRegisteredList(Boolean.FALSE);
         entrant.setUniqueID(uniqueID);
+
+        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    entrant.setEmail(document.getString("email"));
+                    entrant.setName(document.getString("name"));
+                }
+            } else {
+                // Handle the error, e.g., log it
+                Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
+            }
+        });
+
 
         if (currentEvent.addEntrant(entrant)) {
             entrant.setOnWaitingList(Boolean.TRUE);
