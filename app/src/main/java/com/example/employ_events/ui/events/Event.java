@@ -301,6 +301,7 @@ public class Event {
                 continue;
             }
             selected.setOnAcceptedList(true);
+            selected.setOnWaitingList(false);
         }
 
         // Prepare data for Firebase update

@@ -362,6 +362,9 @@ public class AddEventFragment extends Fragment {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
 
                     String theID = documentReference.getId();
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", theID);
+                    db.collection("events").document(theID).set(data, SetOptions.merge());
                     createEntrantListSubcollection(documentReference);
                     try {
                         Bitmap qrCodeBitmap = makeQRBitmap(theID);
