@@ -6,3 +6,4 @@ com.example.employ_events.ui.home
 com.example.employ_events.ui.notifications
 com.example.employ_events.ui.profile
 com.example.employ_events.ui.registeredEvents
+com.example.employ_events.ui.scanQrCode
