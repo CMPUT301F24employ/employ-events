@@ -30,6 +30,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentEditFacilityBinding;
 
+import com.example.employ_events.ui.profile.EditProfileFragment;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,6 +45,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+/*
+There is a bug where you have previously uploaded a pfp, and go to edit the profile again and only update non pfp fields.
+The pfp clears after confirming and is set to null.
+ */
 
 /**
  * A fragment that allows users to edit their facility's profile information.
@@ -118,21 +123,19 @@ public class EditFacilityFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         displayProfile(document, editFacilityViewModel);
 
-                        // Initially hide the remove button
-                        removeButton.setVisibility(View.GONE);
-
                         // Set click listener for the upload banner button
                         uploadButton.setOnClickListener(v -> pickImage());
 
                         // Set click listener for the remove banner button
                         removeButton.setOnClickListener(v -> {
-                            facilityPfpUri = null; // Clear the banner URI
+                            // Clear the image in the UI but do not delete the URI from Firestore
+                            facilityPfpUri = null;
                             facilityPFP.setImageDrawable(null); // Clear the displayed image
                             removeButton.setVisibility(View.GONE); // Hide the remove button
                         });
 
                         confirmButton.setOnClickListener(view -> editProfile(uniqueID, facilityID, () -> NavHostFragment.findNavController(EditFacilityFragment.this)
-                                .navigate(R.id.action_nav_edit_facility_to_nav_facility)));
+                                .popBackStack(R.id.nav_facility, false)));
                     }
                 });
             } else {
@@ -197,10 +200,15 @@ public class EditFacilityFragment extends Fragment {
             editAddress.setText(Objects.requireNonNull(document.get("address")).toString());
             editFacilityViewModel.getText().observe(getViewLifecycleOwner(), editAddress::setText);
         }
+        // Check if there's a profile picture URI available in Firestore
         if (document.get("facilityPfpUri") != null) {
             String uri = Objects.requireNonNull(document.get("facilityPfpUri")).toString();
             loadImageFromUrl(uri);
+            // Show the remove button if there's a profile picture
             removeButton.setVisibility(View.VISIBLE);
+        } else {
+            // If no profile picture, hide the remove button
+            removeButton.setVisibility(View.GONE);
         }
     }
 
@@ -250,10 +258,13 @@ public class EditFacilityFragment extends Fragment {
             profile.setPhone_number(phone.isEmpty() ? null : phone);
             profile.setAddress(address);
             // Handle profile picture logic
-            if (facilityPFP != null) { // User uploaded a custom profile picture
-                uploadPFPAndSaveProfile(profile, facilityID, onComplete); // Upload custom PFP
+            if (facilityPfpUri != null) {
+                // If the user has uploaded a new profile picture, upload it.
+                uploadPFPAndSaveProfile(profile, facilityID, onComplete);
             } else {
-                saveProfile(profile, facilityID, onComplete); // Save profile data to Firestore
+                profile.setFacilityPfpUri(null);
+                // If no new profile picture, save the profile data.
+                saveProfile(profile, facilityID, onComplete);
             }
         }
     }
@@ -267,7 +278,7 @@ public class EditFacilityFragment extends Fragment {
      * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
      */
     private void uploadPFPAndSaveProfile(Facility editProfile, String facilityID, Runnable onComplete) {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".jpg");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".png");
         storageRef.putFile(facilityPfpUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     editProfile.setFacilityPfpUri(uri.toString());
@@ -290,6 +301,7 @@ public class EditFacilityFragment extends Fragment {
         data.put("phone_number", editProfile.getPhone_number());
         data.put("address", editProfile.getAddress());
         data.put("facilityPfpUri", editProfile.getFacilityPfpUri());
+
         db.collection("facilities").document(facilityID).set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     if (onComplete != null) {
