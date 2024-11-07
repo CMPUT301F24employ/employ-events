@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/*
+The purpose of
+ */
+
 /**
  * Represents an event with various attributes such as title, date, registration deadlines,
  * fees, and capacity. It can manage a list of entrants and determine selections from that list.

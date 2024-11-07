@@ -24,7 +24,6 @@ import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
-import com.example.employ_events.ui.events.ManageEventEntrants;
 import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,20 +38,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+
+/*
+This fragment is the page where a user can view the details, and is able to join and leave the event.
+It displays a dialog warning if geolocation is required, which asks for proceed -> joins, cancel -> does not join.
+It sends a user who has yet to set their name and email to the edit profile screen.
+
+Outstanding issues: Join and leave buttons are only setting visibility based on waiting list status.
+Yet to have account for selected/registered/cancelled status.
+ */
 
 /**
  * The EventDetailsFragment is responsible for displaying the details of an event, including its title,
  * description, date, capacity, and other relevant information. It allows users to join or leave the event
  * waiting list by interacting with the UI components such as buttons and text views.
- *
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
  * If the user profile is incomplete (missing name or email), it prompts the user to edit their profile before
  * proceeding. It also handles the logic for showing or hiding the join/leave buttons based on the user's current
  * status in the event's entrants list.
- *
  * It also supports geolocation-based warnings if the event requires geolocation for joining.
  */
 public class EventDetailsFragment extends Fragment{
@@ -181,7 +185,7 @@ public class EventDetailsFragment extends Fragment{
                     .setTitle("Warning! Rejoining is not guaranteed.")
                     .setMessage("Are you sure you want to leave the waiting list?")
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent(currentEvent))
+                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent())
                     .show();
         });
         return root;
@@ -189,9 +193,8 @@ public class EventDetailsFragment extends Fragment{
 
     /**
      * Leaves the event waiting list by deleting the user's entrant record.
-     * @param currentEvent The current event the user is leaving.
      */
-    private void leaveEvent(Event currentEvent) {
+    private void leaveEvent() {
             Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
             String eventID = getArguments().getString("EVENT_ID");
             eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();

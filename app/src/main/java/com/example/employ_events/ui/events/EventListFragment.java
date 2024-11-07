@@ -25,6 +25,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/*
+This fragment is used for displaying the list of events an organizer owns, and
+on click of an event, sends them to the specific event page.
+ */
+
 /**
  * EventListFragment displays a list of events for a specific facility.
  * It fetches events from Firestore based on the facility ID and allows

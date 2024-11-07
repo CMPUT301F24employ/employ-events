@@ -31,6 +31,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is to let organizers download their event specific
+QR code so they may distribute it.
+ */
+
 /**
  * Fragment to download and display a QR code image from a Firebase Firestore URL.
  */
@@ -106,7 +111,6 @@ public class DownloadQRCode extends Fragment {
 
     /**
      * Saves a Bitmap image to external storage in the Pictures directory.
-     *
      * @param bitmap The Bitmap image to save.
      */
     private void saveImageToStorage(Bitmap bitmap) {

@@ -25,6 +25,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/*
+Yet to be progressed until after halfway checkpoint.
+We hope to display a list of events the entrant is in a list for.
+ */
+
 /**
  * Fragment to display a list of registered events. Fetches data from Firestore and displays it in a RecyclerView.
  */

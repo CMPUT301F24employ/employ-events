@@ -1,73 +1,25 @@
 package com.example.employ_events.ui.home;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.bumptech.glide.Glide;
-import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentHomeBinding;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+/*
+Yet to be worked on. We hope to display local events on this screen.
+ */
 
 /**
- * Fragment representing the home screen, which includes the functionality to scan QR codes to retrieve data.
+ * Fragment representing the home screen.
  */
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private CollectionReference eventsRef;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    /**
-     * Launcher to handle QR code scan results and process the scanned data
-     */
-    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), qrCodeResult -> {
-        if (qrCodeResult.getData() != null && qrCodeResult.getResultCode() == getActivity().RESULT_OK) {
-            // qrCodeResult: ActivityResult
-            // qrCodeResult.getData(): Intent
-
-            // Turning the activity result into an intent result
-            IntentResult result = IntentIntegrator.parseActivityResult(qrCodeResult.getResultCode(), qrCodeResult.getData());
-
-            // Getting the contents of the Intent to use
-            String eventID;
-            if (result != null && result.getContents() != null) {
-                // If QR code retrieved data
-                eventID = result.getContents();
-
-                db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // If the event exists in the database, go to event details fragment and fill page with event details from firebase
-                        navigateToEventDetailsFrag(eventID);
-                    } else {
-                        // Else make a toast saying there was an error
-                        Toast.makeText(getContext(), "Error: Event not found in database!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
-                // No data from QR code
-                Toast.makeText(getContext(), "Error: No data retrieved from QR code!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    });
 
     /**
      * Inflates the fragment layout and sets up event listeners for UI components.
@@ -85,63 +37,8 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        Button scanQRCode = binding.scanQrCodeButton;
-        scanQRCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                scanInfo();
-            }
-        });
 
         return root;
-    }
-
-    /*
-    Got code from https://zxing.github.io/zxing/apidocs/com/google/zxing/integration/android/IntentIntegrator.html
-    chatgpt: I want to create a scanqrcode fragment in android studio using zxming. In
-    the fragment there is a button and I click on it to start scanning
-    */
-
-    /**
-     * Loads an event's QR code image into the specified ImageView using the event's ID.
-     *
-     * @param eventID the ID of the event to load
-     * @param view    the ImageView where the QR code image will be displayed
-     */
-    private void loadEvent(String eventID, ImageView view) {
-        db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                Toast.makeText(getContext(), eventID, Toast.LENGTH_SHORT).show();
-                String url = documentSnapshot.getString("QRCodeUrl");
-                if (url != null) {
-                    Glide.with(this).load(url).into(view);
-                }
-            }
-        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Didn't work", Toast.LENGTH_SHORT).show());
-    }
-
-    /**
-     * Navigates to the event details fragment, passing the event ID as an argument.
-     *
-     * @param eventID the ID of the event to be displayed in the details fragment
-     */
-    private void navigateToEventDetailsFrag(String eventID) {
-        Bundle args = new Bundle();
-        args.putString("EVENT_ID", eventID);
-        NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_homeFragment_to_eventDetailsFragment, args);
-    }
-
-    /**
-     * Initiates the QR code scanning process using the IntentIntegrator
-     */
-    private void scanInfo() {
-        IntentIntegrator integrator = IntentIntegrator.forSupportFragment(HomeFragment.this);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
-        integrator.setOrientationLocked(true);
-        integrator.setBeepEnabled(false);
-        integrator.setPrompt("Find a code to scan");
-        Intent data = integrator.createScanIntent();
-        launcher.launch(data);
     }
 
     /**

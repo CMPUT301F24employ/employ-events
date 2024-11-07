@@ -52,7 +52,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/*
+This class handles organizers creating an event, validating the information provided and
+storing it into firebase. It generates a QR code when all fields are valid and the event is being
+created.
 
+Minor issue is when pressing the add/confirm button to create the event, it may load long enough to double click
+the button which crashes the app and adds 2 copies of the event.
+ */
 
 /**
  * AddEventFragment is a Fragment that allows organizers to create a new event
@@ -91,6 +98,7 @@ public class AddEventFragment extends Fragment {
         initializeViews();
 
         // Initialize the ActivityResultLauncher for requesting permission
+        // https://developer.android.com/training/permissions/requesting
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {

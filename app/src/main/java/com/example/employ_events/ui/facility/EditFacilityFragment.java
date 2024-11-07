@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 /*
+The purpose of this fragment is to allow the facility to edit their contact info or upload/remove their pfp.
+
 There is a bug where you have previously uploaded a pfp, and go to edit the profile again and only update non pfp fields.
 The pfp clears after confirming and is set to null.
  */

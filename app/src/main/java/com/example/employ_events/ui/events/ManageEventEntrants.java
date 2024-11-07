@@ -26,6 +26,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+The purpose of this fragment is to allow the organizer to view a list of their events
+waitlisted, selected, registered and canceled entrants. It allows them to press the sample
+button which will automatically sample from eligible entrants up until the event capacity.
+
+View entrants map and cancel entrant have yet to be implemented.
+ */
+
 /**
  * Fragment responsible for managing event entrants. This includes displaying entrants,
  * filtering based on status, and generating sample data for event entrants.

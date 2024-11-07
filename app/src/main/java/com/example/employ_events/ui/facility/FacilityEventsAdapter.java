@@ -18,6 +18,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+/*
+The purpose of this adapter is to assist in displaying a list of a facility's events on their
+manage events page.
+ */
+
 /**
  * Adapter for displaying events in a RecyclerView within a facility.
  */

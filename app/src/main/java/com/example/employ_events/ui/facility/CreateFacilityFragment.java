@@ -18,6 +18,12 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 
+/*
+The purpose of this fragment is to prompt the user to create a facility if they click on facility but do not have one.
+When dismissed or cancelled, it will send the user back to the home screen as they are not allowed to manage their facility
+if it does not exist.
+ */
+
 /**
  * A DialogFragment for creating a new facility. It collects information from the user,
  * such as facility name, address, email, and phone number, and communicates this information
@@ -151,6 +157,19 @@ public class CreateFacilityFragment extends DialogFragment {
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
+        // Inform the user that facility creation was canceled
+        Toast.makeText(getActivity(), "Facility creation canceled. You can start again anytime!", Toast.LENGTH_SHORT).show();
+        NavHostFragment.findNavController(CreateFacilityFragment.this)
+                .popBackStack(R.id.nav_home, false);
+    }
+
+    /**
+     * Called when the dialog is dismissed. This method informs the user that facility creation was
+     * canceled and navigates back to the home fragment.
+     */
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
         // Inform the user that facility creation was canceled
         Toast.makeText(getActivity(), "Facility creation canceled. You can start again anytime!", Toast.LENGTH_SHORT).show();
         NavHostFragment.findNavController(CreateFacilityFragment.this)
