@@ -43,6 +43,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The EventDetailsFragment is responsible for displaying the details of an event, including its title,
+ * description, date, capacity, and other relevant information. It allows users to join or leave the event
+ * waiting list by interacting with the UI components such as buttons and text views.
+ *
+ * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
+ * If the user profile is incomplete (missing name or email), it prompts the user to edit their profile before
+ * proceeding. It also handles the logic for showing or hiding the join/leave buttons based on the user's current
+ * status in the event's entrants list.
+ *
+ * It also supports geolocation-based warnings if the event requires geolocation for joining.
+ */
 public class EventDetailsFragment extends Fragment{
 
     private EventDetailsBinding binding;
@@ -58,7 +70,11 @@ public class EventDetailsFragment extends Fragment{
     private Event currentEvent;
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    /**
+     * Inflates the fragment's view and sets up the UI components.
+     * It also fetches event data from Firestore and checks the user's status in the event's entrants list.
+     */
+     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
 
         binding = EventDetailsBinding.inflate(inflater, container, false);
@@ -170,6 +186,11 @@ public class EventDetailsFragment extends Fragment{
         });
         return root;
     }
+
+    /**
+     * Leaves the event waiting list by deleting the user's entrant record.
+     * @param currentEvent The current event the user is leaving.
+     */
     private void leaveEvent(Event currentEvent) {
             Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
             String eventID = getArguments().getString("EVENT_ID");
@@ -178,12 +199,12 @@ public class EventDetailsFragment extends Fragment{
             joinButton.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Joins the event waiting list by adding the user as an entrant.
+     * @param currentEvent The current event the user is joining.
+     */
     private void joinEvent(Event currentEvent) {
         Entrant entrant = new Entrant();
-        entrant.setOnWaitingList(Boolean.FALSE);
-        entrant.setOnAcceptedList(Boolean.FALSE);
-        entrant.setOnCancelledList(Boolean.FALSE);
-        entrant.setOnRegisteredList(Boolean.FALSE);
         entrant.setUniqueID(uniqueID);
 
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
@@ -193,26 +214,32 @@ public class EventDetailsFragment extends Fragment{
                 if (document != null && document.exists()) {
                     entrant.setEmail(document.getString("email"));
                     entrant.setName(document.getString("name"));
+
+                    // Now that entrant is fully populated, proceed with adding to the event
+                    if (currentEvent.addEntrant(entrant)) {
+                        Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
+                        String eventID = requireArguments().getString("EVENT_ID");
+                        eventsRef.document(eventID)
+                                .collection("entrantsList")
+                                .document(uniqueID)
+                                .set(entrant.toMap(), SetOptions.merge());
+                        leaveButton.setVisibility(View.VISIBLE);
+                        joinButton.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else {
-                // Handle the error, e.g., log it
+                // Handle the error
                 Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
             }
         });
-
-
-        if (currentEvent.addEntrant(entrant)) {
-            entrant.setOnWaitingList(Boolean.TRUE);
-            Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-            String eventID = requireArguments().getString("EVENT_ID");
-            eventsRef.document(eventID).collection("entrantsList").document(uniqueID).set(entrant);
-            leaveButton.setVisibility(View.VISIBLE);
-            joinButton.setVisibility(View.GONE);
-        } else {
-            Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
-        }
     }
 
+
+    /**
+     * Initializes the UI views from the fragment's layout.
+     */
     private void initializeViews() {
         name = binding.eventName;
         description = binding.eventDescription;
@@ -229,6 +256,11 @@ public class EventDetailsFragment extends Fragment{
         leaveButton = binding.leaveButton;
     }
 
+    /**
+     * Displays the event details by populating the UI views with data from the Firestore document.
+     * @param document The Firestore document containing the event data.
+     * @param galleryViewModel The ViewModel used for observing live data.
+     */
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
         // Set optional fields to invisible until it is determined to be non-null.
         waitingListCapacity.setVisibility(View.GONE);
