@@ -157,6 +157,7 @@ public class ManageEventEntrants extends Fragment {
             if (documentSnapshot.exists()) {
                 Event event = documentSnapshot.toObject(Event.class);
                 if (event != null) {
+                    event.setEntrantsList((ArrayList<Entrant>) allEntrants);
                     event.generateSample();
                     Boolean isSampleSuccessful = Boolean.FALSE;
                     if (event.getEntrantsList().size() == (Math.min(event.getEventCapacity(), event.getEntrantsList().size()))){
