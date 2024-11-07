@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
@@ -120,7 +121,13 @@ public class ScanQrCodeFragment extends Fragment {
     private void navigateToEventDetailsFrag(String eventID) {
         Bundle args = new Bundle();
         args.putString("EVENT_ID", eventID);
-        NavHostFragment.findNavController(ScanQrCodeFragment.this).navigate(R.id.action_scan_qr_code_to_eventDetailsFragment, args);
+        NavHostFragment.findNavController(ScanQrCodeFragment.this).navigate(
+                R.id.action_scan_qr_code_to_eventDetailsFragment,
+                args,
+                new NavOptions.Builder()
+                        .setPopUpTo(R.id.scan_qr_code, true) // Remove ScanQrCodeFragment from the back stack
+                        .build()
+        );
     }
 
     /**
