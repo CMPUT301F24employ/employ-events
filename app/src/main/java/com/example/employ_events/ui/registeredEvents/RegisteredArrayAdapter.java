@@ -14,6 +14,10 @@ import com.example.employ_events.ui.events.Event;
 
 import java.util.ArrayList;
 
+/*
+Yet to be completed. We hope to use this in displaying the list of registered events.
+ */
+
 /**
  * RecyclerView.Adapter implementation to display a list of registered events.
  * This adapter binds event data to views that are displayed within a RecyclerView.

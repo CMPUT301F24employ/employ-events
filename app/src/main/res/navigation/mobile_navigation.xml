@@ -193,4 +193,13 @@
         tools:layout="@layout/download_qr_code">
     </fragment>
 
+    <fragment
+        android:id="@+id/scan_qr_code"
+        android:name="com.example.employ_events.ui.scanQrCode.ScanQrCodeFragment"
+        android:label="Download QR Code">
+        <action
+            android:id="@+id/action_scan_qr_code_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
 </navigation>

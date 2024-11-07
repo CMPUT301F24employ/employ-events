@@ -19,15 +19,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/scan_qr_code_button"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/button_colour"
-            android:drawableLeft="@drawable/white_eye"
-            android:text="@string/scan_qr_code"
-            android:textColor="@color/white" />
-
-        <Button
             android:id="@+id/admin_view_button"
             android:layout_width="250dp"
             android:layout_height="wrap_content"

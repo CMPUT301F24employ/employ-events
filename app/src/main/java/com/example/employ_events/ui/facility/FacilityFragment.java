@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is offer options through buttons
+to edit their facility profile or view their events.
+ */
+
 /**
  * FacilityFragment displays facility profile information.
  */

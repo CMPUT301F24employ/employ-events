@@ -1,5 +1,9 @@
 package com.example.employ_events.ui.profile;
 
+/*
+The purpose of this class is to define a user and set/get their profile information.
+ */
+
 /**
  * This is a class that defines a user's Profile.
  */

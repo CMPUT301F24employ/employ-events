@@ -16,6 +16,12 @@ import com.example.employ_events.databinding.FragmentEntrantNotificationsBinding
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
+/*
+Progress stopped until after halfway point.
+ */
+/**
+ * Handles an entrant receiving a notification.
+ */
 public class entrantNotifications extends Fragment {
 
     private FragmentEntrantNotificationsBinding binding;

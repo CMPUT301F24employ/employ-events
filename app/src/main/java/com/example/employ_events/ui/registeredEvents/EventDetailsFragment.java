@@ -24,7 +24,6 @@ import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
-import com.example.employ_events.ui.events.ManageEventEntrants;
 import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,20 +38,22 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+
+/*
+This fragment is the page where a user can view the details, and is able to join and leave the event.
+It displays a dialog warning if geolocation is required, which asks for proceed -> joins, cancel -> does not join.
+It sends a user who has yet to set their name and email to the edit profile screen.
+ */
 
 /**
  * The EventDetailsFragment is responsible for displaying the details of an event, including its title,
  * description, date, capacity, and other relevant information. It allows users to join or leave the event
  * waiting list by interacting with the UI components such as buttons and text views.
- *
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
  * If the user profile is incomplete (missing name or email), it prompts the user to edit their profile before
  * proceeding. It also handles the logic for showing or hiding the join/leave buttons based on the user's current
  * status in the event's entrants list.
- *
  * It also supports geolocation-based warnings if the event requires geolocation for joining.
  */
 public class EventDetailsFragment extends Fragment{
@@ -106,26 +107,10 @@ public class EventDetailsFragment extends Fragment{
                                     document.getLong("eventCapacity").intValue()
                             );
                             displayDetails(document, galleryViewModel);
-
-                            db.collection("events").document(eventID).collection("entrantsList")
-                                    .whereEqualTo("uniqueID", uniqueID)
-                                    .get()
-                                    .addOnCompleteListener(task1 -> {
-                                        if (task1.isSuccessful()) {
-                                            QuerySnapshot querySnapshot = task1.getResult();
-                                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                                leaveButton.setVisibility(View.VISIBLE);
-                                            } else {
-                                                joinButton.setVisibility(View.VISIBLE);
-                                            }
-                                        } else {
-                                            // Handle the error
-                                            Log.w("Firestore", "Error getting documents.", task.getException());
-                                        }
-                                    });
                         }
                     }
                 });
+                checkUserEntryStatus(eventID);
             }
         }
 
@@ -181,22 +166,68 @@ public class EventDetailsFragment extends Fragment{
                     .setTitle("Warning! Rejoining is not guaranteed.")
                     .setMessage("Are you sure you want to leave the waiting list?")
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent(currentEvent))
+                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent())
                     .show();
         });
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getArguments() != null) {
+            String eventID = getArguments().getString("EVENT_ID");
+            if (eventID != null) {
+                checkUserEntryStatus(eventID);
+            }
+        }
+    }
+
+    /**
+     * Checks if the current user is already an entrant for the event.
+     * Displays the appropriate button based on whether the user has joined or not.
+     * If the user is on the cancelled list, both the join and leave buttons are hidden.
+     * @param eventID The ID of the event to check for the entrant.
+     */
+    private void checkUserEntryStatus(String eventID) {
+        db.collection("events").document(eventID).collection("entrantsList")
+                .document(uniqueID)  // Directly reference the document by uniqueID
+                .get()
+                .addOnCompleteListener(task1 -> {
+                    if (task1.isSuccessful()) {
+                        DocumentSnapshot entrantDoc = task1.getResult();  // Get the document snapshot directly
+                        if (entrantDoc != null && entrantDoc.exists()) {  // Check if the document exists
+                            // Check if the entrant has been cancelled
+                            if (Boolean.TRUE.equals(entrantDoc.getBoolean("onCancelledList"))) {
+                                // Cancelled entrants are not allowed to rejoin.
+                                joinButton.setVisibility(View.GONE);
+                                leaveButton.setVisibility(View.GONE);
+                            } else {
+                                leaveButton.setVisibility(View.VISIBLE);
+                                joinButton.setVisibility(View.GONE);  // Hide join button when the user has already joined
+                            }
+                        } else {
+                            // No entrant found, show the join button
+                            joinButton.setVisibility(View.VISIBLE);
+                            leaveButton.setVisibility(View.GONE);  // Hide leave button when the user hasn't joined
+                        }
+                    } else {
+                        // Handle the error
+                        Log.w("Firestore", "Error getting documents.", task1.getException());
+                    }
+                });
+
+    }
+
     /**
      * Leaves the event waiting list by deleting the user's entrant record.
-     * @param currentEvent The current event the user is leaving.
      */
-    private void leaveEvent(Event currentEvent) {
-            Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
-            String eventID = getArguments().getString("EVENT_ID");
-            eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();
-            leaveButton.setVisibility(View.GONE);
-            joinButton.setVisibility(View.VISIBLE);
+    private void leaveEvent() {
+        Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
+        String eventID = getArguments().getString("EVENT_ID");
+        eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();
+        leaveButton.setVisibility(View.GONE);
+        joinButton.setVisibility(View.VISIBLE);
     }
 
     /**

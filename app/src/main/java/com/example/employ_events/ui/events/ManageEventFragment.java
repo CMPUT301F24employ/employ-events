@@ -32,6 +32,11 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is to manage an event such as update the event banner, a button that
+brings you to the download event qr page, and a button to bring you to manage entrants page for the event.
+ */
+
 /**
  * Fragment to manage event details including editing, viewing entrants, and obtaining QR codes.
  */

@@ -14,21 +14,23 @@ import com.example.employ_events.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+This class is used for displaying the RecyclerView lists of entrants.
+No outstanding issues at the moment.
+ */
+
 /**
  * Adapter for managing and displaying a list of entrants in a RecyclerView
  */
-
 public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.EntrantViewHolder> {
     private final ArrayList<Entrant> entrantList;
     private final Context context;
 
     /**
      * Constructs an EntrantsAdapter with the specified context and list of entrants.
-     *
      * @param context    the context in which the adapter is used
      * @param entrantList the list of entrants to be displayed
      */
-
     public EntrantsAdapter(Context context, ArrayList<Entrant> entrantList) {
         this.context = context;
         this.entrantList = new ArrayList<>(entrantList);
@@ -36,12 +38,10 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
 
     /**
      * Inflates the layout for an individual entrant item and returns a new ViewHolder.
-     *
      * @param parent   the parent ViewGroup
      * @param viewType the view type of the new View
      * @return a new instance of EntrantViewHolder
      */
-
     @NonNull
     @Override
     public EntrantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,10 +51,8 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
 
     /**
      * Updates the current list of entrants and refreshes the RecyclerView.
-     *
      * @param entrants the new list of entrants
      */
-
     public void updateEntrantsList(List<Entrant> entrants) {
         this.entrantList.clear();
         this.entrantList.addAll(entrants);
@@ -63,11 +61,9 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
 
     /**
      * Binds entrant data to the specified ViewHolder.
-     *
      * @param holder   the ViewHolder to bind data to
      * @param position the position of the entrant in the list
      */
-
     @Override
     public void onBindViewHolder(@NonNull EntrantViewHolder holder, int position) {
         Entrant entrant = entrantList.get(position);
@@ -77,10 +73,8 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
 
     /**
      * Returns the total number of entrants in the list.
-     *
      * @return the size of the entrant list
      */
-
     @Override
     public int getItemCount() {
         return entrantList.size();
@@ -94,7 +88,6 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
 
         /**
          * Constructs an EntrantViewHolder and initializes its views.
-         *
          * @param itemView the view of the entrant item
          */
         public EntrantViewHolder(@NonNull View itemView) {

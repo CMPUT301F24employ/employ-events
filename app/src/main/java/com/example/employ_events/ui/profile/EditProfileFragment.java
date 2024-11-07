@@ -43,6 +43,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is to allow a user to edit their profile fields.
+Name and email cannot be empty, and will prompt the user if it is and not accept changes until it is not.
+This is where a user can upload their profile picture and remove it.
+This is where the automated profile picture is assigned based on name if a user has yet to set one.
+No issues at the moment.
+ */
+
 /**
  * A fragment that allows users to edit their profile information.
  * This fragment interacts with Firestore to retrieve and update user profiles.
