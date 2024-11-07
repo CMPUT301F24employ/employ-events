@@ -118,6 +118,7 @@ public class ManageEventEntrants extends Fragment {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             String userId = document.getId();
                             Entrant entrant = document.toObject(Entrant.class);
+                            entrant.setUniqueID(userId);
 
                             // Fetch user profile for name and email
                             db.collection("userProfiles").document(userId)
