@@ -31,6 +31,8 @@ if it does not exist.
  */
 public class CreateFacilityFragment extends DialogFragment {
     private CreateFacilityDialogListener listener;
+    private boolean isCreateButtonClicked = false;
+
 
     /**
      * Interface for communicating facility creation events to the hosting activity.
@@ -111,6 +113,7 @@ public class CreateFacilityFragment extends DialogFragment {
                     listener.onFacilityCreated(); // Notify that the facility was created
 
                     Toast.makeText(getActivity(), "Facility Created!", Toast.LENGTH_SHORT).show();
+                    isCreateButtonClicked = true;
                     dialog.dismiss();
                 }
             });
@@ -170,10 +173,13 @@ public class CreateFacilityFragment extends DialogFragment {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        // Inform the user that facility creation was canceled
-        Toast.makeText(getActivity(), "Facility creation canceled. You can start again anytime!", Toast.LENGTH_SHORT).show();
-        NavHostFragment.findNavController(CreateFacilityFragment.this)
-                .popBackStack(R.id.nav_home, false);
+        if (!isCreateButtonClicked) {
+            // Inform the user that the facility creation was canceled
+            Toast.makeText(getActivity(), "Facility creation canceled. You can start again anytime!", Toast.LENGTH_SHORT).show();
+            // Navigate back to the home screen
+            NavHostFragment.findNavController(CreateFacilityFragment.this)
+                    .popBackStack(R.id.nav_home, false);
+        }
     }
 
 }
