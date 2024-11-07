@@ -1,5 +1,7 @@
 package com.example.employ_events.ui.events;
 
+import android.util.Log;
+
 import com.example.employ_events.ui.entrants.Entrant;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -266,6 +268,9 @@ public class Event {
         }
     }
 
+    public void setEntrantsList(ArrayList<Entrant> entrantsList) {
+        this.entrantsList = entrantsList;
+    }
 
     /**
      * Returns the list of entrants for the event.
@@ -302,26 +307,22 @@ public class Event {
             }
             selected.setOnAcceptedList(true);
             selected.setOnWaitingList(false);
+
+            // Update the specific entrant's document in the subcollection
+            String uniqueID = selected.getUniqueID();
+            Map<String, Object> data = new HashMap<>();
+            data.put("onAcceptedList", true);
+            data.put("onWaitingList", false);
+
+            db.collection("events")
+                    .document(getId())
+                    .collection("entrantsList")
+                    .document(uniqueID)
+                    .set(data, SetOptions.merge())
+                    .addOnSuccessListener(aVoid -> Log.d("generateSample", "Updated entrant " + uniqueID))
+                    .addOnFailureListener(e -> Log.e("generateSample", "Error updating entrant " + uniqueID, e));
         }
-
-        // Prepare data for Firebase update
-        Map<String, Object> data = new HashMap<>();
-
-        // Convert the updated entrants list to a map format
-        ArrayList<Map<String, Object>> entrantsMapList = new ArrayList<>();
-        for (Entrant entrant : entrantsList) {
-            entrantsMapList.add(entrant.toMap()); // Assumes Entrant has a `toMap` method
-        }
-        data.put("entrantsList", entrantsMapList);
-
-        // Update Firestore with merged data
-        db.collection("events").document(getId()).set(data, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> {
-                    // Handle successful update if needed
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failed update if needed
-                });
     }
+
 
 }
