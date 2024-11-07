@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
@@ -129,9 +130,11 @@ public class AddEventFragment extends Fragment {
         // Fetch the facility ID
         fetchFacilityID(uniqueID);
 
+        registrationStartDeadlineButton.setEnabled(false); // Disable start date button
+        registrationDeadlineButton.setEnabled(false); // Disable registration deadline button
         // Set up date picker dialogs
         eventDateButton.setOnClickListener(view -> showDateTimePicker(eventDateButton, "eventDate"));
-        registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "endDate"));
+        registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "registrationDeadline"));
         registrationStartDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationStartDeadlineButton, "startDate"));
 
         // Initially hide the remove button
@@ -185,6 +188,14 @@ public class AddEventFragment extends Fragment {
                 else if (eventCapacity.trim().isEmpty()) {
                     eventCapacityInput.setError("Event capacity required");
                     eventCapacityInput.requestFocus();
+                }
+                else if (eventCapacity.trim().equals("0")) {
+                    eventCapacityInput.setError("Event capacity cannot be 0");
+                    eventCapacityInput.requestFocus();
+                }
+                else if (!limitString.trim().isEmpty() && limitString.trim().equals("0")) {
+                    limitInput.setError("Waiting list capacity cannot be 0");
+                    limitInput.requestFocus();
                 }
                 else {
                     // Generate a unique ID for the event
@@ -273,8 +284,10 @@ public class AddEventFragment extends Fragment {
                                 // Save the combined date and time into respective variables
                                 if (filter.equals("eventDate")) {
                                     eventDate = selectedDate.getTime();
+                                    registrationStartDeadlineButton.setEnabled(true);  // Enable Registration Start button
                                 } else if (filter.equals("startDate")) {
                                     registrationStartDeadline = selectedDate.getTime();
+                                    registrationDeadlineButton.setEnabled(true);  // Enable Registration Deadline button
                                 } else {
                                     registrationDeadline = selectedDate.getTime();
                                 }
@@ -285,14 +298,30 @@ public class AddEventFragment extends Fragment {
                 },
                 year, month, day
         );
-        // Set the minimum date based on filter type
-        if (filter.equals("eventDate") || filter.equals("startDate")) {
+
+        // Set the minimum and maximum dates based on filter type
+        if (filter.equals("eventDate")) {
+            // Ensure the current date is being used for event date
             datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-        } else {
-            // Set minimum date to registration open date and maximum date to event date
-            datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
-            datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+        } else if (filter.equals("startDate")) {
+            // Ensure registration start date is no earlier than today
+            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+            if (eventDate != null) {
+                // Ensure registration start date is no later than event date
+                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+            }
+        } else if (filter.equals("registrationDeadline")) {
+            // Ensure registration deadline is between registration start date and event date
+            if (registrationStartDeadline != null && eventDate != null) {
+                datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
+                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+            } else {
+                Toast.makeText(getContext(), "Please set the registration start date and event date first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
+
+        // Show the date picker dialog
         datePickerDialog.show();
     }
 
@@ -381,7 +410,9 @@ public class AddEventFragment extends Fragment {
                     } catch (WriterException e) {
                         throw new RuntimeException(e);
                     }
-                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
+                    NavHostFragment.findNavController(AddEventFragment.this)
+                            .popBackStack();
+
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
     }
