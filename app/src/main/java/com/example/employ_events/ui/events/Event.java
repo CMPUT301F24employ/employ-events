@@ -285,12 +285,12 @@ public class Event {
     public void generateSample() {
         Random random = new Random();
         ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<>();
-        Integer capOfSample = Math.min(this.eventCapacity, this.entrantsList.size());
+        Integer capOfSample = Math.min(getEventCapacity(), getEntrantsList().size());
         Integer i = 0;
 
         // Randomly select entrants based on event capacity
         while (i < capOfSample) {
-            int sampled = random.nextInt(this.entrantsList.size());
+            int sampled = random.nextInt(getEntrantsList().size());
             if (!randomlyGeneratedNumbers.contains(sampled)) {
                 randomlyGeneratedNumbers.add(sampled);
                 i++;
@@ -299,7 +299,7 @@ public class Event {
 
         // Mark selected entrants as accepted
         for (Integer index : randomlyGeneratedNumbers) {
-            Entrant selected = entrantsList.get(index);
+            Entrant selected = getEntrantsList().get(index);
             if (selected.getOnCancelledList() || !selected.getOnWaitingList()) {
                 continue;
             }
@@ -312,7 +312,7 @@ public class Event {
 
         // Convert the updated entrants list to a map format
         ArrayList<Map<String, Object>> entrantsMapList = new ArrayList<>();
-        for (Entrant entrant : entrantsList) {
+        for (Entrant entrant : getEntrantsList()) {
             entrantsMapList.add(entrant.toMap()); // Assumes Entrant has a `toMap` method
         }
         data.put("entrantsList", entrantsMapList);
