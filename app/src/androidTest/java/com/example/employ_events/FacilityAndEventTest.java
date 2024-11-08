@@ -835,5 +835,7 @@ public class FacilityAndEventTest {
         }
         // Go to the list of cancelled entrant
         onView(withText("Cancelled")).perform(click());
+        // Go to the registered list to see final list of entrants
+        onView(withText("Registered")).perform(click());
     }
 }
