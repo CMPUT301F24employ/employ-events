@@ -53,7 +53,6 @@ public class FacilityAndEventTest {
             e.printStackTrace();
         }
 
-        // TEST TOAST Facility ID not found!
         // Check if it's on the facility dialog since facility has not created yet screen
         onView(withId(R.id.editFacilityName)).check(matches(isDisplayed()));
         onView(withId(R.id.editFacilityEmail)).check(matches(isDisplayed()));
@@ -90,8 +89,6 @@ public class FacilityAndEventTest {
         }
         // Check it goes back to the starting screen
         onView(withId(R.id.admin_view_button)).check(matches(isDisplayed()));
-
-        // TEST FOR TOAST Facility creation canceled. You can start again anytime!
     }
 
     @Test
