@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 public class FacilityAndEventTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<MainActivity>(MainActivity.class);
-    //Test wont work if your organizer setting is true for your user id. Rerun the test and it should work.
+    //TEST WON'T WORK IF YOUR ORGANIZER SETTING IS TRUE FOR YOUR USER ID. RERUN THE TEST AND IT SHOULD WORK.
     @Test
     public void test01_HomeToFacilityScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
