@@ -35,10 +35,9 @@ public class QRCodeUITest {
     public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
+    // US 01.06.01 As an entrant I want to view event details within the app by scanning the promotional QR code
     @Test
     public void viewEventDetailsTest() throws InterruptedException {
-        // US 01.06.01
-        // As an entrant I want to view event details within the app by scanning the promotional QR code
 
         ActivityScenario.launch(MainActivity.class);
 

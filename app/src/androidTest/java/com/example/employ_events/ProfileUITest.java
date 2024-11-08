@@ -15,6 +15,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 
+
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -41,8 +42,10 @@ import org.junit.runners.MethodSorters;
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 
+// **MAKE SURE your profile on the app is clear. You can go on firebase and delete it or use a different device.
+// If there is an issue, sometimes running the test individually helps.
+
 // Running the tests in alphabetical order because the "identifiedByDeviceTest" fails if we do not check for it before provide and update info tests
-// Passes if run individually
 // As for all the other tests, order does not matter
 // CITATION: https://junit.org/junit4/javadoc/4.12/org/junit/FixMethodOrder.html
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -51,6 +54,7 @@ public class ProfileUITest {
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
+
 
     // This tests if we are able to go from Home to Profile
     @Test
