@@ -81,34 +81,34 @@ public class EditProfileFragment extends Fragment {
         // Initialize the UI components for the fragment
         initializeViews();
 
-        // Initialize the ActivityResultLauncher for requesting permission
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
-                    if (isGranted) {
-                        // Permission was granted
-                        Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Permission was denied
-                        Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) { // Check if the fragment is attached before showing the Toast
+                        if (isGranted) {
+                            Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
         );
 
-        // Initialize the ActivityResultLauncher for picking an image.
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        // Handle the image selection
-                        pfpUri = result.getData().getData();
-                        userPFP.setImageURI(pfpUri);
-                        userPFP.setVisibility(View.VISIBLE);
-                        removeButton.setVisibility(View.VISIBLE);
-                        isInitialLoad = false;
+                        if (isAdded()) { // Ensure fragment is still attached
+                            pfpUri = result.getData().getData();
+                            userPFP.setImageURI(pfpUri);
+                            userPFP.setVisibility(View.VISIBLE);
+                            removeButton.setVisibility(View.VISIBLE);
+                            isInitialLoad = false;
+                        }
                     }
                 }
         );
+
 
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -235,12 +235,17 @@ public class EditProfileFragment extends Fragment {
             try {
                 URL imageUrl = new URL(url);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-                requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
+
+                // Check if the fragment is attached before updating the UI
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
+                }
             } catch (IOException e) {
                 Log.e("EditProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
+
 
     /**
      * Edits the user's profile based on the input fields and updates the Firestore database.
