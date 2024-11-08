@@ -52,7 +52,6 @@ public class FacilityAndEventTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         // Check if it's on the facility dialog since facility has not created yet screen
         onView(withId(R.id.editFacilityName)).check(matches(isDisplayed()));
         onView(withId(R.id.editFacilityEmail)).check(matches(isDisplayed()));
@@ -193,7 +192,7 @@ public class FacilityAndEventTest {
         }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-       // Wait for the screen to update
+        // Wait for the screen to update
         try {
             Thread.sleep(1500);
         } catch (InterruptedException e) {
@@ -290,18 +289,155 @@ public class FacilityAndEventTest {
         onView(withId(R.id.registration_date_deadline)).check(matches(isDisplayed()));
         onView(withId(R.id.event_capacity)).check(matches(isDisplayed()));
         onView(withId(R.id.limit)).check(matches(isDisplayed()));
+        onView(withId(R.id.limit)).perform(ViewActions.typeText("Test"));
         try {
             Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < 14; i++) {
-            onView(withId(android.R.id.content)).perform(pressKey(KeyEvent.KEYCODE_TAB));
-        }
         onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.feeText)).check(matches(isDisplayed()));
         onView(withId(R.id.geolocation_status)).check(matches(isDisplayed()));
         onView(withId(R.id.save_event_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.save_event_button)).perform(click());
+        onView(withId(R.id.event_title)).check(matches(hasErrorText("Event title required")));
+        onView(withId(R.id.event_title)).perform(ViewActions.typeText("hi"));
+        onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        onView(withId(R.id.description)).check(matches(hasErrorText("Event description required")));
+        onView(withId(R.id.description)).perform(ViewActions.typeText("test@gmail.com"));
+        onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.event_date)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.registration_start_deadline)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.registration_date_deadline)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("OK")).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.event_capacity)).check(matches(hasErrorText("Event capacity required")));
+        onView(withId(R.id.event_capacity)).perform(ViewActions.typeText("0"));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.event_capacity)).check(matches(hasErrorText("Event capacity cannot be 0")));
+        onView(withId(R.id.event_capacity)).perform(ViewActions.replaceText("33"));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.save_event_button)).perform(click());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -335,9 +471,14 @@ public class FacilityAndEventTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < 15; i++) {
-            onView(withId(android.R.id.content)).perform(pressKey(KeyEvent.KEYCODE_TAB));
+        onView(withId(R.id.limit)).check(matches(isDisplayed()));
+        onView(withId(R.id.limit)).perform(ViewActions.typeText("Test"));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        onView(withId(R.id.description)).perform(closeSoftKeyboard());
         try {
             Thread.sleep(1500);
         } catch (InterruptedException e) {
@@ -345,11 +486,25 @@ public class FacilityAndEventTest {
         }
         // Add event information
         onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.event_title)).perform(ViewActions.typeText("Test Event"));
         onView(withId(R.id.description)).perform(ViewActions.typeText("Test case event"));
         onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.event_date)).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withText("OK")).perform(click());
         try {
             Thread.sleep(1500);
@@ -400,6 +555,11 @@ public class FacilityAndEventTest {
         }
         onView(withId(R.id.event_capacity)).perform(ViewActions.typeText("33"));
         onView(withId(R.id.description)).perform(closeSoftKeyboard());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.geolocation_status)).perform(click());
         onView(withId(R.id.save_event_button)).perform(click());
 
@@ -675,8 +835,5 @@ public class FacilityAndEventTest {
         }
         // Go to the list of cancelled entrant
         onView(withText("Cancelled")).perform(click());
-
-        // Go to the registered list to see final list of entrants
-        onView(withText("Registered")).perform(click());
     }
 }
