@@ -22,6 +22,8 @@ import com.example.employ_events.R;
 The purpose of this fragment is to prompt the user to create a facility if they click on facility but do not have one.
 When dismissed or cancelled, it will send the user back to the home screen as they are not allowed to manage their facility
 if it does not exist.
+US 02.01.03 As an organizer, I want to create and manage my facility profile
+
  */
 
 /**

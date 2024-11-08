@@ -50,6 +50,8 @@ The purpose of this fragment is to allow the facility to edit their contact info
 
 There is a bug where you have previously uploaded a pfp, and go to edit the profile again and only update non pfp fields.
 The pfp clears after confirming and is set to null.
+US 02.01.03 As an organizer, I want to create and manage my facility profile
+
  */
 
 /**

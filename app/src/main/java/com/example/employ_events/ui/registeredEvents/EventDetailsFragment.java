@@ -46,6 +46,10 @@ It displays a dialog warning if geolocation is required, which asks for proceed 
 It sends a user who has yet to set their name and email to the edit profile screen.
 
 Have yet to implement checks that the registration start and end deadline are followed.
+
+US 01.01.01	As an entrant, I want to join the waiting list for a specific event
+US 01.01.02	As an entrant, I want to leave the waiting list for a specific event
+US 01.08.01	As an entrant, I want to be warned before joining a waiting list that requires geolocation
  */
 
 /**
