@@ -287,14 +287,14 @@ public class Event {
     /**
      * Generates a random sample of entrants from the entrants list based on the event's capacity.
      * Entrants who are cancelled or not on the waiting list will be excluded from selection.
+     * @param updateFirestore allows for testing, false for testing true for user end.
      */
-    public void generateSample() {
+    public void generateSample(boolean updateFirestore) {
         Random random = new Random();
         ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<>();
         Integer capOfSample = Math.min(this.eventCapacity, this.entrantsList.size());
         Integer i = 0;
 
-        // Randomly select entrants based on event capacity
         while (i < capOfSample) {
             int sampled = random.nextInt(this.entrantsList.size());
             if (!randomlyGeneratedNumbers.contains(sampled)) {
@@ -303,7 +303,6 @@ public class Event {
             }
         }
 
-        // Mark selected entrants as accepted
         for (Integer index : randomlyGeneratedNumbers) {
             Entrant selected = entrantsList.get(index);
             if (selected.getOnCancelledList() || !selected.getOnWaitingList()) {
@@ -312,21 +311,24 @@ public class Event {
             selected.setOnAcceptedList(true);
             selected.setOnWaitingList(false);
 
-            // Update the specific entrant's document in the subcollection
-            String uniqueID = selected.getUniqueID();
-            Map<String, Object> data = new HashMap<>();
-            data.put("onAcceptedList", true);
-            data.put("onWaitingList", false);
+            if (updateFirestore) {
+                // Firestore update logic
+                String uniqueID = selected.getUniqueID();
+                Map<String, Object> data = new HashMap<>();
+                data.put("onAcceptedList", true);
+                data.put("onWaitingList", false);
 
-            db.collection("events")
-                    .document(getId())
-                    .collection("entrantsList")
-                    .document(uniqueID)
-                    .set(data, SetOptions.merge())
-                    .addOnSuccessListener(aVoid -> Log.d("generateSample", "Updated entrant " + uniqueID))
-                    .addOnFailureListener(e -> Log.e("generateSample", "Error updating entrant " + uniqueID, e));
+                db.collection("events")
+                        .document(getId())
+                        .collection("entrantsList")
+                        .document(uniqueID)
+                        .set(data, SetOptions.merge())
+                        .addOnSuccessListener(aVoid -> Log.d("generateSample", "Updated entrant " + uniqueID))
+                        .addOnFailureListener(e -> Log.e("generateSample", "Error updating entrant " + uniqueID, e));
+            }
         }
     }
+
 
 
 }
