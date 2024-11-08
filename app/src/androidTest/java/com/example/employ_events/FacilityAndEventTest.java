@@ -4,7 +4,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressKey;
-import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 
@@ -34,7 +33,7 @@ import static org.junit.Assert.*;
 public class FacilityTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<MainActivity>(MainActivity.class);
-
+    //Test wont work if your organizer setting is true for your user id. Rerun the test and it should work.
     @Test
     public void test01_HomeToFacilityScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
