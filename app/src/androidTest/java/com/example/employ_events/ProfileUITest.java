@@ -13,6 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -209,7 +210,25 @@ public class ProfileUITest {
     }
 
     @Test
-    public void phoneNumberOptionalTest() {
+    public void phoneNumberOptionalTest() throws InterruptedException {
+
+        onView(withContentDescription("Open navigation drawer")).check(matches(isDisplayed())).perform(click());
+        onView(withId(R.id.nav_profile)).check(matches(isDisplayed())).perform(click());
+        onView(withId(R.id.edit_profile_button)).check(matches(isDisplayed())).perform(click());
+
+
+        onView(withId(R.id.editTextUserName)).check(matches(isDisplayed())).perform(replaceText("Jasleen"), closeSoftKeyboard());
+        onView(withId(R.id.editTextUserEmailAddress)).check(matches(isDisplayed())).perform(replaceText("jasleen.h@gmail.com"), closeSoftKeyboard());
+
+        // Leave phone number empty
+        onView(withId(R.id.editTextUserPhone)).check(matches(isDisplayed())).perform(replaceText(""), closeSoftKeyboard());
+        onView(withId(R.id.confirm_button)).check(matches(isDisplayed())).perform(click());
+
+        Thread.sleep(1000);
+
+        // Check if the "Edit Profile" button exists so we know we're back on the Profile page
+        // This indicates that no error was thrown for leaving phone number empty meaning it is optional
+        onView(withId(R.id.edit_profile_button)).check(matches(isDisplayed()));
 
     }
 
