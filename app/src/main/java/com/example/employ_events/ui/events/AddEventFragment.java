@@ -26,6 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -410,8 +412,12 @@ public class AddEventFragment extends Fragment {
                     } catch (WriterException e) {
                         throw new RuntimeException(e);
                     }
-                    NavHostFragment.findNavController(AddEventFragment.this)
-                            .popBackStack();
+                    NavController navController = Navigation.findNavController(view);
+                    NavOptions navOptions = new NavOptions.Builder()
+                            .setPopUpTo(R.id.manageEventFragment, false) // Clears stack up to ManageEventFragment
+                            .build();
+                    navController.navigate(R.id.action_addEventFragment_to_eventListFragment, null, navOptions);
+
 
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
