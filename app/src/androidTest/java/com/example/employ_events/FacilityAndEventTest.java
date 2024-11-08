@@ -4,6 +4,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressKey;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 
@@ -30,7 +31,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
-public class FacilityTest {
+public class FacilityAndEventTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<MainActivity>(MainActivity.class);
     //Test wont work if your organizer setting is true for your user id. Rerun the test and it should work.
@@ -38,12 +39,16 @@ public class FacilityTest {
     public void test01_HomeToFacilityScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -60,12 +65,16 @@ public class FacilityTest {
     public void test02_FacilityToHomeScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -73,7 +82,7 @@ public class FacilityTest {
         onView(withText("Not Now")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -85,12 +94,16 @@ public class FacilityTest {
     public void test04_CreateAndEditFacilityScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -108,7 +121,7 @@ public class FacilityTest {
         onView(withText("Create")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -135,7 +148,7 @@ public class FacilityTest {
         });
         onView(withId(R.id.edit_facility_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -153,13 +166,13 @@ public class FacilityTest {
         onView(withId(R.id.editTextFacilityEmailAddress)).perform(ViewActions.replaceText("test12@gmail.com"));
         onView(withId(R.id.editTextFacilityAddress)).perform(ViewActions.replaceText("edmonton"));
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withId(R.id.confirm_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -172,12 +185,16 @@ public class FacilityTest {
     public void test03_CreateFacilityErrorMessage() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
        // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -196,19 +213,23 @@ public class FacilityTest {
     public void test05_FacilityToEventListBackScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -218,7 +239,7 @@ public class FacilityTest {
         // Check if you can go back to facility page
         onView(withContentDescription("Navigate up")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -231,26 +252,30 @@ public class FacilityTest {
     public void test06_EventListToAddEventScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to add event
         onView(withId(R.id.addEventButton)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -265,7 +290,7 @@ public class FacilityTest {
         onView(withId(R.id.event_capacity)).check(matches(isDisplayed()));
         onView(withId(R.id.limit)).check(matches(isDisplayed()));
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -282,26 +307,30 @@ public class FacilityTest {
     public void test07_CreateEvent() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to add event
         onView(withId(R.id.addEventButton)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -309,7 +338,7 @@ public class FacilityTest {
             onView(withId(android.R.id.content)).perform(pressKey(KeyEvent.KEYCODE_TAB));
         }
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -322,49 +351,49 @@ public class FacilityTest {
 
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withId(R.id.registration_start_deadline)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withId(R.id.registration_date_deadline)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withText("OK")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -374,38 +403,52 @@ public class FacilityTest {
         onView(withId(R.id.save_event_button)).perform(click());
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Check if event is in the list
         onView(withText("Test Event")).check(matches(isDisplayed()));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void test08_EventListToMangeEventScreen() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to view more about the event
         onView(withText("Test Event")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -424,26 +467,30 @@ public class FacilityTest {
     public void test09_MangeEventToUpload_UpdateBannerScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to view more about the event
         onView(withText("Test Event")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -459,7 +506,7 @@ public class FacilityTest {
         // Go to the update/upload Banner page
         onView(withId(R.id.edit_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -467,14 +514,14 @@ public class FacilityTest {
         onView(withId(R.id.uploadBannerButton)).check(matches(isDisplayed()));
         onView(withId(R.id.save_event_button)).check(matches(isDisplayed()));
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click the update button
         onView(withId(R.id.save_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
         }
         // Check if you gone back to manage screen
@@ -493,26 +540,30 @@ public class FacilityTest {
     public void test10_MangeEventToQRCOdeScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to view more about the event
         onView(withText("Test Event")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -529,7 +580,7 @@ public class FacilityTest {
         // Click to go to QR code page
         onView(withId(R.id.qr_code_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
         }
         // Check if on QR page
@@ -538,7 +589,7 @@ public class FacilityTest {
         // Go back to the manage screen
         onView(withContentDescription("Navigate up")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
         }
         // Check if on manage screen
@@ -557,26 +608,30 @@ public class FacilityTest {
     public void test11_MangeEventToWaitingListScreen() {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
-
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
         // Wait for the screen to update
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Click to view more about the event
         onView(withText("Test Event")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -592,7 +647,7 @@ public class FacilityTest {
         // Go to the entrant list screen
         onView(withId(R.id.view_entrants_button)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -606,14 +661,14 @@ public class FacilityTest {
         // Click to sample entrants
         onView(withId(R.id.sample_entrants)).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         // Go to the list of selected entrant
         onView(withText("Selected")).perform(click());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
