@@ -5,26 +5,28 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+/*
+    Unable to test for upload and remove image and deterministically generated from profile name.
+    Not sure how to test if drawable changed from "@drawable/white_person" to whatever the user uploaded
+    or if it was determined by their initial or something.
+    I am able to test if the pfp exists, but not if it changes.
+ */
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -181,6 +183,33 @@ public class ProfileUITest {
         // Check if the error message is displayed for the email field after confirm is pressed
         Thread.sleep(1000);
         onView(withId(R.id.editTextUserEmailAddress)).check(matches(hasErrorText("Email cannot be empty")));
+
+    }
+
+    @Test
+    public void backArrowTest() {
+
+        onView(withContentDescription("Open navigation drawer")).check(matches(isDisplayed())).perform(click());
+        onView(withId(R.id.nav_profile)).check(matches(isDisplayed())).perform(click());
+
+        // Check if "Edit Profile" button exists bc that indicates we're on the Profile page
+        onView(withId(R.id.edit_profile_button)).check(matches(isDisplayed())).perform(click());
+
+        // Check if "Upload" and "Confirm Changes" buttons exist bc that indicates we're on the Edit Profile page
+        // And check if "Edit Profile" button does not exist
+        onView(withId(R.id.uploadPFP)).check(matches(withText("UPLOAD"))).check(matches(isDisplayed()));
+        onView(withId(R.id.confirm_button)).check(matches(withText("CONFIRM CHANGES"))).check(matches(isDisplayed()));
+        onView(withId(R.id.edit_profile_button)).check(doesNotExist());
+
+        // Check if the back arrow exists and press it to go back to Profile page
+        onView(withContentDescription("Navigate up")).check(matches(isDisplayed())).perform(click());
+
+        // Check if "Edit Profile" button exists so we know we're back
+        onView(withId(R.id.edit_profile_button)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void phoneNumberOptionalTest() {
 
     }
 
