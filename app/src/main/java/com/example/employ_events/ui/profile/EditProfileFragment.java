@@ -49,6 +49,14 @@ Name and email cannot be empty, and will prompt the user if it is and not accept
 This is where a user can upload their profile picture and remove it.
 This is where the automated profile picture is assigned based on name if a user has yet to set one.
 No issues at the moment.
+
+US 01.03.03	As an entrant I want my profile picture to be deterministically generated from my profile name
+if I haven't uploaded a profile image yet.
+US 01.03.02	As an entrant I want remove profile picture if need be
+US 01.03.01	As an entrant I want to upload a profile picture for a more personalized experience
+US 01.02.02	As an entrant I want to update information such as name, email and contact information on my profile
+US 01.02.01	As an entrant, I want to provide my personal information such as name, email and optional phone number in the app
+
  */
 
 /**

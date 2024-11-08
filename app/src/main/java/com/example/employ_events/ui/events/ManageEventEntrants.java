@@ -32,6 +32,12 @@ waitlisted, selected, registered and canceled entrants. It allows them to press 
 button which will automatically sample from eligible entrants up until the event capacity.
 
 View entrants map and cancel entrant have yet to be implemented.
+
+US 02.05.02	As an organizer I want to set the system to sample a specified number of attendees to register for the event
+US 02.06.01	As an organizer I want to view a list of all chosen entrants who are invited to apply
+US 02.06.02	As an organizer I want to receive a list of all the cancelled entrants
+US 02.06.03	As an organizer I want to see a final list of entrants who enrolled for the event
+US 02.02.01	As an organizer I want to view the list of entrants who joined my event waiting list
  */
 
 /**
