@@ -4,22 +4,17 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intending;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.intent.Intents;
-import androidx.test.espresso.intent.matcher.IntentMatchers;
-import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.rule.GrantPermissionRule;
 
@@ -28,12 +23,17 @@ import org.junit.Test;
 
 public class QRCodeUITest {
 
+    /*
+    Current issues: Don't want to actually open scanner, but rather pass data into the activity result to be
+    interpreted.
+     */
+
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA);
 
-//    @Rule
-//    public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule =
-//            new ActivityScenarioRule<>(MainActivity.class);
+    @Rule
+    public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule =
+            new ActivityScenarioRule<>(MainActivity.class);
 
     @Test
     public void viewEventDetailsTest() throws InterruptedException {
@@ -60,11 +60,4 @@ public class QRCodeUITest {
         Thread.sleep(2000);
         Intents.release();
     }
-
-    public void signUpUsingQRCodeTest() {
-        // US 01.06.02
-        // As an entrant I want to be able to be sign up for an event by scanning the QR code
-
-    }
-
 }
