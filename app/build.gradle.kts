@@ -33,6 +33,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -71,4 +72,6 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.fragment:fragment-testing:1.8.5")
     debugImplementation("androidx.fragment:fragment-testing-manifest:1.8.5")
+    implementation ("org.osmdroid:osmdroid-android:6.1.20")
+
 }
