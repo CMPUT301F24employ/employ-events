@@ -67,6 +67,7 @@ US 02.01.01	As an organizer I want to create a new event and generate a unique p
 US 02.01.02	As an organizer I want to store hash data of the generated QR code in my database
 US 02.03.01	As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
 US 02.04.01	As an organizer I want to upload an event poster to provide visual information to entrants
+US 02.02.03 As an organizer I want to enable or disable the geolocation requirement for my event.
  */
 
 /**

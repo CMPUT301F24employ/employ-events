@@ -94,6 +94,13 @@ public class ManageEventEntrants extends Fragment {
             }
         });
 
+        viewEntrantMap.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("EVENT_ID", eventId);
+            NavHostFragment.findNavController(ManageEventEntrants.this)
+                    .navigate(R.id.action_manageEventEntrantsFragment_to_event_entrants_map, args);
+        });
+
         setupTabLayout();
 
         return root;

@@ -164,6 +164,9 @@
         <action
             android:id="@+id/action_manageEventEntrantsFragment_to_sendNotificationsScreen"
             app:destination="@+id/sendNotificationScreen" />
+        <action
+            android:id="@+id/action_manageEventEntrantsFragment_to_event_entrants_map"
+            app:destination="@id/event_entrants_map" />
     </fragment>
 
     <fragment
@@ -200,6 +203,12 @@
         <action
             android:id="@+id/action_scan_qr_code_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/event_entrants_map"
+        android:name="com.example.employ_events.ui.events.EventEntrantsMap"
+        android:label="Entrants Map">
     </fragment>
 
 </navigation>
