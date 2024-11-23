@@ -16,11 +16,12 @@ import com.example.employ_events.databinding.FragmentDrawNotificationCardBinding
 import com.example.employ_events.databinding.FragmentManageEventBinding;
 import com.example.employ_events.ui.events.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 /*
+Progress stopped until after halfway checkpoint.
+ */
 
-Handles invites for when they're accepted to an eevent and when they didn't get accepted
-
+/**
+Handles invites for when they're accepted to an event and when they didn't get accepted
 */
 public class DrawNotificationCard extends Fragment {
 

@@ -1,5 +1,7 @@
 package com.example.employ_events.ui.events;
 
+import android.util.Log;
+
 import com.example.employ_events.ui.entrants.Entrant;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -9,6 +11,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+/*
+The purpose of
+ */
 
 /**
  * Represents an event with various attributes such as title, date, registration deadlines,
@@ -246,19 +252,28 @@ public class Event {
      * @param entrant the Entrant object to be added
      * @return true if the entrant was successfully added, false if the waiting list is at capacity
      */
-    public Boolean addEntrant(Entrant entrant){
-        if (this.limited != null){
-            if (entrantsList.size() < this.limited){
+    public boolean addEntrant(Entrant entrant) {
+        // Check if there is a capacity limit
+        if (this.limited != null) {
+            // If the number of entrants is less than the limit, add the entrant
+            if (entrantsList.size() < this.limited) {
                 entrantsList.add(entrant);
-                entrant.setOnWaitingList(Boolean.TRUE);
-                return Boolean.TRUE;
+                entrant.setOnWaitingList(true); // true is the same as Boolean.TRUE
+                return true;
+            } else {
+                // Capacity is full
+                return false;
             }
-            return Boolean.FALSE;
-        } else{
-          entrantsList.add(entrant);
-          entrant.setOnWaitingList(Boolean.TRUE);
-          return Boolean.TRUE;
+        } else {
+            // No limit, just add the entrant
+            entrantsList.add(entrant);
+            entrant.setOnWaitingList(true);
+            return true;
         }
+    }
+
+    public void setEntrantsList(ArrayList<Entrant> entrantsList) {
+        this.entrantsList = entrantsList;
     }
 
     /**
@@ -272,14 +287,14 @@ public class Event {
     /**
      * Generates a random sample of entrants from the entrants list based on the event's capacity.
      * Entrants who are cancelled or not on the waiting list will be excluded from selection.
+     * @param updateFirestore allows for testing, false for testing true for user end.
      */
-    public void generateSample() {
+    public void generateSample(boolean updateFirestore) {
         Random random = new Random();
         ArrayList<Integer> randomlyGeneratedNumbers = new ArrayList<>();
         Integer capOfSample = Math.min(this.eventCapacity, this.entrantsList.size());
         Integer i = 0;
 
-        // Randomly select entrants based on event capacity
         while (i < capOfSample) {
             int sampled = random.nextInt(this.entrantsList.size());
             if (!randomlyGeneratedNumbers.contains(sampled)) {
@@ -288,33 +303,32 @@ public class Event {
             }
         }
 
-        // Mark selected entrants as accepted
         for (Integer index : randomlyGeneratedNumbers) {
             Entrant selected = entrantsList.get(index);
-            if (Boolean.TRUE.equals(selected.getOnCancelledList()) || Boolean.FALSE.equals(selected.getOnWaitingList())) {
+            if (selected.getOnCancelledList() || !selected.getOnWaitingList()) {
                 continue;
             }
-            selected.setOnAcceptedList(Boolean.TRUE);
+            selected.setOnAcceptedList(true);
+            selected.setOnWaitingList(false);
+
+            if (updateFirestore) {
+                // Firestore update logic
+                String uniqueID = selected.getUniqueID();
+                Map<String, Object> data = new HashMap<>();
+                data.put("onAcceptedList", true);
+                data.put("onWaitingList", false);
+
+                db.collection("events")
+                        .document(getId())
+                        .collection("entrantsList")
+                        .document(uniqueID)
+                        .set(data, SetOptions.merge())
+                        .addOnSuccessListener(aVoid -> Log.d("generateSample", "Updated entrant " + uniqueID))
+                        .addOnFailureListener(e -> Log.e("generateSample", "Error updating entrant " + uniqueID, e));
+            }
         }
-
-        // Prepare data for Firebase update
-        Map<String, Object> data = new HashMap<>();
-
-        // Convert the updated entrants list to a map format
-        ArrayList<Map<String, Object>> entrantsMapList = new ArrayList<>();
-        for (Entrant entrant : entrantsList) {
-            entrantsMapList.add(entrant.toMap()); // Assumes Entrant has a `toMap` method
-        }
-        data.put("entrantsList", entrantsMapList);
-
-        // Update Firestore with merged data
-        db.collection("events").document(this.id).set(data, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> {
-                    // Handle successful update if needed
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failed update if needed
-                });
     }
+
+
 
 }

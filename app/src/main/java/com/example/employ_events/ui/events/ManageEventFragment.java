@@ -32,15 +32,27 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is to manage an event such as update the event banner, a button that
+brings you to the download event qr page, and a button to bring you to manage entrants page for the event.
+ */
+
+/**
+ * Fragment to manage event details including editing, viewing entrants, and obtaining QR codes.
+ */
 public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
     private FirebaseFirestore db;
-    private String bannerUri;
+    private String bannerUri, eventId;
     private Button editEventButton, viewEntrantsButton, qrCodeButton;
     private TextView titleTV, descriptionTV, eventDateTV, registrationPeriodTV,
             eventCapacityTV, waitingListCapacityTV, eventFeeTV, geolocationRequiredTV;
     private ImageView bannerImage;
 
+    /**
+     * Inflates the layout, initializes views, fetches event details from Firestore,
+     * and sets up click listeners for various buttons.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,30 +65,30 @@ public class ManageEventFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         initializeViews();
 
+        // Retrieve the event ID passed in the bundle arguments
         if (getArguments() != null) {
-            String eventId = getArguments().getString("EVENT_ID");
-            if (eventId != null) {
-                DocumentReference eventRef = db.collection("events").document(eventId);
-                eventRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            displayDetails(document, manageEventViewModel);
-                        }
+            eventId = getArguments().getString("EVENT_ID");
+        }
+
+        // Fetch event details if eventId is available
+        if (eventId != null) {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+            eventRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        displayDetails(document, manageEventViewModel);
                     }
-                });
-            }
+                }
+            });
         }
 
         editEventButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_editEventFragment, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_editEventFragment, bundle);
                 }
             }
         });
@@ -84,12 +96,9 @@ public class ManageEventFragment extends Fragment {
         qrCodeButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_download_qr_code, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_download_qr_code, bundle);
                 }
             }
         });
@@ -98,12 +107,9 @@ public class ManageEventFragment extends Fragment {
         viewEntrantsButton.setOnClickListener(view -> {
             if (getView() != null) {
                 Bundle bundle = new Bundle();
-                if (getArguments() != null) {
-                    String eventId = getArguments().getString("EVENT_ID");
-                    if (eventId != null) {
-                        bundle.putString("EVENT_ID", eventId); // Pass event ID
-                        Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_manageEventEntrantsFragment, bundle);
-                    }
+                if (eventId != null) {
+                    bundle.putString("EVENT_ID", eventId); // Pass event ID
+                    Navigation.findNavController(getView()).navigate(R.id.action_manageEventFragment_to_manageEventEntrantsFragment, bundle);
                 }
             }
         });
@@ -112,6 +118,9 @@ public class ManageEventFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Initializes all view components (Buttons, TextViews, ImageViews).
+     */
     private void initializeViews() {
         bannerImage = binding.bannerImage;
         titleTV = binding.eventTitle;
@@ -127,7 +136,13 @@ public class ManageEventFragment extends Fragment {
         viewEntrantsButton = binding.viewEntrantsButton;
     }
 
-
+    /**
+     * Displays the event details in the UI based on the retrieved document from Firestore.
+     * Handles both required and optional fields (e.g., waiting list capacity, event fee, etc.).
+     *
+     * @param document The Firestore document containing event data.
+     * @param galleryViewModel The ViewModel for managing event data.
+     */
     private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
         // Set optional fields to invisible until it is determined to be non-null.
         waitingListCapacityTV.setVisibility(View.GONE);
@@ -167,7 +182,7 @@ public class ManageEventFragment extends Fragment {
         // Check the non required fields and set visible if it is not null.
 
         if (document.get("limited") != null) {
-            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited")).toString();
+            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited"));
             waitingListCapacityTV.setVisibility(View.VISIBLE);
             waitingListCapacityTV.setText(waitingList);
             galleryViewModel.getText().observe(getViewLifecycleOwner(), waitingListCapacityTV::setText);
@@ -188,7 +203,9 @@ public class ManageEventFragment extends Fragment {
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
+     * Loads an image from the specified URL and sets it in the banner ImageView.
+     * This method runs in a background thread to avoid blocking the main UI thread.
+     *
      * @param url The URL of the image to be loaded.
      */
     private void loadImageFromUrl(String url) {

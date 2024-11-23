@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.facility.CreateFacilityFragment;
-import com.example.employ_events.ui.facility.Facility;
-import com.example.employ_events.ui.facility.FacilityFragment;
-import com.example.employ_events.ui.profile.NewProfileFragment;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
@@ -25,27 +21,15 @@ import com.example.employ_events.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity
-        implements NewProfileFragment.NewProfileDialogListener{
+        {
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseFirestore db;
 
-
-
-    @Override
-    public void provideInfo(String name, String email, String uniqueID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", name);
-        data.put("email", email);
-        db.collection("userProfiles").document(uniqueID).set(data, SetOptions.merge());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_facility, R.id.nav_profile, R.id.nav_list, R.id.nav_notifications)
+                R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_list, R.id.nav_notifications)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -78,8 +62,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Generate a new UUID and save it
             uniqueID = UUID.randomUUID().toString();
-            sharedPreferences.edit().putString("uniqueID", uniqueID).apply();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("uniqueID", uniqueID);
+            editor.apply();  // Commit changes asynchronously
         }
+
 
         // Create an empty profile using their Unique ID (will not need to sign in).
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
@@ -95,26 +82,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // Use this to check if the required INFO exists - move to waiting list.
 
-        /*
-        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && !document.exists()) {
-                        new NewProfileFragment().show(getSupportFragmentManager(), "Create Profile");
-                    }
-                } else {
-                    // Handle the error, e.g., log it
-                    Log.e("MainActivity", "Error getting documents: ", task.getException());
-                }
-            }
-        });
-
-         */
     }
 
     @Override

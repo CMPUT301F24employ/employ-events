@@ -71,21 +71,23 @@
             android:layout_marginBottom="5dp"
             android:elevation="4dp">
 
-                <TextView
-                    android:id="@+id/faciltyName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Facilty"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            <TextView
+                android:id="@+id/facilityName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Facility"
+                android:textAlignment="textStart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
 
             <TextView
                 android:id="@+id/eventLocation"
                 android:layout_width="364dp"
                 android:layout_height="wrap_content"
                 android:text="Location"
-                android:textAlignment="center"
+                android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
             </LinearLayout>
 
         <LinearLayout
@@ -103,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Registration Period: Registration Open - Registration Close"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -112,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Event Capacity: "
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -122,7 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Waiting List Capacity:"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:visibility="visible" />
@@ -132,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Fee:"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -152,7 +154,17 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:backgroundTint="#3D5AFE"
-            android:text="Join Waitlist" />
+            android:text="Leave Waitlist"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/joinButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="#3D5AFE"
+            android:text="Join Waitlist"
+            android:visibility="gone" />
 
     </LinearLayout>
 

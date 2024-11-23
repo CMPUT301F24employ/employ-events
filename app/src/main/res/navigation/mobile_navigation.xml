@@ -125,6 +125,9 @@
         <action
             android:id="@+id/action_eventDetailsFragment_to_eventListFragment"
             app:destination="@id/eventListFragment" />
+        <action
+            android:id="@+id/action_eventDetailsFragment_to_nav_edit_profile"
+            app:destination="@id/nav_edit_profile" />
     </fragment>
 
     <fragment
@@ -132,9 +135,6 @@
         android:name="com.example.employ_events.ui.events.ManageEventFragment"
         android:label="Manage Event"
         tools:layout="@layout/fragment_manage_event">
-        <action
-            android:id="@+id/action_manageEventFragment_to_eventListFragment"
-            app:destination="@id/eventListFragment" />
         <action
             android:id="@+id/action_manageEventFragment_to_editEventFragment"
             app:destination="@id/editEventFragment" />
@@ -159,11 +159,14 @@
     <fragment
         android:id="@+id/manageEventEntrantsFragment"
         android:name="com.example.employ_events.ui.events.ManageEventEntrants"
-        android:label="event entrants"
+        android:label="Manage Entrants"
         tools:layout="@layout/fragment_manage_event_entrants">
         <action
             android:id="@+id/action_manageEventEntrantsFragment_to_sendNotificationsScreen"
             app:destination="@+id/sendNotificationScreen" />
+        <action
+            android:id="@+id/action_manageEventEntrantsFragment_to_event_entrants_map"
+            app:destination="@id/event_entrants_map" />
     </fragment>
 
     <fragment
@@ -191,6 +194,21 @@
         android:name="com.example.employ_events.ui.events.DownloadQRCode"
         android:label="Download QR Code"
         tools:layout="@layout/download_qr_code">
+    </fragment>
+
+    <fragment
+        android:id="@+id/scan_qr_code"
+        android:name="com.example.employ_events.ui.scanQrCode.ScanQrCodeFragment"
+        android:label="Download QR Code">
+        <action
+            android:id="@+id/action_scan_qr_code_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/event_entrants_map"
+        android:name="com.example.employ_events.ui.events.EventEntrantsMap"
+        android:label="Entrants Map">
     </fragment>
 
 </navigation>

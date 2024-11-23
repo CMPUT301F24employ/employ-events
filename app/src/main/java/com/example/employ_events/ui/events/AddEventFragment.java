@@ -26,7 +26,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
@@ -52,7 +55,20 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/*
+This class handles organizers creating an event, validating the information provided and
+storing it into firebase. It generates a QR code when all fields are valid and the event is being
+created.
 
+Minor issue is when pressing the add/confirm button to create the event, it may load long enough to double click
+the button which crashes the app and adds 2 copies of the event.
+
+US 02.01.01	As an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
+US 02.01.02	As an organizer I want to store hash data of the generated QR code in my database
+US 02.03.01	As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
+US 02.04.01	As an organizer I want to upload an event poster to provide visual information to entrants
+US 02.02.03 As an organizer I want to enable or disable the geolocation requirement for my event.
+ */
 
 /**
  * AddEventFragment is a Fragment that allows organizers to create a new event
@@ -91,6 +107,7 @@ public class AddEventFragment extends Fragment {
         initializeViews();
 
         // Initialize the ActivityResultLauncher for requesting permission
+        // https://developer.android.com/training/permissions/requesting
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
@@ -121,9 +138,11 @@ public class AddEventFragment extends Fragment {
         // Fetch the facility ID
         fetchFacilityID(uniqueID);
 
+        registrationStartDeadlineButton.setEnabled(false); // Disable start date button
+        registrationDeadlineButton.setEnabled(false); // Disable registration deadline button
         // Set up date picker dialogs
         eventDateButton.setOnClickListener(view -> showDateTimePicker(eventDateButton, "eventDate"));
-        registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "endDate"));
+        registrationDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationDeadlineButton, "registrationDeadline"));
         registrationStartDeadlineButton.setOnClickListener(view -> showDateTimePicker(registrationStartDeadlineButton, "startDate"));
 
         // Initially hide the remove button
@@ -177,6 +196,14 @@ public class AddEventFragment extends Fragment {
                 else if (eventCapacity.trim().isEmpty()) {
                     eventCapacityInput.setError("Event capacity required");
                     eventCapacityInput.requestFocus();
+                }
+                else if (eventCapacity.trim().equals("0")) {
+                    eventCapacityInput.setError("Event capacity cannot be 0");
+                    eventCapacityInput.requestFocus();
+                }
+                else if (!limitString.trim().isEmpty() && limitString.trim().equals("0")) {
+                    limitInput.setError("Waiting list capacity cannot be 0");
+                    limitInput.requestFocus();
                 }
                 else {
                     // Generate a unique ID for the event
@@ -265,8 +292,10 @@ public class AddEventFragment extends Fragment {
                                 // Save the combined date and time into respective variables
                                 if (filter.equals("eventDate")) {
                                     eventDate = selectedDate.getTime();
+                                    registrationStartDeadlineButton.setEnabled(true);  // Enable Registration Start button
                                 } else if (filter.equals("startDate")) {
                                     registrationStartDeadline = selectedDate.getTime();
+                                    registrationDeadlineButton.setEnabled(true);  // Enable Registration Deadline button
                                 } else {
                                     registrationDeadline = selectedDate.getTime();
                                 }
@@ -277,14 +306,30 @@ public class AddEventFragment extends Fragment {
                 },
                 year, month, day
         );
-        // Set the minimum date based on filter type
-        if (filter.equals("eventDate") || filter.equals("startDate")) {
+
+        // Set the minimum and maximum dates based on filter type
+        if (filter.equals("eventDate")) {
+            // Ensure the current date is being used for event date
             datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-        } else {
-            // Set minimum date to registration open date and maximum date to event date
-            datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
-            datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+        } else if (filter.equals("startDate")) {
+            // Ensure registration start date is no earlier than today
+            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+            if (eventDate != null) {
+                // Ensure registration start date is no later than event date
+                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+            }
+        } else if (filter.equals("registrationDeadline")) {
+            // Ensure registration deadline is between registration start date and event date
+            if (registrationStartDeadline != null && eventDate != null) {
+                datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
+                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+            } else {
+                Toast.makeText(getContext(), "Please set the registration start date and event date first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
+
+        // Show the date picker dialog
         datePickerDialog.show();
     }
 
@@ -362,6 +407,9 @@ public class AddEventFragment extends Fragment {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
 
                     String theID = documentReference.getId();
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", theID);
+                    db.collection("events").document(theID).set(data, SetOptions.merge());
                     createEntrantListSubcollection(documentReference);
                     try {
                         Bitmap qrCodeBitmap = makeQRBitmap(theID);
@@ -370,7 +418,13 @@ public class AddEventFragment extends Fragment {
                     } catch (WriterException e) {
                         throw new RuntimeException(e);
                     }
-                    Navigation.findNavController(view).navigate(R.id.action_addEventFragment_to_eventListFragment);
+                    NavController navController = Navigation.findNavController(view);
+                    NavOptions navOptions = new NavOptions.Builder()
+                            .setPopUpTo(R.id.manageEventFragment, false) // Clears stack up to ManageEventFragment
+                            .build();
+                    navController.navigate(R.id.action_addEventFragment_to_eventListFragment, null, navOptions);
+
+
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
     }

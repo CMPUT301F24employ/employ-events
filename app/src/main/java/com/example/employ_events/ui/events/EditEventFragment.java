@@ -38,8 +38,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/*
+This fragment is only being used to update the banner of an event
+as there is no US about editing the other details.
+
+US 2.04.02	As an organizer I want to update an event poster to provide visual information to entrants
+ */
+
 /**
- * A Fragment for editing event details, including uploading and displaying a banner image.
+ * A Fragment for editing event details -uploading and displaying a banner image.
  * This fragment allows users to select an image from their device, upload it to Firebase Storage,
  * and save the image URI to Firestore.
  */

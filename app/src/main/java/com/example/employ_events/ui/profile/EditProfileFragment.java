@@ -43,6 +43,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/*
+The purpose of this fragment is to allow a user to edit their profile fields.
+Name and email cannot be empty, and will prompt the user if it is and not accept changes until it is not.
+This is where a user can upload their profile picture and remove it.
+This is where the automated profile picture is assigned based on name if a user has yet to set one.
+No issues at the moment.
+
+US 01.03.03	As an entrant I want my profile picture to be deterministically generated from my profile name
+if I haven't uploaded a profile image yet.
+US 01.03.02	As an entrant I want remove profile picture if need be
+US 01.03.01	As an entrant I want to upload a profile picture for a more personalized experience
+US 01.02.02	As an entrant I want to update information such as name, email and contact information on my profile
+US 01.02.01	As an entrant, I want to provide my personal information such as name, email and optional phone number in the app
+
+ */
+
 /**
  * A fragment that allows users to edit their profile information.
  * This fragment interacts with Firestore to retrieve and update user profiles.
@@ -73,34 +89,34 @@ public class EditProfileFragment extends Fragment {
         // Initialize the UI components for the fragment
         initializeViews();
 
-        // Initialize the ActivityResultLauncher for requesting permission
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
-                    if (isGranted) {
-                        // Permission was granted
-                        Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Permission was denied
-                        Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) { // Check if the fragment is attached before showing the Toast
+                        if (isGranted) {
+                            Toast.makeText(getContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Permission denied to read your external storage", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
         );
 
-        // Initialize the ActivityResultLauncher for picking an image.
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        // Handle the image selection
-                        pfpUri = result.getData().getData();
-                        userPFP.setImageURI(pfpUri);
-                        userPFP.setVisibility(View.VISIBLE);
-                        removeButton.setVisibility(View.VISIBLE);
-                        isInitialLoad = false;
+                        if (isAdded()) { // Ensure fragment is still attached
+                            pfpUri = result.getData().getData();
+                            userPFP.setImageURI(pfpUri);
+                            userPFP.setVisibility(View.VISIBLE);
+                            removeButton.setVisibility(View.VISIBLE);
+                            isInitialLoad = false;
+                        }
                     }
                 }
         );
+
 
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -138,8 +154,7 @@ public class EditProfileFragment extends Fragment {
         });
 
         // Navigate to the profile screen when the changes are confirmed.
-        confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(EditProfileFragment.this)
-                .popBackStack(R.id.nav_profile, false)));
+        confirmButton.setOnClickListener(view -> editProfile(uniqueID, () -> NavHostFragment.findNavController(this).popBackStack()));
 
         return root;
     }
@@ -228,12 +243,17 @@ public class EditProfileFragment extends Fragment {
             try {
                 URL imageUrl = new URL(url);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-                requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
+
+                // Check if the fragment is attached before updating the UI
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
+                }
             } catch (IOException e) {
                 Log.e("EditProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
     }
+
 
     /**
      * Edits the user's profile based on the input fields and updates the Firestore database.
@@ -294,7 +314,7 @@ public class EditProfileFragment extends Fragment {
      * @param onComplete  A callback to execute after successfully updating the profile in Firestore.
      */
     private void uploadPFPAndSaveProfile(Profile editProfile, Runnable onComplete) {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".jpg");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("pfps/" + System.currentTimeMillis() + ".png");
         storageRef.putFile(pfpUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     editProfile.setPfpURI(uri.toString());

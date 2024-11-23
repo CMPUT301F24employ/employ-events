@@ -1,0 +1,9 @@
+com.example.employ_events
+com.example.employ_events.ui.entrants
+com.example.employ_events.ui.events
+com.example.employ_events.ui.facility
+com.example.employ_events.ui.home
+com.example.employ_events.ui.notifications
+com.example.employ_events.ui.profile
+com.example.employ_events.ui.registeredEvents
+com.example.employ_events.ui.scanQrCode

@@ -1,5 +1,9 @@
 package com.example.employ_events.ui.facility;
 
+/*
+The purpose of this class is to define a facility on creation and access setters/getters.
+ */
+
 /**
  * Represents a facility with various attributes including name, owner ID, email, address,
  * phone number, and a profile picture URI.
