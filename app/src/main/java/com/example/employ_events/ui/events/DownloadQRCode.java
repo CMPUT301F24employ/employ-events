@@ -32,6 +32,8 @@ import java.net.URL;
 import java.util.Objects;
 
 /*
+Authors: Tina, Connor
+
 The purpose of this fragment is to let organizers download their event specific
 QR code so they may distribute it.
  */

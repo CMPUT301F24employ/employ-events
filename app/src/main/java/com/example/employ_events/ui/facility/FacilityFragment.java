@@ -36,10 +36,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /*
+Authors: Tina, Sahara
+
 The purpose of this fragment is offer options through buttons
 to edit their facility profile or view their events.
-US 02.01.03 As an organizer, I want to create and manage my facility profile.
 
+US 02.01.03 As an organizer, I want to create and manage my facility profile.
  */
 
 /**

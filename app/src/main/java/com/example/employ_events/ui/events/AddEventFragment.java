@@ -56,6 +56,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /*
+Authors: Sahara, Tina
+
 This class handles organizers creating an event, validating the information provided and
 storing it into firebase. It generates a QR code when all fields are valid and the event is being
 created.
