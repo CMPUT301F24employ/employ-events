@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /*
+Authors: Tina
+
 The purpose of this fragment is to allow a user to edit their profile fields.
 Name and email cannot be empty, and will prompt the user if it is and not accept changes until it is not.
 This is where a user can upload their profile picture and remove it.

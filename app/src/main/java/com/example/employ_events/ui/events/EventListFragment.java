@@ -26,6 +26,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
 /*
+Authors: Aasvi
+
 This fragment is used for displaying the list of events an organizer owns, and
 on click of an event, sends them to the specific event page.
  */

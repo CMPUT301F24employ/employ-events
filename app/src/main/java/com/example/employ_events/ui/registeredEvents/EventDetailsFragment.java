@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /*
+Authors: Tina, Jasleen, Aasvi.
+
 This fragment is the page where a user can view the details, and is able to join and leave the event.
 It displays a dialog warning if geolocation is required, which asks for proceed -> joins, cancel -> does not join.
 It sends a user who has yet to set their name and email to the edit profile screen.

@@ -22,6 +22,8 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 /*
+Authors: Tina
+
 US 02.02.02 As an organizer I want to see on a map where entrants joined my event waiting list from.
 
 https://github.com/osmdroid/osmdroid

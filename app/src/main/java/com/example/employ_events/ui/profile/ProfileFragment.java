@@ -31,6 +31,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
 
+/*
+Authors: Tina
+
+This fragment is for viewing the users profile.
+Allows user to press edit profile to send them to that fragment.
+ */
+
 /**
  * A fragment that displays the user's profile information.
  * It retrieves the profile data from Firestore based on a unique identifier and
