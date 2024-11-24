@@ -33,6 +33,9 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/baseline_person_24"
             android:title="@string/menu_profile" />
-
+        <item
+            android:id="@+id/nav_image"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Image List" />
     </group>
 </menu>
