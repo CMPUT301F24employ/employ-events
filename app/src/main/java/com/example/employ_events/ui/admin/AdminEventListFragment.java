@@ -3,6 +3,7 @@ package com.example.employ_events.ui.admin;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -74,5 +75,12 @@ public class AdminEventListFragment extends Fragment implements FacilityEventsAd
     @Override
     public void onItemClick(Event event) {
         // When you click on an event maybe handle other admin actions like deleting the event
+        if (getView() != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("EVENT_ID", event.getId()); // Pass event ID
+            bundle.putBoolean("IS_ADMIN", true);  // If you were on this page then you would be an admin
+            Navigation.findNavController(getView()).navigate(R.id.action_adminEventListFragment_to_manageEventFragment, bundle);
+        }
+
     }
 }

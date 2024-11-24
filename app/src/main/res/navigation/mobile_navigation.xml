@@ -219,6 +219,9 @@
         android:name="com.example.employ_events.ui.admin.AdminEventListFragment"
         android:label="Admin Browse Events"
         tools:layout="@layout/fragment_admin_event_list">
+        <action
+            android:id="@+id/action_adminEventListFragment_to_manageEventFragment"
+            app:destination="@+id/manageEventFragment" />
     </fragment>
 
 

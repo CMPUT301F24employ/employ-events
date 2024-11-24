@@ -46,10 +46,11 @@ public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
     private FirebaseFirestore db;
     private String bannerUri, eventId;
-    private Button editEventButton, viewEntrantsButton, qrCodeButton;
+    private Button editEventButton, viewEntrantsButton, qrCodeButton, deleteEventButton;
     private TextView titleTV, descriptionTV, eventDateTV, registrationPeriodTV,
             eventCapacityTV, waitingListCapacityTV, eventFeeTV, geolocationRequiredTV;
     private ImageView bannerImage;
+    private boolean isAdmin = false;
 
     /**
      * Inflates the layout, initializes views, fetches event details from Firestore,
@@ -65,12 +66,15 @@ public class ManageEventFragment extends Fragment {
         View root = binding.getRoot();
 
         db = FirebaseFirestore.getInstance();
-        initializeViews();
+//        initializeViews();
 
-        // Retrieve the event ID passed in the bundle arguments
+        // Retrieve the event ID passed in the bundle arguments also checking for admin
         if (getArguments() != null) {
             eventId = getArguments().getString("EVENT_ID");
+            isAdmin = getArguments().getBoolean("IS_ADMIN", false);
         }
+
+        initializeViews();
 
         // Fetch event details if eventId is available
         if (eventId != null) {
@@ -136,6 +140,17 @@ public class ManageEventFragment extends Fragment {
         editEventButton = binding.editEventButton;
         qrCodeButton = binding.qrCodeButton;
         viewEntrantsButton = binding.viewEntrantsButton;
+        deleteEventButton = binding.deleteEventButton;
+
+        // Hiding these buttons if the user is an admin and only showing delete event button
+        if (isAdmin) {
+            editEventButton.setVisibility(View.GONE);
+            qrCodeButton.setVisibility(View.GONE);
+            viewEntrantsButton.setVisibility(View.GONE);
+        } else {
+            deleteEventButton.setVisibility(View.GONE);
+        }
+
     }
 
     /**

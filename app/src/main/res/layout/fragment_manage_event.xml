@@ -153,6 +153,13 @@
                 android:background="@drawable/button_background"
                 android:text="@string/manage_entrants" />
 
+            <Button
+                android:id="@+id/delete_event_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete Event" />
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
