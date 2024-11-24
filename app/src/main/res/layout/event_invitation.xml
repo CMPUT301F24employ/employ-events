@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue_light_background"
+    android:padding="16dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/white_card_background"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/Congrats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Congratulations! \n You won an invitation!"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        </LinearLayout>
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/white_card_background"
+        android:padding="5dp"
+        android:layout_marginBottom="5dp"
+        android:elevation="4dp">
+
+            <TextView
+                android:id="@+id/eventName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Event Title"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+            <TextView
+                android:id="@+id/eventDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Event Date"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/white_card_background"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/facilityName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Facility"
+                android:padding="5dp"
+                android:textAlignment="textStart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+            <TextView
+                android:id="@+id/eventLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:padding="5dp"
+                android:textAlignment="textStart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/white_card_background"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/accept_or_decline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please confirm your participation by accepting or declining your invitation below!"
+                android:layout_margin="5dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+            <TextView
+                android:id="@+id/warning_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Note: Failing to accept your invitation in a timely manner may result in the forfeit of your spot at the discretion of the organizer."
+                android:layout_margin="5dp"
+                android:textAlignment="textStart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:columnCount="2"
+                android:padding="8dp">
+
+                <Button
+                    android:id="@+id/decline_invitation_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="5dp"
+                    android:text="Decline" />
+
+                <Button
+                    android:id="@+id/accept_invitation_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="5dp"
+                    android:text="Accept" />
+            </GridLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
