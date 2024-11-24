@@ -27,6 +27,12 @@
             android:drawableLeft="@drawable/white_eye"
             android:text="Admin View"
             android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/admin_browse_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Browse Events" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
