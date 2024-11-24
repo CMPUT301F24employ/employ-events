@@ -37,5 +37,11 @@
             android:id="@+id/nav_image"
             android:icon="@drawable/baseline_person_24"
             android:title="Image List" />
+
+        <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
+        <item
+            android:id="@+id/adminEventListFragment"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Admin Actions" />
     </group>
 </menu>
