@@ -25,6 +25,11 @@
             android:title="@string/menu_facility" />
 
         <item
+            android:id="@+id/nav_invitations"
+            android:icon="@drawable/baseline_email_24"
+            android:title="Invitations" />
+
+        <item
             android:id="@+id/nav_notifications"
             android:icon="@drawable/white_notification"
             android:title="Notifications" />
