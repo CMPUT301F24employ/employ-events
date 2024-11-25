@@ -231,5 +231,29 @@
             app:destination="@+id/manageEventFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/invitation_fragment"
+        android:name="com.example.employ_events.ui.invitation.InvitationFragment"
+        tools:layout="@layout/event_invitation"
+        android:label="Invitation">
+        <action
+            android:id="@+id/action_invitation_fragment_to_nav_invitations"
+            app:destination="@id/nav_invitations" />
+        <action
+            android:id="@+id/action_invitation_fragment_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_invitations"
+        android:name="com.example.employ_events.ui.invitation.InvitationsListFragment"
+        tools:layout="@layout/fragment_invitations_list"
+        android:label="Invitations">
+
+        <action
+            android:id="@+id/action_nav_invitations_to_invitation_fragment"
+            app:destination="@id/invitation_fragment" />
+    </fragment>
+
 
 </navigation>

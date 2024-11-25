@@ -74,36 +74,6 @@
             android:padding="5dp">
 
             <TextView
-                android:id="@+id/facilityName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Facility"
-                android:padding="5dp"
-                android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/eventLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Location"
-                android:padding="5dp"
-                android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/white_card_background"
-            android:elevation="4dp"
-            android:orientation="vertical"
-            android:padding="5dp">
-
-            <TextView
                 android:id="@+id/accept_or_decline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -131,6 +101,7 @@
                 <Button
                     android:id="@+id/decline_invitation_button"
                     android:layout_width="0dp"
+                    android:maxWidth="320dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="5dp"
@@ -139,6 +110,7 @@
                 <Button
                     android:id="@+id/accept_invitation_button"
                     android:layout_width="0dp"
+                    android:maxWidth="320dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="5dp"
