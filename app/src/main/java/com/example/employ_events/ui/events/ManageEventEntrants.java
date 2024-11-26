@@ -2,6 +2,7 @@ package com.example.employ_events.ui.events;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,6 +50,7 @@ US 01.05.01 As an entrant I want another chance to be chosen from the waiting li
  */
 
 /**
+ * @author Tina, Sahara, Aasvi
  * Fragment responsible for managing event entrants. This includes displaying entrants,
  * filtering based on status, and generating sample data for event entrants.
  */
@@ -56,13 +58,14 @@ public class ManageEventEntrants extends Fragment {
 
     private FragmentManageEventEntrantsBinding binding;
     private FirebaseFirestore db;
-    private Button sendNotification, sampleEntrants, removeEntrants, viewEntrantMap;
-    private String eventId;
+    private Button sendNotification, sampleEntrants, removeEntrants, viewEntrantMap, removeAnEntrant;
+    private String eventId, eventCapacity;
     private RecyclerView entrantsList;
     private EntrantsAdapter entrantsAdapter;
     private TabLayout tabLayout;
     private List<Entrant> allEntrants = new ArrayList<>();
-    private ListenerRegistration entrantsListener;
+    private ListenerRegistration entrantsListener, entrantListener;
+    private TextView selectedRegisteredCount;
 
     /**
      * Inflates the view, initializes variables, fetches entrants and sets up tab layout.
@@ -94,15 +97,23 @@ public class ManageEventEntrants extends Fragment {
             });
         }
 
+        // Hide the view entrants map button for non geolocation events.
+        updateViewEntrantsMapVisibility();
+
+        // Initializes the entrant count.
+        updateCounts();
+
         // Sample entrants button functionality
         sampleEntrants.setOnClickListener(v -> {
             if (eventId != null) {
                 fetchEventAndGenerateSample(eventId);
+                updateCounts();
             } else {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // View entrants map functionality
         viewEntrantMap.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("EVENT_ID", eventId);
@@ -110,9 +121,11 @@ public class ManageEventEntrants extends Fragment {
                     .navigate(R.id.action_manageEventEntrantsFragment_to_event_entrants_map, args);
         });
 
+        // Remove unregistered entrants functionality.
         removeEntrants.setOnClickListener(v -> {
             if (eventId != null) {
                 fetchEventAndRemoveEntrants(eventId);
+                updateCounts();
             } else {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
@@ -129,10 +142,12 @@ public class ManageEventEntrants extends Fragment {
     private void initializeViews() {
         sendNotification = binding.sendNotification;
         sampleEntrants = binding.sampleEntrants;
-        removeEntrants = binding.removeEntrant;
+        removeEntrants = binding.removeEntrants;
         viewEntrantMap = binding.viewEntrantMap;
         entrantsList = binding.entrantsList;
         tabLayout = binding.tabLayout;
+        selectedRegisteredCount = binding.selectedRegisteredCount;
+        removeAnEntrant = binding.removeEntrant;
 
         // Initialize the adapter with an empty list for now
         entrantsAdapter = new EntrantsAdapter(getContext(), new ArrayList<>());
@@ -140,7 +155,57 @@ public class ManageEventEntrants extends Fragment {
         entrantsList.setAdapter(entrantsAdapter);
     }
 
+    private void updateCounts() {
+        entrantListener = db.collection("events").document(eventId)
+                .collection("entrantsList")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e("LiveCounts", "Error listening for changes", error);
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        int acceptedRegisteredCount = 0;
+
+                        for (DocumentSnapshot entrantDoc : snapshots.getDocuments()) {
+                            // Increase count if entrant is selected or registered.
+                            if (Boolean.TRUE.equals(entrantDoc.getBoolean("onAcceptedList")) ||
+                                    Boolean.TRUE.equals(entrantDoc.getBoolean("onRegisteredList"))) {
+                                acceptedRegisteredCount++;
+                            }
+                        }
+
+                        // Update UI with live counts
+                        if (isAdded()) {
+                            String count = (acceptedRegisteredCount) + " Entrants / " + eventCapacity + " Entrant Capacity.";
+                            selectedRegisteredCount.setText(count);
+                        }
+                    }
+                });
+    }
+
     /**
+     * @author Tina
+     * Checks the events geolocation requirement and hides the entrants map button if not required.
+     */
+    private void updateViewEntrantsMapVisibility() {
+        db.collection("events").document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geoLocation"));
+                            if (!geolocation) {
+                                viewEntrantMap.setVisibility(View.GONE);
+                            }
+                            eventCapacity = document.get("eventCapacity").toString();
+                        }
+                    }
+        });
+    }
+
+    /**
+     * @author Tina
      * Fetches the entrants for a given event and populates the entrant list.
      * @param eventId The unique identifier of the event
      */
@@ -183,6 +248,7 @@ public class ManageEventEntrants extends Fragment {
     }
 
     /**
+     * @author Sahara, Tina
      * Fetches event data and generates a sample list of entrants based on event capacity.
      * @param eventId The unique identifier of the event
      */
@@ -218,6 +284,7 @@ public class ManageEventEntrants extends Fragment {
     }
 
     /**
+     * @author Tina
      * Removes entrants with "selected" set to true.
      * @param eventId The unique identifier of the event whose entrants need to be updated.
      **/
@@ -242,6 +309,7 @@ public class ManageEventEntrants extends Fragment {
     }
 
     /**
+     * @author Tina, Aasvi
      * Filters the entrants list based on the selected tab (status).
      * @param tabPosition The position of the selected tab (0 - Waitlisted, 1 - Selected, 2 - Cancelled, 3 - Registered)
      */
@@ -279,6 +347,7 @@ public class ManageEventEntrants extends Fragment {
     }
 
     /**
+     * @author Tina, Aasvi
      * Sets up the TabLayout and its tab selection listener for filtering entrants.
      */
     private void setupTabLayout() {
@@ -300,6 +369,9 @@ public class ManageEventEntrants extends Fragment {
         super.onDestroyView();
         if (entrantsListener != null) {
             entrantsListener.remove();
+        }
+        if (entrantListener != null) {
+            entrantListener.remove();
         }
         binding = null;
     }
