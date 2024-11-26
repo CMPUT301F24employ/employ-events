@@ -1,5 +1,7 @@
 package com.example.employ_events.ui.entrants;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ public class Entrant {
     private String name, uniqueID, email;
     private boolean onWaitingList, onCancelledList,
             onAcceptedList, onRegisteredList;
+    private Double latitude, longitude;
 
     /**
      * Default constructor for creating an empty Entrant object.
@@ -153,5 +156,21 @@ public class Entrant {
         map.put("onWaitingList", getOnWaitingList());
         // Add other fields as needed
         return map;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

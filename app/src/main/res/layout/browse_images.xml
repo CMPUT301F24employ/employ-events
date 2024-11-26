@@ -1,0 +1,20 @@
+<!-- res/layout/fragment_admin_browse_images.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Image view -->
+    <ImageView
+        android:id="@+id/imageRecyclerView"
+        android:layout_width="80sp"
+        android:layout_height="60sp"
+        android:layout_centerVertical="true"
+        android:scaleType="centerCrop"
+        />
+
+    <!-- Add dmin Option -->
+</LinearLayout>

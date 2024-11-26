@@ -25,6 +25,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 /*
+Authors: Connor, Tina
+
 Purpose is to handle the scanning of an event qr code that brings the entrant
 to event details page.
 US 01.06.02	As an entrant I want to be able to be sign up for an event by scanning the QR code

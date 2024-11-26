@@ -74,5 +74,7 @@ dependencies {
     androidTestImplementation ("androidx.fragment:fragment-testing:1.8.5")
     debugImplementation("androidx.fragment:fragment-testing-manifest:1.8.5")
     implementation ("org.osmdroid:osmdroid-android:6.1.20")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.google.firebase:firebase-storage:21.0.1")
 
 }

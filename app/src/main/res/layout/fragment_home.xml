@@ -27,6 +27,7 @@
             android:drawableLeft="@drawable/white_eye"
             android:text="Admin View"
             android:textColor="@color/white" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

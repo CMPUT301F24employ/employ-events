@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,18 +24,28 @@ Yet to be completed. We hope to use this in displaying the list of registered ev
  * This adapter binds event data to views that are displayed within a RecyclerView.
  */
 public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArrayAdapter.ViewHolder> {
-    private ArrayList<Event> registeredEvents;
-    private Context context;
+    private final ArrayList<Event> registeredEvents;
+    private final Context context;
+    private final OnItemClickListener onItemClickListener;
 
     /**
-     * Constructs a new RegisteredArrayAdapter with the specified context and list of registered events.
+     * Interface for handling item click events.
+     */
+    public interface OnItemClickListener {
+        void onItemClick(String eventId);
+    }
+
+    /**
+     * Constructs a new RegisteredArrayAdapter.
      *
      * @param context          the context in which the adapter is used
      * @param registeredEvents the list of events to display
+     * @param onItemClickListener the listener for item click events
      */
-    public RegisteredArrayAdapter(Context context, ArrayList<Event> registeredEvents) {
-        this.registeredEvents = registeredEvents;
+    public RegisteredArrayAdapter(Context context, ArrayList<Event> registeredEvents, OnItemClickListener onItemClickListener) {
+        this.registeredEvents = registeredEvents != null ? registeredEvents : new ArrayList<>();
         this.context = context;
+        this.onItemClickListener = onItemClickListener;
     }
 
     /**
@@ -48,9 +59,8 @@ public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArray
     @Override
     public RegisteredArrayAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_registered_events, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_invitation, parent, false);
         return new ViewHolder(view);
-        //return null;
     }
 
     /**
@@ -61,22 +71,21 @@ public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArray
      */
     @Override
     public void onBindViewHolder(@NonNull RegisteredArrayAdapter.ViewHolder holder, int position) {
-
         Event event = registeredEvents.get(position);
         holder.name.setText(event.getEventTitle());
-        holder.itemView.setOnClickListener(v -> {
-        });
 
+        // Handle item clicks
+        holder.itemView.setOnClickListener(v -> {
+            onItemClickListener.onItemClick(event.getId()); // Pass the event ID to the listener
+        });
     }
 
     /**
      * Returns the total number of events in the list.
-     *
      * @return the size of the registered events list
      */
     @Override
     public int getItemCount() {
-
         return registeredEvents.size();
     }
 
@@ -88,12 +97,11 @@ public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArray
 
         /**
          * Constructs a ViewHolder and initializes the event name TextView.
-         *
          * @param view the view representing a single event item
          */
         public ViewHolder(@NonNull View view) {
             super(view);
-            name = view.findViewById(R.id.eventName);
+            name = view.findViewById(R.id.eventName_ITV);
         }
     }
 }

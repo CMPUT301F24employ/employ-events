@@ -12,6 +12,13 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_image"
+        android:name="com.example.employ_events.ui.admin.ImageListFragment"
+        android:label="Image List"
+        tools:layout="@layout/fragment_image_list">
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_home"
         android:name="com.example.employ_events.ui.home.HomeFragment"
         android:label="@string/menu_home"
@@ -22,6 +29,12 @@
         <action
             android:id="@+id/action_homeFragment_to_entrantNotifications"
             app:destination="@+id/entrantNotifications" />
+        <action
+            android:id="@+id/action_homeFragment_to_adminEventListFragment"
+            app:destination="@+id/adminEventListFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_adminBrowseProfilesFragment"
+            app:destination="@+id/adminBrowseProfilesFragment" />
     </fragment>
 
     <fragment
@@ -85,10 +98,14 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_list"
+        android:id="@+id/nav_registered_events"
         android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
         android:label="Registered Events"
-        tools:layout="@layout/fragment_registered_events" />
+        tools:layout="@layout/fragment_registered_events" >
+        <action
+            android:id="@+id/action_nav_registered_events_to_eventDetailsFragment"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/eventListFragment"
@@ -210,5 +227,56 @@
         android:name="com.example.employ_events.ui.events.EventEntrantsMap"
         android:label="Entrants Map">
     </fragment>
+
+    <fragment
+        android:id="@+id/adminEventListFragment"
+        android:name="com.example.employ_events.ui.admin.AdminEventListFragment"
+        android:label="Admin Browse Events"
+        tools:layout="@layout/fragment_admin_event_list">
+        <action
+            android:id="@+id/action_adminEventListFragment_to_manageEventFragment"
+            app:destination="@+id/manageEventFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.employ_events.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/adminBrowseProfilesFragment"
+        android:name="com.example.employ_events.ui.admin.AdminBrowseProfilesFragment"
+        android:label="Admin Browse Profiles"
+        tools:layout="@layout/fragment_admin_profile_list">
+        <action
+            android:id="@+id/action_adminBrowseProfilesFragment_to_profileFragment"
+            app:destination="@+id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/invitation_fragment"
+        android:name="com.example.employ_events.ui.invitation.InvitationFragment"
+        tools:layout="@layout/event_invitation"
+        android:label="Invitation">
+        <action
+            android:id="@+id/action_invitation_fragment_to_nav_invitations"
+            app:destination="@id/nav_invitations" />
+        <action
+            android:id="@+id/action_invitation_fragment_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_invitations"
+        android:name="com.example.employ_events.ui.invitation.InvitationsListFragment"
+        tools:layout="@layout/fragment_invitations_list"
+        android:label="Invitations">
+
+        <action
+            android:id="@+id/action_nav_invitations_to_invitation_fragment"
+            app:destination="@id/invitation_fragment" />
+    </fragment>
+
 
 </navigation>

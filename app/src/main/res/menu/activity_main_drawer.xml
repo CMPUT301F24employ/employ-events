@@ -15,7 +15,7 @@
             android:title="Scan QR Code" />
 
         <item
-            android:id="@+id/nav_list"
+            android:id="@+id/nav_registered_events"
             android:icon="@drawable/baseline_event_24"
             android:title="Registered Events" />
 
@@ -23,6 +23,11 @@
             android:id="@+id/nav_facility"
             android:icon="@drawable/baseline_holiday_village_24"
             android:title="@string/menu_facility" />
+
+        <item
+            android:id="@+id/nav_invitations"
+            android:icon="@drawable/baseline_email_24"
+            android:title="Invitations" />
 
         <item
             android:id="@+id/nav_notifications"
@@ -33,6 +38,20 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/baseline_person_24"
             android:title="@string/menu_profile" />
+        <item
+            android:id="@+id/nav_image"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Image List" />
 
+        <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
+        <item
+            android:id="@+id/adminEventListFragment"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Admin Actions" />
+
+        <item
+            android:id="@+id/adminBrowseProfilesFragment"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Profiles" />
     </group>
 </menu>

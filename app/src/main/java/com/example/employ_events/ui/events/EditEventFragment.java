@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /*
+Authors: Tina
+
 This fragment is only being used to update the banner of an event
 as there is no US about editing the other details.
 

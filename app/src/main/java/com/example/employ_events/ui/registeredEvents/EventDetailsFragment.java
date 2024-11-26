@@ -4,11 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,21 +17,16 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.EventDetailsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.events.Event;
-import com.example.employ_events.ui.events.ManageEventViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -44,18 +35,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import android.Manifest;
 import com.google.firebase.firestore.SetOptions;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 /*
+Authors: Tina, Jasleen.
+
 This fragment is the page where a user can view the details, and is able to join and leave the event.
 It displays a dialog warning if geolocation is required, which asks for proceed -> joins, cancel -> does not join.
 It sends a user who has yet to set their name and email to the edit profile screen.
@@ -71,6 +60,7 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  */
 
 /**
+ * @author Tina, Jasleen
  * The EventDetailsFragment is responsible for displaying the details of an event.
  * It allows users to join or leave the event waiting list.
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
@@ -100,215 +90,222 @@ public class EventDetailsFragment extends Fragment{
     private FusedLocationProviderClient fusedLocationProviderClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
-
     /**
+     * @author Tina, Jasleen
      * Inflates the fragment's view and sets up the UI components.
      * It also fetches event data from Firestore and checks the user's status in the event's entrants list.
      */
      public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ManageEventViewModel galleryViewModel = new ViewModelProvider(this).get(ManageEventViewModel.class);
 
         binding = EventDetailsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         uniqueID = sharedPreferences.getString("uniqueID", null);
-
 
         db = FirebaseFirestore.getInstance();
         eventsRef = db.collection("events");
         initializeViews();
 
-        if (getArguments() != null) {
-            eventID = getArguments().getString("EVENT_ID");
-            if (eventID != null) {
-                DocumentReference eventRef = db.collection("events").document(eventID);
-                eventRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            currentEvent = new Event(
-                                    document.getString("eventTitle"),
-                                    document.getString("facilityID"),
-                                    document.getDate("eventDate"),
-                                    document.getDate("registrationDateDeadline"),
-                                    document.getDate("registrationStartDate"),
-                                    document.getBoolean("geoLocation"),
-                                    document.getLong("eventCapacity").intValue()
-                            );
-                            displayDetails(document, galleryViewModel);
-                        }
-                    }
-                });
-                checkUserEntryStatus(eventID);
-            }
-        }
+         // Retrieve event ID from arguments
+         if (getArguments() != null) {
+             eventID = getArguments().getString("EVENT_ID");
+             if (eventID != null) {
+                 loadEventDetails();
+             }
+         }
 
          requestPermissionLauncher = registerForActivityResult(
                  new ActivityResultContracts.RequestPermission(),
                  isGranted -> {
-                     if (isGranted) {
-                         // Permission granted, fetch the location
-                         fetchUserLocation(eventID);
-                     } else {
-                         // Permission denied
-                         Toast.makeText(requireContext(), "Location permission is required", Toast.LENGTH_SHORT).show();
-                     }
+                     if (isGranted) fetchUserLocation();
+                     else Toast.makeText(requireContext(), "Location permission is required to join.", Toast.LENGTH_SHORT).show();
                  }
          );
 
-        joinButton.setOnClickListener(view -> {
-            if (currentEvent == null) {
-                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Check if the required profile info exists; if not, navigate to edit profile.
-            DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-            docRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        if (document.getString("name") == null || document.getString("email") == null) {
-                            Toast.makeText(getContext(), "Name and email required! Edit your profile and try again.", Toast.LENGTH_LONG).show();
-                            // Navigate to edit profile and exit the join logic
-                            NavHostFragment.findNavController(EventDetailsFragment.this)
-                                    .navigate(R.id.action_eventDetailsFragment_to_nav_edit_profile);
-                            return;  // Exit here to prevent further execution of join logic
-                        } else {
-                            // Profile is complete, proceed to join with geolocation warning if needed
-                            if (currentEvent.getGeoLocation()) {
-                                new AlertDialog.Builder(requireContext())
-                                        .setTitle("Warning! Geolocation Required")
-                                        .setMessage("Are you sure you want to join the waiting list?")
-                                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                                        .setPositiveButton("Proceed", (dialog, which) -> requestLocationPermission(currentEvent))
-                                        .show();
-                            }
-                            else {
-                                joinEvent(currentEvent);
-                            }
-                        }
-                    } else {
-                        Log.e("EventDetailsFragment", "User profile document does not exist");
-                    }
-                } else {
-                    Log.e("EventDetailsFragment", "Error getting user profile: ", task.getException());
-                }
-            });
-        });
+         joinButton.setOnClickListener(view -> {
+             if (currentEvent == null) {
+                 Toast.makeText(getContext(), "Event details not available.", Toast.LENGTH_SHORT).show();
+                 return;
+             }
+             handleJoinButtonClick();
+         });
 
         leaveButton.setOnClickListener(view -> {
-            if (currentEvent == null) {
-                Toast.makeText(getContext(), "Event details not available", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Warning! Rejoining is not guaranteed.")
-                    .setMessage("Are you sure you want to leave the waiting list?")
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                    .setPositiveButton("Proceed", (dialog, which) -> leaveEvent())
-                    .show();
+            leaveEvent();
         });
+
+
         return root;
     }
 
+    /**
+     * @author Tina
+     * Update the buttons visibility on resume.
+     */
     @Override
     public void onResume() {
         super.onResume();
-        if (getArguments() != null) {
-            String eventID = getArguments().getString("EVENT_ID");
-            if (eventID != null) {
-                checkUserEntryStatus(eventID);
+        if (eventID != null) {
+            updateJoinButtonVisibility();
+        }
+    }
+
+    /**
+     * @author Tina
+     * Loads the event details by creating a new event - current event,
+     * and calling the display details and button visibility methods.
+     */
+    private void loadEventDetails() {
+        DocumentReference eventRef = eventsRef.document(eventID);
+        eventRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    currentEvent = new Event(
+                            document.getString("eventTitle"),
+                            document.getString("facilityID"),
+                            document.getDate("eventDate"),
+                            document.getDate("registrationDateDeadline"),
+                            document.getDate("registrationStartDate"),
+                            document.getBoolean("geoLocation"),
+                            Objects.requireNonNull(document.getLong("eventCapacity")).intValue()
+                    );
+                    displayDetails(document);
+                    updateJoinButtonVisibility();
+                }
+            }
+        });
+    }
+
+    /**
+     * @author Tina
+     * Updates join button visibility based on current date and user status.
+     */
+    private void updateJoinButtonVisibility() {
+        leaveButton.setVisibility(View.GONE);
+        joinButton.setVisibility(View.GONE);
+        Date currentDate = new Date();
+
+        // Check if the event is within the registration window
+        if (currentEvent != null && currentEvent.getRegistrationStartDate().before(currentDate)
+                && currentEvent.getRegistrationDateDeadline().after(currentDate)) {
+
+            // Check if the user is part of any special lists (cancelled, accepted, registered)
+            db.collection("events").document(eventID)
+                    .collection("entrantsList").document(uniqueID).get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                            DocumentSnapshot entrantDoc = task.getResult();
+                            boolean isWaitlisted = entrantDoc.getBoolean("onWaitingList") != null && Boolean.TRUE.equals(entrantDoc.getBoolean("onWaitingList"));
+                            boolean isCancelled = entrantDoc.getBoolean("onCancelledList") != null && Boolean.TRUE.equals(entrantDoc.getBoolean("onCancelledList"));
+                            boolean isAccepted = entrantDoc.getBoolean("onAcceptedList") != null && Boolean.TRUE.equals(entrantDoc.getBoolean("onAcceptedList"));
+                            boolean isRegistered = entrantDoc.getBoolean("onRegisteredList") != null && Boolean.TRUE.equals(entrantDoc.getBoolean("onRegisteredList"));
+
+                            // If the user is on any of these lists, don't show the join button
+                            if (isCancelled || isAccepted || isRegistered) {
+                                if (isAdded()) { // Ensure fragment is still attached
+                                    joinButton.setVisibility(View.GONE);
+                                }
+                            }
+                            else if (isWaitlisted) {
+                                if (isAdded()) {
+                                    leaveButton.setVisibility(View.VISIBLE);
+                                    joinButton.setVisibility(View.GONE);
+                                }
+                            }
+                            else {
+                                // If the user is not in any list, show the join button
+                                if (isAdded()) {
+                                    joinButton.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                        else {
+                            joinButton.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+        } else {
+            // Hide the join button if the registration window is closed
+            if (isAdded()) {
+                joinButton.setVisibility(View.GONE);
             }
         }
     }
 
     /**
-     * Checks if the current user is already an entrant for the event.
-     * Displays the appropriate button based on whether the user has joined or not.
-     * If the user is on the cancelled list, both the join and leave buttons are hidden.
-     * @param eventID The ID of the event to check for the entrant.
-     */
-    private void checkUserEntryStatus(String eventID) {
-        db.collection("events").document(eventID).collection("entrantsList")
-                .document(uniqueID)  // Directly reference the document by uniqueID
-                .get()
-                .addOnCompleteListener(task1 -> {
-                    if (task1.isSuccessful()) {
-                        DocumentSnapshot entrantDoc = task1.getResult();  // Get the document snapshot directly
-                        if (entrantDoc != null && entrantDoc.exists()) {  // Check if the document exists
-                            // Check if the entrant has been cancelled
-                            if (Boolean.TRUE.equals(entrantDoc.getBoolean("onCancelledList"))) {
-                                // Cancelled entrants are not allowed to rejoin.
-                                joinButton.setVisibility(View.GONE);
-                                leaveButton.setVisibility(View.GONE);
-                            } else {
-                                leaveButton.setVisibility(View.VISIBLE);
-                                joinButton.setVisibility(View.GONE);  // Hide join button when the user has already joined
-                            }
-                        } else {
-                            // No entrant found, show the join button
-                            joinButton.setVisibility(View.VISIBLE);
-                            leaveButton.setVisibility(View.GONE);  // Hide leave button when the user hasn't joined
-                        }
-                    } else {
-                        // Handle the error
-                        Log.w("Firestore", "Error getting documents.", task1.getException());
-                    }
-                });
-
-    }
-
-    /**
+     * @author Tina, Jasleen
      * Leaves the event waiting list by deleting the user's entrant record.
+     * Gives user a warning and requires confirmation prior to leaving.
      */
     private void leaveEvent() {
-        Toast.makeText(getContext(), "You have left the waiting list.", Toast.LENGTH_SHORT).show();
-        String eventID = getArguments().getString("EVENT_ID");
-        eventsRef.document(eventID).collection("entrantsList").document(uniqueID).delete();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Leave Event")
+                .setMessage("Are you sure you want to leave? Rejoining is not guaranteed.")
+                .setPositiveButton("Yes", (dialog, which) -> db.collection("events")
+                        .document(eventID).collection("entrantsList")
+                        .document(uniqueID).delete()
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(getContext(), "Left event.", Toast.LENGTH_SHORT).show();
+                        }))
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .show();
+
         leaveButton.setVisibility(View.GONE);
-        joinButton.setVisibility(View.VISIBLE);
+        Date currentDate = new Date();
+        // Check if the event is within the registration window
+        if (currentEvent != null && currentEvent.getRegistrationStartDate().before(currentDate)
+                && currentEvent.getRegistrationDateDeadline().after(currentDate)) {
+            joinButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            joinButton.setVisibility(View.GONE);
+        }
     }
 
     /**
-     * Joins the event waiting list by adding the user as an entrant.
-     * @param currentEvent The current event the user is joining.
+     * @author Tina, Jasleen
+     * Joins the event by adding the user to the entrants list.
      */
-    private void joinEvent(Event currentEvent) {
-        Entrant entrant = new Entrant();
-        entrant.setUniqueID(uniqueID);
-
-        DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    entrant.setEmail(document.getString("email"));
-                    entrant.setName(document.getString("name"));
-
-                    // Now that entrant is fully populated, proceed with adding to the event
-                    if (currentEvent.addEntrant(entrant)) {
-                        Toast.makeText(getContext(), "You have successfully joined the event!", Toast.LENGTH_SHORT).show();
-                        String eventID = requireArguments().getString("EVENT_ID");
-                        eventsRef.document(eventID)
-                                .collection("entrantsList")
-                                .document(uniqueID)
-                                .set(entrant.toMap(), SetOptions.merge());
-                        fetchUserLocation(eventID);
-                        leaveButton.setVisibility(View.VISIBLE);
-                        joinButton.setVisibility(View.GONE);
-                    } else {
-                        Toast.makeText(getContext(), "Sorry, waiting list is full", Toast.LENGTH_SHORT).show();
+    private void joinEvent() {
+        // Start by getting user profile
+        db.collection("userProfiles").document(uniqueID).get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null || !task.getResult().exists()) {
+                        throw new Exception("User profile does not exist or failed to fetch.");
                     }
-                }
-            } else {
-                // Handle the error
-                Log.e("EventDetailsFragment", "Error getting documents: ", task.getException());
-            }
-        });
-    }
+                    // Create the entrant object from the user profile
+                    DocumentSnapshot profileDoc = task.getResult();
+                    Entrant entrant = new Entrant(uniqueID);
+                    entrant.setName(profileDoc.getString("name"));
+                    entrant.setEmail(profileDoc.getString("email"));
+                    entrant.setOnWaitingList(true);
 
+                    // Now proceed to set the entrant data in the event
+                    return db.collection("events").document(eventID)
+                            .collection("entrantsList")
+                            .document(uniqueID)
+                            .set(entrant.toMap(), SetOptions.merge());
+                })
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Successfully joined the event
+                        if (isAdded()) { // Check if the fragment is still attached
+                            Toast.makeText(getContext(), "Successfully joined!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        // Handle failure
+                        if (isAdded()) {
+                            Toast.makeText(getContext(), "Error joining event: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                        Log.e("EventDetailsFragment", "Error joining event", task.getException());
+                    }
+                });
+        joinButton.setVisibility(View.GONE);
+        leaveButton.setVisibility(View.VISIBLE);
+    }
 
     /**
      * Initializes the UI views from the fragment's layout.
@@ -318,7 +315,7 @@ public class EventDetailsFragment extends Fragment{
         description = binding.eventDescription;
         fee = binding.fee;
         date = binding.eventDate;
-        facility = binding.facilityName; // do this and location separately
+        facility = binding.facilityName;
         location = binding.eventLocation;
         period = binding.registrationPeriod;
         geolocation = binding.geolocationStatus;
@@ -330,220 +327,151 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
+     * @author Tina
      * Displays the event details by populating the UI views with data from the Firestore document.
      * @param document The Firestore document containing the event data.
-     * @param galleryViewModel The ViewModel used for observing live data.
      */
-    private void displayDetails(DocumentSnapshot document, ManageEventViewModel galleryViewModel) {
-        // Set optional fields to invisible until it is determined to be non-null.
-        waitingListCapacity.setVisibility(View.GONE);
-        fee.setVisibility(View.GONE);
-        bannerImage.setVisibility(View.GONE);
+    private void displayDetails(DocumentSnapshot document) {
+        name.setText(document.getString("eventTitle"));
+        description.setText(document.getString("description"));
 
-        // Set fields to corresponding views.
-
-        name.setText(Objects.requireNonNull(document.get("eventTitle")).toString());
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), name::setText);
-
-        // To format dates in user friendly format using month abbreviations and 12 hour clock with am/pm.
-        Format formatter = new SimpleDateFormat("MMM-dd-yyyy hh:mm aa");
-        String eventDate = formatter.format(document.getDate("eventDate"));
-        String regOpenDate = formatter.format(document.getDate("registrationStartDate"));
-        String regCloseDate = formatter.format(document.getDate("registrationDateDeadline"));
-
-        date.setText(Objects.requireNonNull(eventDate));
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), date::setText);
-
-        description.setText(Objects.requireNonNull(document.get("description")).toString());
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), description::setText);
-
-        String registrationPeriod = "Registration Period: " + regOpenDate + " - " + regCloseDate;
+        // Format and display event dates
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E, MMM dd yyyy hh:mm a", Locale.getDefault());
+        date.setText(dateFormat.format(document.getDate("eventDate")));
+        String registrationPeriod = "Registration Period: " + dateFormat.format(document.getDate("registrationStartDate")) +
+                " - " + dateFormat.format(document.getDate("registrationDateDeadline"));
         period.setText(registrationPeriod);
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), period::setText);
 
-        String event_capacity = "Event Capacity: " + Objects.requireNonNull(document.get("eventCapacity"));
-        eventCapacity.setText(event_capacity);
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), eventCapacity::setText);
+        String EC = "Event Capacity: " + document.get("eventCapacity");
+        eventCapacity.setText(EC);
 
-        String geoLocation = "Geolocation required: " + Objects.requireNonNull(document.getBoolean("geoLocation"));
-        geolocation.setText(geoLocation);
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), geolocation::setText);
+        String Geo = "Geolocation required: " + document.getBoolean("geoLocation");
+        geolocation.setText(Geo);
 
-        // Check the non required fields and set visible if it is not null.
-
-        if (document.get("limited") != null) {
-            String waitingList = "Waiting List Capacity: " + Objects.requireNonNull(document.get("limited"));
-            waitingListCapacity.setVisibility(View.VISIBLE);
-            waitingListCapacity.setText(waitingList);
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), waitingListCapacity::setText);
-        }
-
+        // Optional fields
         if (document.get("fee") != null) {
-            String fee_ = "Fee: " + Objects.requireNonNull(document.get("fee"));
             fee.setVisibility(View.VISIBLE);
-            fee.setText(fee_);
-            galleryViewModel.getText().observe(getViewLifecycleOwner(), fee::setText);
+            String f = "Fee: " + document.get("fee");
+            fee.setText(f);
         }
-
+        if (document.get("limited") != null) {
+            waitingListCapacity.setVisibility(View.VISIBLE);
+            String WLC = "Waiting List Capacity: " + document.get("limited");
+            waitingListCapacity.setText(WLC);
+        }
         if (document.get("bannerUri") != null) {
-            bannerImage.setVisibility(View.VISIBLE);
-            bannerUri = Objects.requireNonNull(document.get("bannerUri")).toString();
+            bannerUri = document.getString("bannerUri");
             loadImageFromUrl(bannerUri);
         }
 
+        // Fetch facility details
         String facilityID = document.getString("facilityID");
-        // Obtain facility name, pfp, and location and update correlating views.
-        db.collection("facilities").document(Objects.requireNonNull(facilityID))
-        .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document1 = task.getResult();
-                if (document1 != null && document1.exists()) {
-                    String location_ = document1.getString("address");
-                    location.setText(location_);
-                    galleryViewModel.getText().observe(getViewLifecycleOwner(), location::setText);
-                    String name = document1.getString("name");
-                    facility.setText(name);
-                    galleryViewModel.getText().observe(getViewLifecycleOwner(), facility::setText);
-                }
-            }
-        });
-
-        checkRegistrationPeriod(currentEvent);
-    }
-
-    /**
-     * Loads an image from a URL and displays it in the ImageView.
-     * @param url The URL of the image to be loaded.
-     */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(input);
-                requireActivity().runOnUiThread(() -> bannerImage.setImageBitmap(bitmap));
-            } catch (IOException e) {
-                Log.e("EventDetailsFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
-    }
-
-    /**
-     * Fetches the user's current location and updates the Firestore database with the location data.
-     * @param eventID The unique identifier for the event.
-     */
-    private void fetchUserLocation(String eventID) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
-        // Check if permission is granted first
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-
-            // Create a LocationRequest for high accuracy
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // High accuracy
-            locationRequest.setNumUpdates(1); // Request only one update
-
-            // Create a LocationCallback to receive the update
-            LocationCallback locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    super.onLocationResult(locationResult);
-
-                    // Get the location from the result
-                    if (!locationResult.getLocations().isEmpty()) {
-                        Location location = locationResult.getLastLocation();
-                        if (location != null) {
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            // Save the location to Firestore
-                            saveUserLocationToEntrants(eventID, latitude, longitude);
-                        }
-                    }
-                    // Stop receiving updates after getting the location
-                    fusedLocationProviderClient.removeLocationUpdates(this);
-                }
-            };
-
-            // Request the location update
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        } else {
-            // Request permission if not granted
-            requestLocationPermission(currentEvent);
+        if (facilityID != null) {
+            db.collection("facilities").document(facilityID).get()
+                    .addOnSuccessListener(facilityDoc -> {
+                        location.setText(facilityDoc.getString("address"));
+                        facility.setText(facilityDoc.getString("name"));
+                    });
         }
     }
 
+    /**
+     * @author Tina
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
+     */
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(bannerImage);
+        }
+    }
 
     /**
-     * Saves the user's current location to the event's entrants list in Firestore.
-     * This method updates the location data (latitude and longitude) for the specific entrant.
-     *
-     * @param eventID The unique identifier of the event to which the user belongs.
-     * @param latitude The latitude of the user's current location.
-     * @param longitude The longitude of the user's current location.
+     * @author Tina
+     * Handles the profile required check when join is clicked.
+     * If user has a profile, handles event geolocation:
+     * - required -> warning -> handle geolocation requirement.
+     * - not required -> join event.
      */
-    private void saveUserLocationToEntrants(String eventID, double latitude, double longitude) {
+    private void handleJoinButtonClick() {
+        db.collection("userProfiles").document(uniqueID).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                        DocumentSnapshot profileDoc = task.getResult();
+                        String name = profileDoc.getString("name");
+                        String email = profileDoc.getString("email");
+
+                        if (name == null || email == null) {
+                            // Send the user to create their profile if it does not exist.
+                            Toast.makeText(getContext(), "Name and email required! Edit your profile and try again.", Toast.LENGTH_LONG).show();
+                            NavHostFragment.findNavController(this).navigate(R.id.action_eventDetailsFragment_to_nav_edit_profile);
+                        } else if (currentEvent.getGeoLocation()) {
+                            // Warn the user if geolocation is required for this event.
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle("Warning! Geolocation Required")
+                                    .setMessage("Are you sure you want to join the waiting list?")
+                                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                                    .setPositiveButton("Proceed", (dialog, which) -> handleGeolocationRequirement())
+                                    .show();
+                        } else {
+                            joinEvent();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Fetches the user's location and saves it if permission is granted.
+     * @author Tina
+     */
+    private void fetchUserLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    saveUserLocationToEntrants(location.getLatitude(), location.getLongitude());
+                }
+            });
+        }
+    }
+
+    /**
+     * Saves the user's location to the entrants list.
+     * @author Tina
+     * @param latitude The user's latitude.
+     * @param longitude The user's longitude.
+     */
+    private void saveUserLocationToEntrants(double latitude, double longitude) {
         Map<String, Object> locationData = new HashMap<>();
         locationData.put("latitude", latitude);
         locationData.put("longitude", longitude);
 
-        // Update location data in the entrantsList subcollection
-        db.collection("events").document(eventID).collection("entrantsList").document(uniqueID)
-                .set(locationData, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Location saved successfully in entrantsList."))
-                .addOnFailureListener(e -> Log.e("Firestore", "Failed to save location: ", e));
+        // Merge the user's location to their user file.
+        db.collection("events").document(eventID).collection("entrantsList")
+                .document(uniqueID).set(locationData, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> joinEvent())
+                .addOnFailureListener(e -> {
+                    Log.e("EventDetailsFragment", "Failed to save location", e);
+                    Toast.makeText(getContext(), "Failed to save location. Try again.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
-     * Requests the necessary location permission from the user before proceeding with location-based features.
-     * If permission is granted, the event is joined.
-     * @param currentEvent The current event object the user is trying to join.
+     * Handles geolocation requirement for events.
+     * @author Tina
      */
-    private void requestLocationPermission(Event currentEvent) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
+    private void handleGeolocationRequirement() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            joinEvent(currentEvent);
+            fetchUserLocation();
         } else {
-            // Check if the user previously denied the permission
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Location Permission Required")
-                        .setMessage("This event requires location access. Please grant location permission to join.")
-                        .setPositiveButton("Grant Permission", (dialog, which) -> requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION))
-                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                        .show();
-            } else {
-                // Request permission directly
-                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-            }
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
-
-    /**
-     * This method checks if the current date falls within the event's registration period.
-     * If the current date is outside of the registration period, it hides the join button.
-     * If the current date is within the registration period, it ensures the join button is visible.
-     */
-    private void checkRegistrationPeriod(Event currentEvent) {
-        Date currentDate = new Date(); // Get the current date
-        Date registrationStartDate = currentEvent.getRegistrationStartDate();
-        Date registrationDateDeadline = currentEvent.getRegistrationDateDeadline();
-        // Check if the current date is within the registration period
-        if (registrationStartDate != null && registrationDateDeadline != null) {
-            if (currentDate.before(registrationStartDate) || currentDate.after(registrationDateDeadline)) {
-                // Current date is outside the registration period, hide the join button
-                joinButton.setVisibility(View.GONE);  // Hides the button
-            } else {
-                // Current date is within the registration period, show the join button
-                joinButton.setVisibility(View.VISIBLE);  // Ensures the button is visible
-            }
-        }
-    }
-
 
     @Override
     public void onDestroyView() {
