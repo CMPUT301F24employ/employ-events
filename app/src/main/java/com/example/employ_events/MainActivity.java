@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.notifications.ApplicationClass;
 import com.example.employ_events.ui.notifications.Notification;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
@@ -33,8 +32,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.onesignal.OneSignal;
-import com.onesignal.debug.LogLevel;
+
 
 public class MainActivity extends AppCompatActivity
         {
