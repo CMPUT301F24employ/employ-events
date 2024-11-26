@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.material.v130alpha02)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.messaging)
+    implementation("androidx.core:core:1.12.0")
 
 
     implementation("com.google.android.libraries.places:places:4.0.0")
