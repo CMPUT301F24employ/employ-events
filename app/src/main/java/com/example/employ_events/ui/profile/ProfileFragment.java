@@ -47,8 +47,9 @@ public class ProfileFragment extends Fragment{
 
     private FragmentProfileBinding binding;
     private TextView name, email, phone_number;
-    private Button editProfileButton;
+    private Button editProfileButton, deleteProfileButton;
     private ImageView pfp;
+    private boolean isAdmin = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,6 +68,11 @@ public class ProfileFragment extends Fragment{
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference profilesRef = db.collection("userProfiles");
 
+        if (getArguments() != null) {
+            uniqueID = getArguments().getString("uniqueID");
+            isAdmin = getArguments().getBoolean("IS_ADMIN", false);
+        }
+
         // Initialize the UI components for the fragment
         initializeViews();
 
@@ -83,6 +89,7 @@ public class ProfileFragment extends Fragment{
             }
         });
 
+
         // Navigate to the edit profile screen when the button is clicked
         editProfileButton.setOnClickListener(v->
                 NavHostFragment.findNavController(ProfileFragment.this)
@@ -90,6 +97,8 @@ public class ProfileFragment extends Fragment{
 
         return root;
     }
+
+
 
     /**
      * Initializes the views for the fragment by binding UI elements to variables.
@@ -100,6 +109,15 @@ public class ProfileFragment extends Fragment{
         email = binding.profileEmail;
         editProfileButton = binding.editProfileButton;
         pfp = binding.userPFP;
+
+        deleteProfileButton = binding.deleteProfileButton;
+        // Hiding edit button if the user is an admin and only showing delete event button
+        if (isAdmin) {
+            editProfileButton.setVisibility(View.GONE);
+        } else {
+            deleteProfileButton.setVisibility(View.GONE);
+        }
+
     }
 
     /**

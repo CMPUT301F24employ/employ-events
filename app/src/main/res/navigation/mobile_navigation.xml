@@ -239,6 +239,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.employ_events.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
         android:id="@+id/adminBrowseProfilesFragment"
         android:name="com.example.employ_events.ui.admin.AdminBrowseProfilesFragment"
         android:label="Admin Browse Profiles"

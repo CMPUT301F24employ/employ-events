@@ -7,18 +7,20 @@ import static java.security.AccessController.getContext;
 
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentAdminProfileListBinding;
+import com.example.employ_events.ui.events.Event;
 import com.example.employ_events.ui.profile.Profile;
 import com.example.employ_events.ui.profile.ProfileAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,7 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-public class AdminBrowseProfilesFragment extends Fragment {
+public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdapter.ProfileClickListener{
 
     private FragmentAdminProfileListBinding binding;
     private FirebaseFirestore db;
@@ -41,7 +43,7 @@ public class AdminBrowseProfilesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         profileList = new ArrayList<>();
-        profileAdapter = new ProfileAdapter(requireContext(), profileList);
+        profileAdapter = new ProfileAdapter(requireContext(), profileList, this);
 
         setupRecyclerView();
         loadProfiles();
@@ -65,7 +67,7 @@ public class AdminBrowseProfilesFragment extends Fragment {
     private void loadProfiles() {
         db.collection("userProfiles").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                //profileList.clear();
+                profileList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     String uniqueID = document.getId();
                     Profile profile = new Profile(uniqueID);
@@ -74,9 +76,9 @@ public class AdminBrowseProfilesFragment extends Fragment {
                     profile.setPhoneNumber(document.getString("phoneNumber"));
 
                     profileList.add(profile);
-                    //Log.d("AdminBrowseProfiles", "Profiles loaded: " + profileList.size());
+
                 }
-                profileAdapter.notifyDataSetChanged();
+                profileAdapter.updateProfileList(profileList);
 
             } else {
                 Toast.makeText(getContext(), "Error loading profiles!", Toast.LENGTH_SHORT).show();
@@ -85,8 +87,14 @@ public class AdminBrowseProfilesFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void onItemClick(Profile profile) {
+        if (getView() != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("uniqueID", profile.getUniqueID());
+            bundle.putBoolean("IS_ADMIN", true);
+            Navigation.findNavController(getView()).navigate(R.id.action_adminBrowseProfilesFragment_to_profileFragment, bundle);
+        }
+
     }
+
 }
