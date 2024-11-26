@@ -140,6 +140,7 @@ public class Entrant {
         this.onRegisteredList = onRegisteredList;
     }
 
+
     /**
      * Converts the Entrant object to a Map. This is useful for storing the
      * entrant's data in a database or for easy serialization.

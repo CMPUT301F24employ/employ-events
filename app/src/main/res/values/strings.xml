@@ -52,4 +52,6 @@
     <string name="update_banner">Update Banner</string>
     <string name="qr_code">QR Code</string>
     <string name="manage_entrants">Manage Entrants</string>
+    <string name="channel_name">SendingNotification</string>
+    <string name="channel_description">To Send Notifications to Entrants</string>
 </resources>
