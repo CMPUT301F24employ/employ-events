@@ -48,5 +48,10 @@
             android:id="@+id/adminEventListFragment"
             android:icon="@drawable/baseline_person_24"
             android:title="Admin Actions" />
+
+        <item
+            android:id="@+id/adminBrowseProfilesFragment"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Profiles" />
     </group>
 </menu>
