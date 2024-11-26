@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventBinding;
@@ -23,6 +24,8 @@ import com.example.employ_events.ui.profile.EditProfileViewModel;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +36,11 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 /*
-Authors: Tina, Sahara, Aasvi, Jasleen
+Authors: Tina, Sahara, Aasvi, Jasleen, Connor
 
 The purpose of this fragment is to manage an event such as update the event banner, a button that
-brings you to the download event qr page, and a button to bring you to manage entrants page for the event.
+brings you to the download event qr page, a button to bring you to manage entrants page for the event,
+and a button to delete the event if the user is an admin.
  */
 
 /**
@@ -45,6 +49,7 @@ brings you to the download event qr page, and a button to bring you to manage en
 public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
     private FirebaseFirestore db;
+    private FirebaseStorage storage;
     private String bannerUri, eventId;
     private Button editEventButton, viewEntrantsButton, qrCodeButton, deleteEventButton;
     private TextView titleTV, descriptionTV, eventDateTV, registrationPeriodTV,
@@ -66,7 +71,7 @@ public class ManageEventFragment extends Fragment {
         View root = binding.getRoot();
 
         db = FirebaseFirestore.getInstance();
-//        initializeViews();
+        storage = FirebaseStorage.getInstance();
 
         // Retrieve the event ID passed in the bundle arguments also checking for admin
         if (getArguments() != null) {
@@ -74,6 +79,7 @@ public class ManageEventFragment extends Fragment {
             isAdmin = getArguments().getBoolean("IS_ADMIN", false);
         }
 
+        // Initialize views after it is determined whether user is admin or not
         initializeViews();
 
         // Fetch event details if eventId is available
@@ -120,7 +126,21 @@ public class ManageEventFragment extends Fragment {
             }
         });
 
+        // Delete Event
+        deleteEventButton.setOnClickListener(view -> {
+            db.collection("events").document(eventId).delete().addOnSuccessListener(unused -> {
+                StorageReference storageReference = storage.getReference().child("QRCodes/" + eventId + ".png");
 
+                storageReference.delete().addOnSuccessListener(unused1 -> {
+                    Toast.makeText(getContext(), "Event successfully deleted!", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Event successfully deleted!", Toast.LENGTH_SHORT).show();
+                });
+
+            }).addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Error deleting event qr code from storage!", Toast.LENGTH_SHORT).show();
+            });
+        });
         return root;
     }
 
