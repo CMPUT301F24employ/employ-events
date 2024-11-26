@@ -95,6 +95,7 @@ public class ProfileFragment extends Fragment{
                 NavHostFragment.findNavController(ProfileFragment.this)
                         .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
+
         return root;
     }
 
