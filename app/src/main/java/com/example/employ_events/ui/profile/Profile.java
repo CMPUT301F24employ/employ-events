@@ -4,23 +4,17 @@ package com.example.employ_events.ui.profile;
 The purpose of this class is to define a user and set/get their profile information.
  */
 
-import com.example.employ_events.ui.notifications.Notification;
-
-import java.util.ArrayList;
-
 /**
  * This is a class that defines a user's Profile.
  */
 public class Profile {
     private String uniqueID, name, email, pfpURI, phoneNumber;
     private boolean isEntrant, isAdmin, isOrganizer, customPFP;
-    private ArrayList<Notification> notificationArrayList;
 
     /**
      * Constructs a new Profile with the specified unique ID..
      * @param uniqueID the unique identifier for the device
      */
-
     public Profile(String uniqueID) {
         this.uniqueID = uniqueID;
         this.isEntrant = false;
@@ -154,9 +148,4 @@ public class Profile {
      * @param customPFP A boolean indicating if the profile picture is custom (true) or default (false).
      */
     public void setCustomPFP(boolean customPFP) { this.customPFP = customPFP; }
-
-    public void addNotification(Notification notification ){
-        notification.setRead(true);
-        notificationArrayList.add(notification);
-    }
 }

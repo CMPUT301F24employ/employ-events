@@ -1,16 +1,11 @@
 package com.example.employ_events;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.notifications.ApplicationClass;
-import com.example.employ_events.ui.notifications.Notification;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
@@ -27,14 +22,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.onesignal.OneSignal;
-import com.onesignal.debug.LogLevel;
 
 public class MainActivity extends AppCompatActivity
         {
@@ -44,16 +32,12 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         com.example.employ_events.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        createNotificationChannel();
+
         setSupportActionBar(binding.appBarMain.toolbar);
-        monitorNotifications();
-        //Create notification channel
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -116,78 +100,6 @@ public class MainActivity extends AppCompatActivity
                 || super.onSupportNavigateUp();
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            String CHANNEL_ID = "Organizer Notification";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this.
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void monitorNotifications() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID = sharedPreferences.getString("uniqueID", null);
-
-        if (uniqueID == null) {
-            Log.e("MonitorNotifications", "Unique ID is null. Cannot monitor notifications.");
-            return;
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("userProfiles")
-                .document(uniqueID)
-                .collection("Notifications")
-                .addSnapshotListener((snapshots, e) -> {
-                    if (e != null) {
-                        Log.e("Firestore", "Listen failed.", e);
-                        return;
-                    }
-
-                    if (snapshots != null && !snapshots.isEmpty()) {
-                        // List to store unread notifications
-                        List<Notification> unreadNotifications = new ArrayList<>();
-
-                        for (QueryDocumentSnapshot doc : snapshots) {
-                            // Convert Firestore data to Notification object
-
-                            Map<String, Object> notificationMap = (Map<String, Object>) doc.get("Notification");
-                            if (notificationMap != null) {
-                                String eventID = (String) notificationMap.get("eventID");
-                                String message = (String) notificationMap.get("message");
-                                Boolean read = (Boolean) notificationMap.get("read");
 
 
-                                // Create Notification object
-                                Notification notification = new Notification(eventID, message, Boolean.TRUE.equals(read));
-                                // Check if notification is unread
-                                if (!notification.isRead()) {
-                                    unreadNotifications.add(notification);
-
-                                    // Optionally mark the notification as read in Firebase
-                                    doc.getReference().update("Notification.read", true)
-                                            .addOnSuccessListener(aVoid ->
-                                                    Log.d("Firestore", "Notification marked as read"))
-                                            .addOnFailureListener(error ->
-                                                    Log.e("Firestore", "Error marking notification as read", error));
-                                }
-                            }
-
-                            // Send all unread notifications
-                            for (Notification notification : unreadNotifications) {
-                                notification.sendNotification(getApplicationContext());
-                            }
-                        }
-                    }
-                });
-    }
 }
