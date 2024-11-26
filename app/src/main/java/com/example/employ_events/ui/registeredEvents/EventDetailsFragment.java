@@ -60,6 +60,7 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  */
 
 /**
+ * @author Tina, Jasleen
  * The EventDetailsFragment is responsible for displaying the details of an event.
  * It allows users to join or leave the event waiting list.
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
