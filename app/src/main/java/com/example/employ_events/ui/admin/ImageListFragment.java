@@ -40,24 +40,29 @@ public class ImageListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<Image> arrayList;
     private Button remove;
+    private ImageAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentImageListBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         recyclerView = root.findViewById(R.id.recycler);
-
+        remove = root.findViewById(R.id.adminAction);
         db = FirebaseFirestore.getInstance();
         arrayList = new ArrayList<>();
 
         // Initialize ImageAdapter
-        ImageAdapter adapter = new ImageAdapter(getContext(), arrayList);
+        adapter = new ImageAdapter(getContext(), arrayList);
         adapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
             @Override
-            public void onClick(Image image) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(image.getUrl()));
-                intent.setDataAndType(Uri.parse(image.getUrl()), "banners/*");
-                startActivity(intent);
+            public void onClick(Image image, int position) {
+                // Handle remove button
+                remove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeImage(image, position);
+                    }
+                });
             }
         });
         recyclerView.setAdapter(adapter);
@@ -67,8 +72,6 @@ public class ImageListFragment extends Fragment {
 
         // Load images from "posters" or another folder
         loadImagesFromFolder("pfps", adapter);
-        //Toast.makeText(getContext(), "HI", Toast.LENGTH_SHORT).show();
-
 
         remove = root.findViewById(R.id.adminAction);
 
@@ -109,6 +112,31 @@ public class ImageListFragment extends Fragment {
                         Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
+
     }
+    private void removeImage(Image image, int position) {
+        // Get the reference to the Firebase Storage location of the image
+        StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(image.getUrl());
+
+        // Delete the image from Firebase Storage
+        imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                // Image successfully deleted from Firebase
+                Toast.makeText(getContext(), "Image deleted from Firebase", Toast.LENGTH_SHORT).show();
+
+                // Remove the image from the RecyclerView and arrayList
+                arrayList.remove(position);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Failed to delete the image
+                Toast.makeText(getContext(), "Failed to delete image from Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
 

@@ -33,7 +33,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Glide.with(context).load(arrayList.get(position).getUrl()).into(holder.imageView);
-        holder.itemView.setOnClickListener(view -> onItemClickListener.onClick(arrayList.get(position)));
+        holder.itemView.setOnClickListener(view -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onClick(arrayList.get(position), position);
+            }
+        });
     }
 
     @Override
@@ -54,6 +58,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public interface OnItemClickListener {
-        void onClick(Image image);
+        void onClick(Image image, int position);
     }
 }
