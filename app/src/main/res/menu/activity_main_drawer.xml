@@ -15,7 +15,7 @@
             android:title="Scan QR Code" />
 
         <item
-            android:id="@+id/nav_list"
+            android:id="@+id/nav_registered_events"
             android:icon="@drawable/baseline_event_24"
             android:title="Registered Events" />
 
