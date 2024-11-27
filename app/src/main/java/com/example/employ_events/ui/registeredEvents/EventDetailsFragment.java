@@ -130,13 +130,12 @@ public class EventDetailsFragment extends Fragment{
                  return;
              }
              handleJoinButtonClick();
-             updateJoinButtonVisibility();
          });
 
         leaveButton.setOnClickListener(view -> {
             leaveEvent();
-            updateJoinButtonVisibility();
         });
+
 
         return root;
     }
@@ -186,6 +185,7 @@ public class EventDetailsFragment extends Fragment{
      */
     private void updateJoinButtonVisibility() {
         leaveButton.setVisibility(View.GONE);
+        joinButton.setVisibility(View.GONE);
         Date currentDate = new Date();
 
         // Check if the event is within the registration window
@@ -207,16 +207,23 @@ public class EventDetailsFragment extends Fragment{
                             if (isCancelled || isAccepted || isRegistered) {
                                 if (isAdded()) { // Ensure fragment is still attached
                                     joinButton.setVisibility(View.GONE);
-                                    if (isWaitlisted) {
-                                        leaveButton.setVisibility(View.VISIBLE);
-                                    }
                                 }
-                            } else {
+                            }
+                            else if (isWaitlisted) {
+                                if (isAdded()) {
+                                    leaveButton.setVisibility(View.VISIBLE);
+                                    joinButton.setVisibility(View.GONE);
+                                }
+                            }
+                            else {
                                 // If the user is not in any list, show the join button
                                 if (isAdded()) {
                                     joinButton.setVisibility(View.VISIBLE);
                                 }
                             }
+                        }
+                        else {
+                            joinButton.setVisibility(View.VISIBLE);
                         }
                     });
 
@@ -245,6 +252,17 @@ public class EventDetailsFragment extends Fragment{
                         }))
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .show();
+
+        leaveButton.setVisibility(View.GONE);
+        Date currentDate = new Date();
+        // Check if the event is within the registration window
+        if (currentEvent != null && currentEvent.getRegistrationStartDate().before(currentDate)
+                && currentEvent.getRegistrationDateDeadline().after(currentDate)) {
+            joinButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            joinButton.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -285,6 +303,8 @@ public class EventDetailsFragment extends Fragment{
                         Log.e("EventDetailsFragment", "Error joining event", task.getException());
                     }
                 });
+        joinButton.setVisibility(View.GONE);
+        leaveButton.setVisibility(View.VISIBLE);
     }
 
     /**
