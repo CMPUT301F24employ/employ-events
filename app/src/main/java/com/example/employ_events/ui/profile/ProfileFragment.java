@@ -1,5 +1,7 @@
 package com.example.employ_events.ui.profile;
 
+import static java.security.AccessController.getContext;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -24,6 +27,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,6 +99,13 @@ public class ProfileFragment extends Fragment{
                 NavHostFragment.findNavController(ProfileFragment.this)
                         .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
+        String finalUniqueID = uniqueID;
+        deleteProfileButton.setOnClickListener(v -> {
+            if (finalUniqueID != null) {
+                //deleteProfile(finalUniqueID, db);
+                deleteProfileAndFacility(finalUniqueID, db);
+            }
+        });
 
         return root;
     }
@@ -166,6 +177,46 @@ public class ProfileFragment extends Fragment{
                 Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
             }
         }).start();
+    }
+
+
+    private void deleteProfileAndFacility(String uniqueID, FirebaseFirestore db) {
+
+        WriteBatch batch = db.batch();
+        DocumentReference profileRef = db.collection("userProfiles").document(uniqueID);
+
+        db.collection("facilities")
+                .whereEqualTo("organizer_id", uniqueID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        boolean hasFacility = !task.getResult().isEmpty();
+                        for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                            batch.delete(document.getReference());
+                        }
+
+                        batch.delete(profileRef);
+                        batch.commit()
+                                .addOnSuccessListener(unused -> {
+                                    if (hasFacility) {
+                                        Toast.makeText(getContext(), "Profile and associated facility have been successfully deleted!", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                       Toast.makeText(getContext(), "No associated facility found. Profile successfully deleted!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Error deleting profile and associated facility.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                    else {
+                        Toast.makeText(getContext(), "Error fetching associated facility.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error fetching associated facility.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
