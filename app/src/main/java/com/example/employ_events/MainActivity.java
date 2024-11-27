@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseFirestore db;
+    private boolean isAdmin;
+    private String uniqueID;
 
 
     @Override
@@ -53,23 +55,10 @@ public class MainActivity extends AppCompatActivity
         monitorNotifications();
         //Create notification channel
 
-        DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_registered_events,
-                R.id.nav_notifications, R.id.adminEventListFragment, R.id.nav_image, R.id.nav_invitations)
-                .setOpenableLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
         db = FirebaseFirestore.getInstance();
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
 
         if (sharedPreferences.contains("uniqueID")) {
             // Retrieve the existing UUID
@@ -82,14 +71,13 @@ public class MainActivity extends AppCompatActivity
             editor.apply();  // Commit changes asynchronously
         }
 
-
         // Create an empty profile using their Unique ID (will not need to sign in).
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document != null && !document.exists()) {
-                    db.collection("userProfiles").document(uniqueID).set(new Profile(uniqueID));
+                if (!document.exists()) {
+                    docRef.set(new Profile(uniqueID));
                 }
             } else {
                 // Handle the error, e.g., log it
@@ -97,6 +85,31 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+
+        // Show admin menu buttons for admins and hide for non admins.
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            boolean isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
+            menu.findItem(R.id.nav_image).setVisible(isAdmin);
+            menu.findItem(R.id.adminBrowseProfilesFragment).setVisible(isAdmin);
+        }).addOnFailureListener(e -> {
+            Log.e("MainActivity", "Error fetching admin status: ", e);
+        });
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_registered_events,
+                R.id.nav_notifications, R.id.adminEventListFragment, R.id.nav_image, R.id.nav_invitations, R.id.adminBrowseProfilesFragment)
+                .setOpenableLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
     }
 
