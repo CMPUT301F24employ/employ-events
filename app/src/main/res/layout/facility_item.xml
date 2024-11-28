@@ -36,11 +36,6 @@
                 android:layout_height="wrap_content"
                 android:text="Address" />
 
-            <TextView
-                android:id="@+id/facility_phone_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phone Number" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

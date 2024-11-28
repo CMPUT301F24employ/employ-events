@@ -123,7 +123,7 @@ public class ProfileFragment extends Fragment{
         pfp = binding.userPFP;
         deleteProfileButton = binding.deleteProfileButton;
 
-        // Hiding edit button if the user is an admin and only showing delete event button
+        // Hiding edit button if the user is an admin and only showing delete profile button
         if (isAdmin) {
             editProfileButton.setVisibility(View.GONE);
         } else {

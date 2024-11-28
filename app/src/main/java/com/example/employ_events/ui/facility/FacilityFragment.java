@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,8 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     private ImageView facilityPFP;
     private FacilityViewModel facilityViewModel;
     private String uniqueID;
+    private Button deleteFacilityButton;
+    private boolean isAdmin = false;
 
     /**
      * Called when a new facility is created. This method handles the addition of the facility to
@@ -105,26 +108,35 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         // Initialize Firestore database instance
         db = FirebaseFirestore.getInstance();
 
+        if (getArguments() != null) {
+            uniqueID = getArguments().getString("organizer_id");
+            isAdmin = getArguments().getBoolean("IS_ADMIN", false);
+        }
+
         // Prompt user to create facility if they are not yet an organizer.
         setupUserProfile(uniqueID);
 
         // Initialize the UI components for the fragment
         initializeViews();
 
+
         // Fetch the facility ID and display facility profile.
         getFacilityID(uniqueID, facilityID -> {
-            if (facilityID != null) {
-                DocumentReference facilityRef = db.collection("facilities").document(facilityID);
-                facilityRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        displayProfile(document, facilityViewModel);
-                    }
-                });
-            } else {
-                Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
+            if (!isAdmin) {
+                if (facilityID != null) {
+                    DocumentReference facilityRef = db.collection("facilities").document(facilityID);
+                    facilityRef.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            displayProfile(document, facilityViewModel);
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
 
         // Button to navigate to EventListFragment to view events
         binding.viewEventButton.setOnClickListener(view ->
@@ -234,6 +246,15 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         phone_number = binding.facilityPhoneTV;
         address = binding.facilityAddressTV;
         facilityPFP = binding.facilityPFP;
+        deleteFacilityButton = binding.deleteFacilityButton;
+
+        // Hiding edit button if the user is an admin and only showing delete facility button
+        if (isAdmin) {
+            binding.viewEventButton.setVisibility(View.GONE);
+            binding.editFacilityButton.setVisibility(View.GONE);
+        } else {
+            deleteFacilityButton.setVisibility(View.GONE);
+        }
     }
 
     /**

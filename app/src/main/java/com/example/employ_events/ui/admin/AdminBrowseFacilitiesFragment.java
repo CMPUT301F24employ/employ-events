@@ -85,8 +85,10 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     public void onItemClick(Facility facility) {
         if (getView() != null) {
             Bundle bundle = new Bundle();
-            bundle.putString("uniqueID", facility.getOrganizer_id());
-            Navigation.findNavController(getView()).navigate(R.id.action_adminBrowseFacilitiesFragment_to_nav_facility, bundle);
+            bundle.putString("organizer_id", facility.getOrganizer_id());
+            bundle.putBoolean("IS_ADMIN", true);
+
+            Navigation.findNavController(getView()).navigate(R.id.action_adminBrowseFacilitiesFragment_to_facilityFragment, bundle);
         }
     }
 }

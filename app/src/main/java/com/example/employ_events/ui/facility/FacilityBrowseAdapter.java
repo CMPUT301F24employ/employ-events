@@ -47,10 +47,9 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
 
         holder.facilityCard.setOnClickListener(view -> listener.onItemClick(facility));
 
-        holder.nameTextView.setText(facility.getName() != null ? facility.getName() : "No Name Provided");
-        holder.emailTextView.setText(facility.getEmail() != null ? facility.getEmail() : "No Email Provided");
-        holder.phoneNumberTextView.setText(facility.getPhone_number() != null ? facility.getPhone_number() : "No Phone Number Provided");
-        holder.addressTextView.setText(facility.getAddress() != null ? facility.getAddress() : "No Address Provided");
+        holder.nameTextView.setText(facility.getName());
+        holder.emailTextView.setText(facility.getEmail());
+        holder.addressTextView.setText(facility.getAddress());
     }
 
     @Override
@@ -70,7 +69,6 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
         private final TextView nameTextView;
         private final TextView emailTextView;
         private final TextView addressTextView;
-        private final TextView phoneNumberTextView;
 
         public FacilityViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,7 +76,6 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
             nameTextView = itemView.findViewById(R.id.facility_name);
             emailTextView = itemView.findViewById(R.id.facility_email);
             addressTextView = itemView.findViewById(R.id.facility_address);
-            phoneNumberTextView = itemView.findViewById(R.id.facility_phone_number);
         }
     }
 }
