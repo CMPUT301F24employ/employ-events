@@ -11,11 +11,8 @@ import com.example.employ_events.R;
 
 import java.util.ArrayList;
 
-/*
-Authors: Tina
- */
-
 /**
+ * @author Tina
  * Adapter for displaying a list of event invitations in a RecyclerView.
  * This adapter binds each event's data to a view and handles click events.
  */
@@ -23,6 +20,7 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
     private Context context;
     private ArrayList<EventItem> invitationsList;
     private OnItemClickListener listener;
+
 
     /**
      * Constructor for InvitationsAdapter.
@@ -53,7 +51,6 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
 
     /**
      * Binds the data from the event item to the UI elements in the ViewHolder.
-     *
      * @param holder The ViewHolder which contains the views.
      * @param position The position of the item in the list.
      */
@@ -61,7 +58,7 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         EventItem eventItem = invitationsList.get(position);
 
-        // Bind the data to the UI elements (e.g., event name)
+        // Bind the data to the UI elements
         holder.eventNameTextView.setText(eventItem.getEventName());
 
         // Set up the click listener
@@ -74,7 +71,6 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
 
     /**
      * Returns the total number of items in the list.
-     *
      * @return The size of the invitations list.
      */
     @Override
@@ -90,7 +86,6 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
 
         /**
          * Constructor for the ViewHolder.
-         *
          * @param itemView The view representing an individual item in the RecyclerView.
          */
         public ViewHolder(View itemView) {
@@ -101,7 +96,6 @@ public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.
 
     /**
      * Interface to handle click events on the RecyclerView items.
-     * Implement this interface in the parent activity or fragment to respond to item clicks.
      */
     public interface OnItemClickListener {
         void onItemClick(EventItem event);

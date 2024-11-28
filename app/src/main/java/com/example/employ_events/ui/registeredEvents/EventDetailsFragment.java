@@ -332,6 +332,10 @@ public class EventDetailsFragment extends Fragment{
      * @param document The Firestore document containing the event data.
      */
     private void displayDetails(DocumentSnapshot document) {
+        waitingListCapacity.setVisibility(View.GONE);
+        fee.setVisibility(View.GONE);
+        bannerImage.setVisibility(View.GONE);
+
         name.setText(document.getString("eventTitle"));
         description.setText(document.getString("description"));
 
@@ -362,6 +366,7 @@ public class EventDetailsFragment extends Fragment{
         if (document.get("bannerUri") != null) {
             bannerUri = document.getString("bannerUri");
             loadImageFromUrl(bannerUri);
+            bannerImage.setVisibility(View.VISIBLE);
         }
 
         // Fetch facility details

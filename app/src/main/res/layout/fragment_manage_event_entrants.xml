@@ -104,20 +104,20 @@
             android:text="Remove An Entrant" />
 
         <Button
-            android:id="@+id/remove_entrants"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="5dp"
-            android:text="Remove Unregistered" />
-
-        <Button
             android:id="@+id/view_entrant_map"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="5dp"
             android:text="Map of Entrants" />
+
+        <Button
+            android:id="@+id/remove_entrants"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:text="Remove Unregistered Entrants" />
 
     </GridLayout>
     </LinearLayout>
