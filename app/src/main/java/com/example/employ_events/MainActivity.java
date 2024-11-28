@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
+import com.example.employ_events.ui.home.HomeFragment;
 import com.example.employ_events.ui.notifications.Notification;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity
 
         // Show admin menu buttons for admins and hide for non admins.
         docRef.get().addOnSuccessListener(documentSnapshot -> {
-            boolean isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
+            isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
             menu.findItem(R.id.nav_image).setVisible(isAdmin);
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_registered_events,
-                R.id.nav_notifications, R.id.adminEventListFragment, R.id.nav_image, R.id.nav_invitations, R.id.adminBrowseProfilesFragment)
+                R.id.nav_notifications, R.id.nav_invitations)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
