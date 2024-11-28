@@ -35,6 +35,15 @@
         <action
             android:id="@+id/action_homeFragment_to_adminBrowseProfilesFragment"
             app:destination="@+id/adminBrowseProfilesFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_invitations"
+            app:destination="@id/nav_invitations" />
+        <action
+            android:id="@+id/action_nav_home_to_scan_qr_code"
+            app:destination="@id/scan_qr_code" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_facility"
+            app:destination="@id/nav_facility" />
     </fragment>
 
     <fragment
