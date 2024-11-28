@@ -39,7 +39,8 @@
                 android:layout_height="wrap_content"
                 android:text="Event Title"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                android:padding="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <TextView
                 android:id="@+id/event_date"
@@ -47,14 +48,15 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="Event Date"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                android:padding="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <!-- Description Input -->
             <TextView
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Description"
                 android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
@@ -67,16 +69,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/white_card_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp"
             android:elevation="4dp">
 
             <TextView
                 android:id="@+id/registration_period"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Registration Period: Registration Open - Registration Close"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -84,8 +85,7 @@
                 android:id="@+id/event_capacity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Event Capacity: "
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -94,8 +94,7 @@
                 android:id="@+id/waiting_list_capacity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Waiting List Capacity:"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:visibility="visible" />
@@ -105,8 +104,7 @@
                 android:id="@+id/feeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:text="Fee:"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -120,46 +118,44 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
         </LinearLayout>
 
-        <LinearLayout
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="fill_horizontal"
-            android:orientation="horizontal" >
+            android:layout_margin="10dp"
+            android:columnCount="2">
 
             <Button
                 android:id="@+id/edit_event_button"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="3dp"
-                android:background="@drawable/button_background"
-                android:text="@string/update_banner"/>
+                android:layout_columnWeight="1"
+                android:text="Update\nEvent Banner"/>
 
             <Button
                 android:id="@+id/qr_code_button"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="3dp"
-                android:background="@drawable/button_background"
-                android:text="@string/qr_code" />
+                android:layout_columnWeight="1"
+                android:text="View\nQR CODE" />
 
             <Button
                 android:id="@+id/view_entrants_button"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
                 android:layout_margin="3dp"
-                android:background="@drawable/button_background"
                 android:text="@string/manage_entrants" />
 
             <Button
                 android:id="@+id/delete_event_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Delete Event" />
+                android:layout_columnWeight="1"
+                android:layout_margin="3dp"
+                android:text="Delete\nEvent" />
 
-        </LinearLayout>
+        </GridLayout>
     </LinearLayout>
 </ScrollView>

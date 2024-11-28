@@ -25,15 +25,18 @@ No outstanding issues at the moment.
 public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.EntrantViewHolder> {
     private final ArrayList<Entrant> entrantList;
     private final Context context;
+    private OnItemClickListener listener;
+
 
     /**
      * Constructs an EntrantsAdapter with the specified context and list of entrants.
      * @param context    the context in which the adapter is used
      * @param entrantList the list of entrants to be displayed
      */
-    public EntrantsAdapter(Context context, ArrayList<Entrant> entrantList) {
+    public EntrantsAdapter(Context context, ArrayList<Entrant> entrantList, OnItemClickListener listener) {
         this.context = context;
         this.entrantList = new ArrayList<>(entrantList);
+        this.listener = listener;
     }
 
     /**
@@ -69,6 +72,13 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
         Entrant entrant = entrantList.get(position);
         holder.nameTextView.setText(entrant.getName() != null ? entrant.getName() : "N/A");
         holder.emailTextView.setText(entrant.getEmail() != null ? entrant.getEmail() : "N/A");
+
+        // Set up the click listener
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(entrant.getUniqueID());
+            }
+        });
     }
 
     /**
@@ -96,4 +106,13 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
             emailTextView = itemView.findViewById(R.id.entrant_email);
         }
     }
+
+    /**
+     * Interface to handle click entrant on the RecyclerView items.
+     */
+    public interface OnItemClickListener {
+        void onItemClick(String uniqueID);
+    }
+
+
 }

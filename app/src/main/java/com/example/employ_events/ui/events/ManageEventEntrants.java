@@ -1,5 +1,6 @@
 package com.example.employ_events.ui.events;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -19,13 +20,18 @@ import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventEntrantsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.entrants.EntrantsAdapter;
+import com.example.employ_events.ui.invitation.InvitationsAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.SetOptions;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 Authors: Tina, Aasvi, Sahara.
@@ -77,7 +83,35 @@ public class ManageEventEntrants extends Fragment {
         View root = binding.getRoot();
 
         db = FirebaseFirestore.getInstance();
+
         initializeViews();
+
+        EntrantsAdapter.OnItemClickListener listener = new EntrantsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String entrantUniqueID) {
+                Log.d("EntrantsFragment", "Entrant clicked with ID: " + entrantUniqueID);
+
+                // When an entrant is clicked on the list and remove an entrant button is clicked:
+                // Prompt the user with a confirmation if they would like to remove this entrant.
+                removeAnEntrant.setOnClickListener(v -> {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Remove Entrant")
+                            .setMessage("Are you sure you want to remove this entrant?")
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                deleteAnEntrant(entrantUniqueID);
+                                entrantsAdapter.notifyDataSetChanged();
+                            })
+                            .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                            .show();
+                });
+            }
+        };
+
+        // Initialize the adapter with an empty list for now
+        entrantsAdapter = new EntrantsAdapter(getContext(), new ArrayList<>(), listener);
+        entrantsList.setLayoutManager(new LinearLayoutManager(getContext()));
+        entrantsList.setAdapter(entrantsAdapter);
+
 
         // Retrieve eventId from arguments passed to the fragment
         if (getArguments() != null) {
@@ -96,6 +130,8 @@ public class ManageEventEntrants extends Fragment {
                         .navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
             });
         }
+
+
 
         // Hide the view entrants map button for non geolocation events.
         updateViewEntrantsMapVisibility();
@@ -148,11 +184,28 @@ public class ManageEventEntrants extends Fragment {
         tabLayout = binding.tabLayout;
         selectedRegisteredCount = binding.selectedRegisteredCount;
         removeAnEntrant = binding.removeEntrant;
+    }
 
-        // Initialize the adapter with an empty list for now
-        entrantsAdapter = new EntrantsAdapter(getContext(), new ArrayList<>());
-        entrantsList.setLayoutManager(new LinearLayoutManager(getContext()));
-        entrantsList.setAdapter(entrantsAdapter);
+    /**
+     * Cancels an individual entrant.
+     * @param entrantUniqueID The unique ID of the entrant to be removed.
+     */
+    private void deleteAnEntrant(String entrantUniqueID) {
+        db.collection("events").document(eventId).collection("entrantsList").document(entrantUniqueID).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("onCancelledList", true);
+                            data.put("onWaitingList", false);
+                            data.put("onRegisteredList", false);
+                            data.put("onAcceptedList", false);
+                            db.collection("events").document(eventId).collection("entrantsList")
+                                    .document(entrantUniqueID).set(data, SetOptions.merge());
+                        }
+                    }
+                });
     }
 
     private void updateCounts() {
