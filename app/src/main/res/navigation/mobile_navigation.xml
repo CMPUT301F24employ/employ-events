@@ -264,6 +264,16 @@
     </fragment>
 
     <fragment
+        android:id="@+id/adminBrowseFacilitiesFragment"
+        android:name="com.example.employ_events.ui.admin.AdminBrowseFacilitiesFragment"
+        android:label="Admin Browse Facilities"
+        tools:layout="@layout/fragment_admin_facility_list">
+        <action
+            android:id="@+id/action_adminBrowseFacilitiesFragment_to_nav_facility"
+            app:destination="@+id/profileFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/invitation_fragment"
         android:name="com.example.employ_events.ui.invitation.InvitationFragment"
         tools:layout="@layout/event_invitation"

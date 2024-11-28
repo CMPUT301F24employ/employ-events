@@ -53,5 +53,10 @@
             android:id="@+id/adminBrowseProfilesFragment"
             android:icon="@drawable/ic_menu_list"
             android:title="Admin Browse Profiles" />
+
+        <item
+            android:id="@+id/adminBrowseFacilitiesFragment"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Facilities" />
     </group>
 </menu>
