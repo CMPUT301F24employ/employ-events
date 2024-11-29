@@ -46,6 +46,7 @@ public class HomeFragment extends Fragment {
     private Map<String, ListenerRegistration> entrantListeners = new HashMap<>();
     private Map<String, Integer> previousEntrantCounts = new HashMap<>(); // To track previous counts
     private int totalEntrantsCount = 0, invitationCount, winCount, joinCount;
+    private boolean isTestMode = false; // Add flag to determine if we are in test mode
 
 
     /**
@@ -68,6 +69,9 @@ public class HomeFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         uniqueID = sharedPreferences.getString("uniqueID", null);
 
+        // Check if we are in test mode (could be set in the tests or via a debug flag)
+        isTestMode = (getActivity() != null && getActivity().getIntent().getBooleanExtra("isTestMode", false));
+
         startListeningForEntrantCount();
         fetchInvitationWinJoinCount();
 
@@ -75,22 +79,6 @@ public class HomeFragment extends Fragment {
         facilityButton.setVisibility(View.GONE);
         scanQrButton.setVisibility(View.GONE);
         invitationsButton.setVisibility(View.GONE);
-        // Remember to unhide the textviews that go above button in xml if fixed.
-
-        /*
-        facilityButton.setOnClickListener(v ->
-            NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.action_nav_home_to_nav_facility));
-
-        scanQrButton.setOnClickListener(v ->
-                NavHostFragment.findNavController(HomeFragment.this)
-                        .navigate(R.id.action_nav_home_to_scan_qr_code));
-
-        invitationsButton.setOnClickListener(v ->
-                NavHostFragment.findNavController(HomeFragment.this)
-                        .navigate(R.id.action_nav_home_to_nav_invitations));
-
-         */
 
         return root;
     }
@@ -113,30 +101,32 @@ public class HomeFragment extends Fragment {
      * Listens to firebase to update the total event entrants count and event count.
      */
     private void startListeningForEntrantCount() {
-        // Listen to the Facilities collection to get the facilityId for the organizerId
-        facilityListener = db.collection("facilities")
-                .whereEqualTo("organizer_id", uniqueID)
-                .addSnapshotListener((facilitySnapshot, error) -> {
-                    if (error != null) {
-                        Log.e("FirestoreError", "Error fetching facility data: ", error);
-                        return;
-                    }
+        // Only start listening if not in test mode
+        if (!isTestMode) {
+            // Listen to the Facilities collection to get the facilityId for the organizerId
+            facilityListener = db.collection("facilities")
+                    .whereEqualTo("organizer_id", uniqueID)
+                    .addSnapshotListener((facilitySnapshot, error) -> {
+                        if (error != null) {
+                            Log.e("FirestoreError", "Error fetching facility data: ", error);
+                            return;
+                        }
 
-                    if (facilitySnapshot != null && !facilitySnapshot.isEmpty()) {
-                        // Get the facilityId
-                        String facilityId = facilitySnapshot.getDocuments().get(0).getId();
+                        if (facilitySnapshot != null && !facilitySnapshot.isEmpty()) {
+                            // Get the facilityId
+                            String facilityId = facilitySnapshot.getDocuments().get(0).getId();
 
-                        // Listen to the Events collection using the facilityId
-                        listenForEvents(facilityId);
-                    }
-                });
+                            // Listen to the Events collection using the facilityId
+                            listenForEvents(facilityId);
+                        }
+                    });
+        }
     }
 
     /**
      * Listens to firebase to update the total event count.
      * @param facilityId The facilityID associated with the organizer.
      */
-    // Listen to the Events collection in real-time
     private void listenForEvents(String facilityId) {
         // Listen to the Events collection with the facilityId
         eventCountListener = db.collection("events")
@@ -209,59 +199,62 @@ public class HomeFragment extends Fragment {
      * - Lottery Wins
      */
     private void fetchInvitationWinJoinCount() {
-        db.collection("events")
-                .addSnapshotListener((querySnapshot, error) -> {
-                    if (error != null) {
-                        Log.e("FirestoreError", "Error listening to events collection: ", error);
-                        return;
-                    }
-
-                    if (querySnapshot != null) {
-                        // Initialize count to 0 for each snapshot
-                        invitationCount = 0;
-                        winCount = 0;
-                        joinCount = 0;
-                        for (QueryDocumentSnapshot document : querySnapshot) {
-                            String eventId = document.getId();
-
-                            // Listener for each user's document in the entrantsList subcollection
-                            db.collection("events")
-                                    .document(eventId)
-                                    .collection("entrantsList")
-                                    .document(uniqueID)
-                                    .addSnapshotListener((entrantSnapshot, entrantError) -> {
-                                        if (entrantError != null) {
-                                            Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
-                                            return;
-                                        }
-
-                                        if (entrantSnapshot != null && entrantSnapshot.exists()) {
-                                            Boolean onAcceptedList = entrantSnapshot.getBoolean("onAcceptedList");
-                                            Boolean onRegisteredList = entrantSnapshot.getBoolean("onRegisteredList");
-                                            if (onAcceptedList != null && onAcceptedList) {
-                                                invitationCount++;
-                                                winCount++;
-                                            }
-                                            else if (onRegisteredList != null && onRegisteredList) {
-                                                winCount++;
-                                            }
-                                            joinCount++;
-                                        }
-
-                                        // Update the textviews.
-                                        String invC = "Pending Invitations: " + invitationCount;
-                                        invitationsCount.setText(invC);
-
-                                        String winC = "Total Event Lottery Wins: " + winCount;
-                                        selectedCount.setText(winC);
-
-                                        String joinC = "Total Events Joined: " + joinCount;
-                                        anEntrantCount.setText(joinC);
-
-                                    });
+        // Only start listening if not in test mode
+        if (!isTestMode) {
+            db.collection("events")
+                    .addSnapshotListener((querySnapshot, error) -> {
+                        if (error != null) {
+                            Log.e("FirestoreError", "Error listening to events collection: ", error);
+                            return;
                         }
-                    }
-                });
+
+                        if (querySnapshot != null) {
+                            // Initialize count to 0 for each snapshot
+                            invitationCount = 0;
+                            winCount = 0;
+                            joinCount = 0;
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                String eventId = document.getId();
+
+                                // Listener for each user's document in the entrantsList subcollection
+                                db.collection("events")
+                                        .document(eventId)
+                                        .collection("entrantsList")
+                                        .document(uniqueID)
+                                        .addSnapshotListener((entrantSnapshot, entrantError) -> {
+                                            if (entrantError != null) {
+                                                Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
+                                                return;
+                                            }
+
+                                            if (entrantSnapshot != null && entrantSnapshot.exists()) {
+                                                Boolean onAcceptedList = entrantSnapshot.getBoolean("onAcceptedList");
+                                                Boolean onRegisteredList = entrantSnapshot.getBoolean("onRegisteredList");
+                                                if (onAcceptedList != null && onAcceptedList) {
+                                                    invitationCount++;
+                                                    winCount++;
+                                                }
+                                                else if (onRegisteredList != null && onRegisteredList) {
+                                                    winCount++;
+                                                }
+                                                joinCount++;
+                                            }
+
+                                            // Update the textviews.
+                                            String invC = "Pending Invitations: " + invitationCount;
+                                            invitationsCount.setText(invC);
+
+                                            String winC = "Total Event Lottery Wins: " + winCount;
+                                            selectedCount.setText(winC);
+
+                                            String joinC = "Total Events Joined: " + joinCount;
+                                            anEntrantCount.setText(joinC);
+
+                                        });
+                            }
+                        }
+                    });
+        }
     }
 
     /**
