@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
         <item
@@ -12,12 +10,12 @@
         <item
             android:id="@+id/scan_qr_code"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Scan QR Code" />
+            android:title="@string/menu_scan_qr_code" />
 
         <item
             android:id="@+id/nav_registered_events"
             android:icon="@drawable/baseline_event_24"
-            android:title="Registered Events" />
+            android:title="@string/menu_registered_events" />
 
         <item
             android:id="@+id/nav_facility"
@@ -27,12 +25,12 @@
         <item
             android:id="@+id/nav_invitations"
             android:icon="@drawable/baseline_email_24"
-            android:title="Invitations" />
+            android:title="@string/menu_invitations" />
 
         <item
-            android:id="@+id/nav_notifications"
+            android:id="@+id/entrantNotifications"
             android:icon="@drawable/white_notification"
-            android:title="Notifications" />
+            android:title="@string/menu_notifications" />
 
         <item
             android:id="@+id/nav_profile"
@@ -41,22 +39,22 @@
         <item
             android:id="@+id/nav_image"
             android:icon="@drawable/ic_menu_list"
-            android:title="Admin Browse Images" />
+            android:title="@string/menu_admin_browse_images" />
 
         <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
         <item
             android:id="@+id/adminEventListFragment"
             android:icon="@drawable/ic_menu_list"
-            android:title="Admin Browse Events" />
+            android:title="@string/menu_admin_browse_events" />
 
         <item
             android:id="@+id/adminBrowseProfilesFragment"
             android:icon="@drawable/ic_menu_list"
-            android:title="Admin Browse Profiles" />
+            android:title="@string/menu_admin_browse_profiles" />
 
         <item
             android:id="@+id/adminBrowseFacilitiesFragment"
             android:icon="@drawable/ic_menu_list"
-            android:title="Admin Browse Facilities" />
+            android:title="@string/menu_admin_browse_facilities" />
     </group>
 </menu>
