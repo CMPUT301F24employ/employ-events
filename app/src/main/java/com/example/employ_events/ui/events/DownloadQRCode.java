@@ -39,6 +39,7 @@ QR code so they may distribute it.
  */
 
 /**
+ * @author Connor, Tina
  * Fragment to download and display a QR code image from a Firebase Firestore URL.
  */
 public class DownloadQRCode extends Fragment {

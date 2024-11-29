@@ -4,11 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.EditEventBinding;
 import com.google.firebase.firestore.DocumentReference;
@@ -32,8 +30,6 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -48,6 +44,7 @@ US 2.04.02	As an organizer I want to update an event poster to provide visual in
  */
 
 /**
+ * @author Tina
  * A Fragment for editing event details -uploading and displaying a banner image.
  * This fragment allows users to select an image from their device, upload it to Firebase Storage,
  * and save the image URI to Firestore.
@@ -238,19 +235,17 @@ public class EditEventFragment extends Fragment {
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
-     * @param url The URL of the image to be loaded.
+     * @author Tina
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
      */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-                requireActivity().runOnUiThread(() -> bannerImageView.setImageBitmap(bitmap));
-            } catch (IOException e) {
-                Log.e("EditProfileFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(bannerImageView);
+        }
     }
 
     @Override

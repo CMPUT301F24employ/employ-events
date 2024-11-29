@@ -37,6 +37,7 @@ on click of Admin Remove, remove the image from the list and firebase.
  */
 
 /**
+ * @author Aaron
  * AdminImageLstFragment displays a list of image for all image.
  * It fetches images from Firestore in the storage and allows
  * the admin to view events or remove selected image.
