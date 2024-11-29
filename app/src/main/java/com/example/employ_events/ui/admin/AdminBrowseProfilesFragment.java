@@ -65,8 +65,6 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
      */
     private void loadProfiles() {
         db.collection("userProfiles")
-                // This prevents admins from deleting other admin profiles
-                .whereEqualTo("admin", false)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

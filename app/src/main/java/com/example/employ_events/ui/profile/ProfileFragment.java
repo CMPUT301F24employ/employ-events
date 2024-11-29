@@ -180,102 +180,117 @@ public class ProfileFragment extends Fragment{
     }
 
     private void deleteProfileAndFacility(String uniqueID, FirebaseFirestore db) {
-        WriteBatch batch = db.batch();
         DocumentReference profileRef = db.collection("userProfiles").document(uniqueID);
+        profileRef.get().addOnCompleteListener(profileTask -> {
+            if (profileTask.isSuccessful() && profileTask.getResult() != null) {
+                DocumentSnapshot profileDoc = profileTask.getResult();
 
-        // Fetching facilities associated with the user profile
-        db.collection("facilities")
-                .whereEqualTo("organizer_id", uniqueID)
-                .get()
-                .addOnCompleteListener(facilityTask -> {
-                    if (facilityTask.isSuccessful() && facilityTask.getResult() != null) {
+                // Check if the profile has the "admin" field set to true
+                // If yes, then the profile cannot be deleted, otherwise everything proceeds as normal
+                isAdmin = profileDoc.getBoolean("admin");
+                if (Boolean.TRUE.equals(isAdmin)) {
+                    Toast.makeText(getContext(), "Sorry, you cannot delete admin profiles.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
 
-                        // Check if the user has an associated facility
-                        if (!facilityTask.getResult().isEmpty()) {
-                            DocumentSnapshot facilityDoc = facilityTask.getResult().getDocuments().get(0);
-                            // Delete the facility
-                            batch.delete(facilityDoc.getReference());
+            WriteBatch batch = db.batch();
 
-                            // Fetching events whose facilityID match the facility's ID
-                            db.collection("events")
-                                    .whereEqualTo("facilityID", facilityDoc.getId())
-                                    .get()
-                                    .addOnCompleteListener(eventTask -> {
-                                        if (eventTask.isSuccessful() && eventTask.getResult() != null) {
-                                            // Delete all events and QR codes associated with the facility
-                                            for (DocumentSnapshot eventDoc : eventTask.getResult().getDocuments()) {
-                                                batch.delete(eventDoc.getReference());
-                                                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("QRCodes/" + eventDoc.getId() + ".png");
-                                                storageReference.delete();
+            // Fetching facilities associated with the user profile
+            db.collection("facilities")
+                    .whereEqualTo("organizer_id", uniqueID)
+                    .get()
+                    .addOnCompleteListener(facilityTask -> {
+                        if (facilityTask.isSuccessful() && facilityTask.getResult() != null) {
+
+                            // Check if the user has an associated facility
+                            if (!facilityTask.getResult().isEmpty()) {
+                                DocumentSnapshot facilityDoc = facilityTask.getResult().getDocuments().get(0);
+                                // Delete the facility
+                                batch.delete(facilityDoc.getReference());
+
+                                // Fetching events whose facilityID match the facility's ID
+                                db.collection("events")
+                                        .whereEqualTo("facilityID", facilityDoc.getId())
+                                        .get()
+                                        .addOnCompleteListener(eventTask -> {
+                                            if (eventTask.isSuccessful() && eventTask.getResult() != null) {
+                                                // Delete all events and QR codes associated with the facility
+                                                for (DocumentSnapshot eventDoc : eventTask.getResult().getDocuments()) {
+                                                    batch.delete(eventDoc.getReference());
+                                                    StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("QRCodes/" + eventDoc.getId() + ".png");
+                                                    storageReference.delete();
+                                                }
                                             }
-                                        }
 
-                                        // Removing a user from the entrantsList in all events they have joined
-                                        db.collection("events")
-                                                .get()  // Fetch all events in the system
-                                                .addOnCompleteListener(allEventsTask -> {
-                                                    if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
-                                                        // Iterate through all events to find the ones where the user is an entrant
-                                                        for (DocumentSnapshot eventDoc : allEventsTask.getResult().getDocuments()) {
-                                                            db.collection("events")
-                                                                    .document(eventDoc.getId())
-                                                                    .collection("entrantsList")
-                                                                    .document(uniqueID)
-                                                                    .delete();
-                                                                    }
-                                                        }
+                                            // Removing a user from the entrantsList in all events they have joined
+                                            db.collection("events")
+                                                    .get()  // Fetch all events in the system
+                                                    .addOnCompleteListener(allEventsTask -> {
+                                                        if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
+                                                            // Iterate through all events to find the ones where the user is an entrant
+                                                            for (DocumentSnapshot eventDoc : allEventsTask.getResult().getDocuments()) {
+                                                                db.collection("events")
+                                                                        .document(eventDoc.getId())
+                                                                        .collection("entrantsList")
+                                                                        .document(uniqueID)
+                                                                        .delete();
+                                                                        }
+                                                            }
+                                                        });
+
+                                            // Delete the user profile
+                                            batch.delete(profileRef);
+                                            batch.commit()
+                                                    .addOnSuccessListener(unused -> {
+                                                        Toast.makeText(getContext(), "Profile and associated facility have been successfully deleted!", Toast.LENGTH_SHORT).show();
+                                                        NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Toast.makeText(getContext(), "Error deleting profile and associated facility.", Toast.LENGTH_SHORT).show();
                                                     });
+                                        });
+                            }
 
-                                        // Delete the user profile
-                                        batch.delete(profileRef);
-                                        batch.commit()
-                                                .addOnSuccessListener(unused -> {
-                                                    Toast.makeText(getContext(), "Profile and associated facility have been successfully deleted!", Toast.LENGTH_SHORT).show();
-                                                    NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Toast.makeText(getContext(), "Error deleting profile and associated facility.", Toast.LENGTH_SHORT).show();
-                                                });
-                                    });
-                        }
-
-                        else {
-                            // Removing a user from the entrantsList in all events they have joined
-                            db.collection("events")
-                                    .get()
-                                    .addOnCompleteListener(allEventsTask -> {
-                                        if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
-                                            // Iterate through all events to find the ones where the user is an entrant
-                                            for (DocumentSnapshot eventDoc : allEventsTask.getResult().getDocuments()) {
-                                                db.collection("events")
-                                                        .document(eventDoc.getId())
-                                                        .collection("entrantsList")
-                                                        .document(uniqueID)
-                                                        .delete();
+                            else {
+                                // Removing a user from the entrantsList in all events they have joined
+                                db.collection("events")
+                                        .get()
+                                        .addOnCompleteListener(allEventsTask -> {
+                                            if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
+                                                // Iterate through all events to find the ones where the user is an entrant
+                                                for (DocumentSnapshot eventDoc : allEventsTask.getResult().getDocuments()) {
+                                                    db.collection("events")
+                                                            .document(eventDoc.getId())
+                                                            .collection("entrantsList")
+                                                            .document(uniqueID)
+                                                            .delete();
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
 
-                            // If no associated facility is found, only profile is deleted
-                            batch.delete(profileRef);
-                            batch.commit()
-                                    .addOnSuccessListener(unused -> {
-                                        Toast.makeText(getContext(), "No associated facility found. Profile deleted successfully!", Toast.LENGTH_SHORT).show();
-                                        NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(getContext(), "Error deleting profile.", Toast.LENGTH_SHORT).show();
-                                    });
+                                // If no associated facility is found, only profile is deleted
+                                batch.delete(profileRef);
+                                batch.commit()
+                                        .addOnSuccessListener(unused -> {
+                                            Toast.makeText(getContext(), "No associated facility found. Profile deleted successfully!", Toast.LENGTH_SHORT).show();
+                                            NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(getContext(), "Error deleting profile.", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
                         }
-                    }
-                    else {
-                        Toast.makeText(getContext(), "Error fetching associated facilities.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show();
-                });
-    }
+                        else {
+                            Toast.makeText(getContext(), "Error fetching associated facilities.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show();
+                    });
+        });
+        }
+
 
     @Override
     public void onDestroyView() {
