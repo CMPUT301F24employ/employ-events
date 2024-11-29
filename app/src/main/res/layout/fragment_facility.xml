@@ -10,10 +10,7 @@
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,10 +32,9 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="380dp"
+                        android:layout_height="360dp"
                         android:background="@drawable/top_background"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -46,20 +42,20 @@
 
                     <ImageView
                         android:id="@+id/facilityPFP"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="20dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_marginTop="50dp"
+                        android:scaleType="centerCrop"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:scaleType="centerCrop"
                         app:srcCompat="@drawable/white_person" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="80dp"
                         android:layout_marginEnd="20dp"
                         android:background="@drawable/white_background"
                         android:orientation="vertical"
@@ -67,19 +63,21 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/facilityPFP">
 
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="15dp"
                             android:orientation="horizontal">
 
+
                             <TextView
                                 android:id="@+id/facilityName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Facility Name"
+                                android:text="Name"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                                android:textSize="14sp" />
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/facilityNameTV"
@@ -92,11 +90,11 @@
                         </LinearLayout>
 
                         <View
-                            android:id="@+id/view"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
+                            android:layout_margin="10dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_blue" />
+                            android:background="#A8B6FF" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -108,9 +106,9 @@
                                 android:id="@+id/facilityEmail"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Facility Email"
+                                android:text="Email"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                                android:textSize="14sp" />
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/facilityEmailTV"
@@ -123,11 +121,11 @@
                         </LinearLayout>
 
                         <View
-                            android:id="@+id/view2"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
+                            android:layout_margin="10dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_blue" />
+                            android:background="#A8B6FF" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -139,9 +137,9 @@
                                 android:id="@+id/facilityAddress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Facility Address"
+                                android:text="Address"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                                android:textSize="14sp" />
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/facilityAddressTV"
@@ -154,11 +152,12 @@
                         </LinearLayout>
 
                         <View
-                            android:id="@+id/view3"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/view2"
+                            android:layout_width="match_parent"
                             android:layout_height="1dp"
+                            android:layout_margin="10dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_blue" />
+                            android:background="#A8B6FF" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -170,9 +169,9 @@
                                 android:id="@+id/facilityPhone"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Facility Phone Number"
+                                android:text="Phone Number"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                                android:textSize="14sp" />
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/facilityPhoneTV"
@@ -185,14 +184,11 @@
                         </LinearLayout>
 
                         <View
-                            android:id="@+id/view4"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginBottom="10dp"
+                            android:layout_margin="10dp"
                             android:layout_weight="1"
-                            android:background="@color/primary_blue" />
+                            android:background="#A8B6FF" />
 
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
