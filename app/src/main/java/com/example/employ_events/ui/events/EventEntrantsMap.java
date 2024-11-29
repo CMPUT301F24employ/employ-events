@@ -30,32 +30,19 @@ https://github.com/osmdroid/osmdroid
  */
 
 /**
+ * @author Tina
  * A fragment that displays a map with markers showing the join locations of entrants for the event.
  * The map is centered based on the average location of all the entrants, and each entrant's location is marked with a pin.
  */
 public class EventEntrantsMap extends Fragment {
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String eventID;
     private float totalLongitude, totalLatitude;
     private int count = 0;
 
-    // Empty constructor required for Fragment
+    // Empty constructor
     public EventEntrantsMap() {}
-
-    /**
-     * Factory method to create a new instance of this fragment.
-     *
-     * @param eventID The unique identifier for the event whose entrants are to be displayed.
-     * @return A new instance of EventEntrantsMap fragment.
-     */
-    public static EventEntrantsMap newInstance(String eventID) {
-        EventEntrantsMap fragment = new EventEntrantsMap();
-        Bundle args = new Bundle();
-        args.putString("EVENT_ID", eventID);  // Pass the eventID as an argument
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     /**
      * Initializes the eventID from the arguments and configures OSMDroid.
@@ -82,7 +69,6 @@ public class EventEntrantsMap extends Fragment {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setTilesScaledToDpi(true);
         mapView.setUseDataConnection(true);
-        mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
 
         IMapController mapController = mapView.getController();
