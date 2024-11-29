@@ -1,5 +1,6 @@
 package com.example.employ_events.ui.notifications;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,44 +9,42 @@ import android.content.Intent;
 import androidx.core.app.NotificationCompat;
 
 import com.example.employ_events.R;
+import com.example.employ_events.ui.invitation.InvitationsListFragment;
+import android.Manifest;
+import android.content.pm.PackageManager;
+
+import androidx.core.content.ContextCompat;
 
 /**
- * Represents a notification related to an event
+ * @author Sahara, Tina, Aasvi
+ * Represents a notification for event-related actions, such as invitations, cancellations, or waitlist updates.
+ * Provides functionality for creating and sending notifications to users.
  */
 public class Notification {
     private String eventID;
     private String message;
     private boolean invitation, cancellation, waitingList, read;
-    NotificationCompat.Builder builder;
+    private NotificationCompat.Builder builder;
     private String CHANNEL_ID = "Organizer Notification";
     private Integer NOTIFICATION_ID = 0;
-    NotificationManager notificationManager;
-    Intent intent;
+    private NotificationManager notificationManager;
+    private Intent intent;
 
     /**
-     * Default constructor for Notification
-     */
-    public Notification() {
-
-    }
-
-    /**
-     * Constructs a Notification with specified event ID, message, and invitation status.
+     * Constructs a Notification object with the specified event ID, message, and read status.
      *
-     * @param eventID     the ID of the event associated with this notification
-     * @param message,  the message of the notification
-     * @param read   true if this notification has been read, false otherwise
+     * @param eventID the unique identifier of the event associated with the notification
+     * @param message the message content of the notification
+     * @param read    indicates whether the notification has been read
      */
     public Notification(String eventID, String message, boolean read) {
         this.eventID = eventID;
         this.message = message;
         this.read = read;
-
     }
 
     /**
-     * Gets the event ID associated with this notification.
-     *
+     * Gets the event ID associated with the notification.
      * @return the event ID
      */
     public String getEventID() {
@@ -53,8 +52,7 @@ public class Notification {
     }
 
     /**
-     * Sets the event ID for this notification.
-     *
+     * Sets the event ID associated with the notification.
      * @param eventID the event ID to set
      */
     public void setEventID(String eventID) {
@@ -62,8 +60,7 @@ public class Notification {
     }
 
     /**
-     * Gets the message of this notification.
-     *
+     * Gets the message content of the notification.
      * @return the notification message
      */
     public String getMessage() {
@@ -71,8 +68,7 @@ public class Notification {
     }
 
     /**
-     * Sets the message of this notification.
-     *
+     * Sets the message content of the notification.
      * @param message the message to set
      */
     public void setMessage(String message) {
@@ -80,45 +76,73 @@ public class Notification {
     }
 
     /**
-     * Checks if this notification is an invitation.
-     *
-     * @return true if this is an invitation, false otherwise
+     * Checks whether the notification is an invitation.
+     * @return true if it's an invitation, false otherwise
      */
     public boolean isInvitation() {
         return invitation;
     }
 
     /**
-     * Sets the invitation status of this notification.
-     *
-     * @param invitation true if this is an invitation, false otherwise
+     * Sets whether the notification is an invitation.
+     * @param invitation true if it's an invitation, false otherwise
      */
     public void setInvitation(boolean invitation) {
         this.invitation = invitation;
     }
-    public void sendNotification(Context context){
-        intent = new Intent(context, Notification.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.white_notification)
-                .setContentTitle("Employ Events Notification")
-                .setContentText(this.message)
-                // Set the intent that fires when the user taps the notification.
-                .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        notificationManager = context.getSystemService(NotificationManager.class);
-        // TODO: 2024-11-23 check notification permissions before executing
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
 
-
-    }
-
+    /**
+     * Checks whether the notification has been read.
+     * @return true if the notification has been read, false otherwise
+     */
     public boolean isRead() {
         return read;
     }
 
+    /**
+     * Sets the read status of the notification.
+     * @param read true if the notification has been read, false otherwise
+     */
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    /**
+     * Sends a notification to the user.
+     * This method creates the notification and posts it to the system's notification manager.
+     *
+     * @param context the application context
+     */
+    public void sendNotification(Context context) {
+        // Ensure the context is valid
+        if (context == null) {
+            return;
+        }
+
+        intent = new Intent(context, InvitationsListFragment.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // Create a pending intent for the notification
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Build the notification
+        builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.white_notification)
+                .setContentTitle("Employ Events Notification")
+                .setContentText(this.message)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true); // Ensures the notification gets cleared when tapped
+
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Check if the app has permission to post notifications
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            if (notificationManager != null) {
+                notificationManager.notify(NOTIFICATION_ID, builder.build());
+            }
+        } else {
+            System.out.println("Notification permission not granted.");
+        }
     }
 }

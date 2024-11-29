@@ -1,8 +1,16 @@
 package com.example.employ_events.ui.notifications;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -15,16 +23,18 @@ import android.widget.Toast;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentSendNotificationScreenBinding;
 import com.example.employ_events.ui.events.Event;
+import com.example.employ_events.ui.invitation.InvitationsListFragment;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
- * A Fragment for sending notifications, which retrieves an event ID (if available)
- * from the arguments to display relevant notification details.
+ * A Fragment for sending notifications. It retrieves the event ID (if available) from the
+ * arguments to display relevant notification details for the entrants of the event.
  */
 public class SendNotificationScreen extends Fragment {
 
@@ -34,11 +44,8 @@ public class SendNotificationScreen extends Fragment {
 
     /**
      * Inflates the fragment's view and retrieves the event ID from the arguments if available.
-     *
-     * @param inflater           LayoutInflater to inflate views in the fragment
-     * @param container          ViewGroup containing the fragment's UI
-     * @param savedInstanceState Bundle with saved instance data
-     * @return the root view of the fragment
+     * Sets up an OnClickListener for the "Send Invitation" button to send notifications
+     * to entrants of the specified event.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,13 +55,14 @@ public class SendNotificationScreen extends Fragment {
 
         sendInvitationButton = binding.sendInvitationButton;
 
+        // Check if the event ID was passed as an argument to the fragment
         if (getArguments() != null) {
             String eventId = getArguments().getString("EVENT_ID");
             if (eventId != null) {
 
-                // use the event ID here
+                // Set an OnClickListener for the "Send Invitation" button
                 sendInvitationButton.setOnClickListener(view -> {
-//                    Event event
+                    // Fetch the list of entrants for the event from Firestore
                     db.collection("events").document(eventId).collection("entrantsList").get()
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
@@ -66,7 +74,6 @@ public class SendNotificationScreen extends Fragment {
                                             Notification notification = new Notification(eventId, "You suck", false);
                                             notification.sendNotification(this.getContext());
                                             addNotification(entrantId, notification);
-
                                         }
                                     } else {
                                         System.out.println("No entrants found in the subcollection.");
@@ -75,18 +82,19 @@ public class SendNotificationScreen extends Fragment {
                                     System.err.println("Error fetching entrants: " + task.getException());
                                 }
                             });
-
-
-
                 });
-
-
             }
         }
 
         return root;
     }
 
+    /**
+     * Adds a notification to the user's profile in Firestore.
+     *
+     * @param userID     The ID of the user to add the notification to
+     * @param notification The Notification object containing the message to be saved
+     */
     private void addNotification(String userID, Notification notification) {
         db.collection("userProfiles")
                 .document(userID)
@@ -98,7 +106,7 @@ public class SendNotificationScreen extends Fragment {
                         System.out.println("Document successfully written!")
                 )
                 .addOnFailureListener(e ->
-                        System.err.println("Error writing document: ")
+                        System.err.println("Error writing document: " + e.getMessage())
                 );
     }
 }
