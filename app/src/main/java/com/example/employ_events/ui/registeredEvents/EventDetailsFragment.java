@@ -1,9 +1,15 @@
 package com.example.employ_events.ui.registeredEvents;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,6 +95,7 @@ public class EventDetailsFragment extends Fragment{
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private ActivityResultLauncher<String> requestNotificationPermissionLauncher;
 
     /**
      * @author Tina, Jasleen
@@ -116,6 +123,18 @@ public class EventDetailsFragment extends Fragment{
              }
          }
 
+         requestNotificationPermissionLauncher = registerForActivityResult(
+                 new ActivityResultContracts.RequestPermission(),
+                 isGranted -> {
+                     if (isGranted) {
+                         Toast.makeText(requireContext(), "Notification enabled!", Toast.LENGTH_SHORT).show();
+                     } else {
+                         Toast.makeText(requireContext(), "Notifications permission denied.", Toast.LENGTH_SHORT).show();
+                     }
+                 }
+         );
+         checkAndRequestNotificationPermission();
+
          requestPermissionLauncher = registerForActivityResult(
                  new ActivityResultContracts.RequestPermission(),
                  isGranted -> {
@@ -138,6 +157,19 @@ public class EventDetailsFragment extends Fragment{
 
 
         return root;
+    }
+
+    /**
+     * @author Aasvi
+     * Checks if notification permission is granted and requests if necessary
+     */
+    private void checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     /**
