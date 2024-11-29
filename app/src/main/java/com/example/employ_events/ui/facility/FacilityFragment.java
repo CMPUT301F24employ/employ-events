@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,8 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     private ImageView facilityPFP;
     private FacilityViewModel facilityViewModel;
     private String uniqueID;
+    private Button deleteFacilityButton;
+    private boolean isAdmin = false;
 
     /**
      * Called when a new facility is created. This method handles the addition of the facility to
@@ -98,15 +101,23 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         binding = FragmentFacilityBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Retrieve uniqueID from SharedPreferences for Firestore lookup
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        uniqueID = sharedPreferences.getString("uniqueID", null);
-
         // Initialize Firestore database instance
         db = FirebaseFirestore.getInstance();
 
-        // Prompt user to create facility if they are not yet an organizer.
-        setupUserProfile(uniqueID);
+        if (getArguments() != null) { // Coming from admin browse.
+            uniqueID = getArguments().getString("organizer_id");
+            isAdmin = getArguments().getBoolean("IS_ADMIN");
+        }
+        else { // Regular user.
+            // Retrieve uniqueID from SharedPreferences for Firestore lookup
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            uniqueID = sharedPreferences.getString("uniqueID", null);
+
+            isAdmin = false;
+
+            // Prompt user to create facility if they are not yet an organizer.
+            setupUserProfile(uniqueID);
+        }
 
         // Initialize the UI components for the fragment
         initializeViews();
@@ -234,6 +245,15 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         phone_number = binding.facilityPhoneTV;
         address = binding.facilityAddressTV;
         facilityPFP = binding.facilityPFP;
+        deleteFacilityButton = binding.deleteFacilityButton;
+
+        // Hiding edit button if the user is an admin and only showing delete facility button
+        if (isAdmin) {
+            binding.viewEventButton.setVisibility(View.GONE);
+            binding.editFacilityButton.setVisibility(View.GONE);
+        } else {
+            deleteFacilityButton.setVisibility(View.GONE);
+        }
     }
 
     /**

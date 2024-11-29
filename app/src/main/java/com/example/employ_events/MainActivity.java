@@ -1,9 +1,13 @@
 package com.example.employ_events;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +17,8 @@ import com.example.employ_events.ui.notifications.Notification;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -39,6 +45,8 @@ public class MainActivity extends AppCompatActivity
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseFirestore db;
+    private boolean isAdmin;
+    private String uniqueID;
 
 
     @Override
@@ -49,27 +57,15 @@ public class MainActivity extends AppCompatActivity
         com.example.employ_events.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         createNotificationChannel();
+        requestNotificationPermission();
         setSupportActionBar(binding.appBarMain.toolbar);
         monitorNotifications();
         //Create notification channel
 
-        DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_registered_events,
-                R.id.nav_notifications, R.id.adminEventListFragment, R.id.nav_image, R.id.nav_invitations)
-                .setOpenableLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
         db = FirebaseFirestore.getInstance();
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
 
         if (sharedPreferences.contains("uniqueID")) {
             // Retrieve the existing UUID
@@ -82,14 +78,13 @@ public class MainActivity extends AppCompatActivity
             editor.apply();  // Commit changes asynchronously
         }
 
-
         // Create an empty profile using their Unique ID (will not need to sign in).
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document != null && !document.exists()) {
-                    db.collection("userProfiles").document(uniqueID).set(new Profile(uniqueID));
+                if (!document.exists()) {
+                    docRef.set(new Profile(uniqueID));
                 }
             } else {
                 // Handle the error, e.g., log it
@@ -97,6 +92,30 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+
+        // Show admin menu buttons for admins and hide for non admins.
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
+            menu.findItem(R.id.nav_image).setVisible(isAdmin);
+            menu.findItem(R.id.adminBrowseProfilesFragment).setVisible(isAdmin);
+            menu.findItem(R.id.adminBrowseFacilitiesFragment).setVisible(isAdmin);
+        }).addOnFailureListener(e -> Log.e("MainActivity", "Error fetching admin status: ", e));
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.scan_qr_code, R.id.nav_facility, R.id.nav_profile, R.id.nav_registered_events,
+                R.id.nav_notifications, R.id.nav_invitations)
+                .setOpenableLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
     }
 
@@ -128,6 +147,17 @@ public class MainActivity extends AppCompatActivity
             // or other notification behaviors after this.
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        1);
+            }
         }
     }
 

@@ -6,20 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
-import com.example.employ_events.databinding.FragmentHomeBinding;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -37,8 +35,6 @@ US 01.06.01	As an entrant I want to view event details within the app by scannin
  */
 public class ScanQrCodeFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
-    private CollectionReference eventsRef;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
@@ -84,15 +80,13 @@ public class ScanQrCodeFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ScanQrCodeViewModel scanQrCodeViewModelViewModel =
-                new ViewModelProvider(this).get(ScanQrCodeViewModel.class);
-
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
 
         scanInfo();
 
-        return root;
+        return layout;
+
     }
 
     /*
@@ -155,6 +149,5 @@ public class ScanQrCodeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }

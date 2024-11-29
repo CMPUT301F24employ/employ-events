@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/baseline_home_24"
             android:title="@string/menu_home" />
 
         <item
@@ -40,18 +40,23 @@
             android:title="@string/menu_profile" />
         <item
             android:id="@+id/nav_image"
-            android:icon="@drawable/baseline_person_24"
-            android:title="Image List" />
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Images" />
 
         <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
         <item
             android:id="@+id/adminEventListFragment"
-            android:icon="@drawable/baseline_person_24"
-            android:title="Admin Actions" />
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Events" />
 
         <item
             android:id="@+id/adminBrowseProfilesFragment"
             android:icon="@drawable/ic_menu_list"
             android:title="Admin Browse Profiles" />
+
+        <item
+            android:id="@+id/adminBrowseFacilitiesFragment"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Admin Browse Facilities" />
     </group>
 </menu>

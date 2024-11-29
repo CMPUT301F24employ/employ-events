@@ -73,6 +73,7 @@ US 02.02.03 As an organizer I want to enable or disable the geolocation requirem
  */
 
 /**
+ * @author Sahara, Tina
  * AddEventFragment is a Fragment that allows organizers to create a new event
  * by providing details such as title, description, dates, time, fee, capacity, and location.
  */

@@ -26,6 +26,7 @@ to accept / decline if deleted notification.
  */
 
 /**
+ * @author Tina
  * Fragment to display a list of invitations the user has accepted.
  * It fetches event data from Firestore, filters the invitations based on the user's status,
  * and binds the filtered list to a RecyclerView using an adapter.
@@ -88,25 +89,42 @@ public class InvitationsListFragment extends Fragment {
      */
     private void fetchSelectedInvitations() {
         db = FirebaseFirestore.getInstance();
-        db.collection("events")  // Assuming events collection
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+        db.collection("events")
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("FirestoreError", "Error listening to events collection: ", error);
+                        return;
+                    }
+
+                    if (querySnapshot != null) {
+                        invitationsList.clear();  // Clear the list to prevent duplicate entries
+                        for (QueryDocumentSnapshot document : querySnapshot) {
                             String eventId = document.getId();
-                            // Check if the current user is an entrant with the selected field set to true
+                            String eventName = document.getString("eventTitle");
+
+                            // Set up a listener for each user's document in the entrantsList subcollection
                             db.collection("events")
                                     .document(eventId)
                                     .collection("entrantsList")
-                                    .document(uniqueID) // User document ID is the uniqueID
-                                    .get()
-                                    .addOnCompleteListener(entrantTask -> {
-                                        if (entrantTask.isSuccessful() && entrantTask.getResult().exists()) {
-                                            Boolean onAcceptedList = entrantTask.getResult().getBoolean("onAcceptedList");
+                                    .document(uniqueID)
+                                    .addSnapshotListener((entrantSnapshot, entrantError) -> {
+                                        if (entrantError != null) {
+                                            Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
+                                            return;
+                                        }
+
+                                        if (entrantSnapshot != null && entrantSnapshot.exists()) {
+                                            Boolean onAcceptedList = entrantSnapshot.getBoolean("onAcceptedList");
                                             if (onAcceptedList != null && onAcceptedList) {
-                                                // If the current user is an entrant with selected=true, fetch event name and add to list
-                                                String eventName = document.getString("eventTitle");
-                                                invitationsList.add(new EventItem(eventId, eventName));
+                                                // Add to list only if not already present
+                                                EventItem eventItem = new EventItem(eventId, eventName);
+                                                if (!invitationsList.contains(eventItem)) {
+                                                    invitationsList.add(eventItem);
+                                                    adapter.notifyDataSetChanged();  // Update the adapter
+                                                }
+                                            } else {
+                                                // Remove if no longer on accepted list
+                                                invitationsList.removeIf(event -> event.getEventId().equals(eventId));
                                                 adapter.notifyDataSetChanged();  // Update the adapter
                                             }
                                         }
@@ -115,4 +133,5 @@ public class InvitationsListFragment extends Fragment {
                     }
                 });
     }
+
 }

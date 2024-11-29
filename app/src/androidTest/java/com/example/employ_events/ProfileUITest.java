@@ -297,7 +297,7 @@ public class ProfileUITest {
 
         // Navigating to Registered Events
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        onView(withId(R.id.nav_list)).perform(click());
+        onView(withId(R.id.nav_registered_events)).perform(click());
 
         // Navigating back to Profile
         onView(withContentDescription("Open navigation drawer")).perform(click());

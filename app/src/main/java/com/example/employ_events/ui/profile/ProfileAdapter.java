@@ -52,9 +52,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 listener.onItemClick(profile);
             }
         });
-        holder.nameTextView.setText(profile.getName() != null ? profile.getName() : "N/A");
-        holder.emailTextView.setText(profile.getEmail() != null ? profile.getEmail() : "N/A");
-        holder.phoneNumberTextView.setText(profile.getPhoneNumber() != null ? profile.getPhoneNumber() : "N/A");
+        holder.nameTextView.setText(profile.getName() == null ? profile.getUniqueID() : profile.getName());
+        holder.emailTextView.setText(profile.getEmail() != null ? profile.getEmail() : "No Email provided");
+        holder.phoneNumberTextView.setText(profile.getPhoneNumber() != null ? profile.getPhoneNumber() : "No phone number provided");
     }
 
     @Override

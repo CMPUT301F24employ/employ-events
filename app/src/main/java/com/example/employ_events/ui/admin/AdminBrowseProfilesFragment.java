@@ -1,11 +1,9 @@
 package com.example.employ_events.ui.admin;
 
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-import static java.security.AccessController.getContext;
-
-
 import androidx.fragment.app.Fragment;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentAdminProfileListBinding;
-import com.example.employ_events.ui.events.Event;
 import com.example.employ_events.ui.profile.Profile;
 import com.example.employ_events.ui.profile.ProfileAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -46,10 +43,12 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
         profileAdapter = new ProfileAdapter(requireContext(), profileList, this);
 
         setupRecyclerView();
+        setAdminStatusTrue();
         loadProfiles();
 
         return root;
     }
+
 
     /**
      * Sets up the RecyclerView for displaying the profiles.
@@ -65,25 +64,25 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
      * Loads profiles from Firestore and updates the RecyclerView.
      */
     private void loadProfiles() {
-        db.collection("userProfiles").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                profileList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    String uniqueID = document.getId();
-                    Profile profile = new Profile(uniqueID);
-                    profile.setName(document.getString("name"));
-                    profile.setEmail(document.getString("email"));
-                    profile.setPhoneNumber(document.getString("phoneNumber"));
+        db.collection("userProfiles")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        profileList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String uniqueID = document.getId();
+                            Profile profile = new Profile(uniqueID);
+                            profile.setName(document.getString("name"));
+                            profile.setEmail(document.getString("email"));
+                            profile.setPhoneNumber(document.getString("phoneNumber"));
 
-                    profileList.add(profile);
-
-                }
-                profileAdapter.updateProfileList(profileList);
-
-            } else {
-                Toast.makeText(getContext(), "Error loading profiles!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                            profileList.add(profile);
+                        }
+                        profileAdapter.updateProfileList(profileList);
+                    } else {
+                        Toast.makeText(getContext(), "Error loading profiles!", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
@@ -97,4 +96,17 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
 
     }
 
+    /**
+     * Sets the 'admin' field in Firebase to true for the current user.
+     * This restricts admins from deleting their own profile.
+     */
+    private void setAdminStatusTrue() {
+        String uniqueID = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("uniqueID", null);
+
+        if (uniqueID != null) {
+            db.collection("userProfiles")
+                    .document(uniqueID)
+                    .update("admin", true);
+        }
+    }
 }

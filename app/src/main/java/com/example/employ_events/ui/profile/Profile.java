@@ -126,6 +126,11 @@ public class Profile {
     }
 
     /**
+     * Sets the user's amin role.
+     * @param admin true to indicate user is an admin, false otherwise.
+     */
+    public void setAdmin(boolean admin) {isAdmin = admin;}
+    /**
      * Retrieves the URI of the profile picture.
      * @return A string representing the URI of the profile picture.
      */
