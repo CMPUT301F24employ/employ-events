@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_image"
-        android:name="com.example.employ_events.ui.admin.ImageListFragment"
+        android:name="com.example.employ_events.ui.admin.AdminImageListFragment"
         android:label="Image List"
         tools:layout="@layout/fragment_image_list">
     </fragment>
