@@ -289,7 +289,7 @@ public class ProfileFragment extends Fragment{
                         Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show();
                     });
         });
-        }
+    }
 
 
     @Override
