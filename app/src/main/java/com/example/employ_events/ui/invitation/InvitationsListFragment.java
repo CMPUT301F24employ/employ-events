@@ -26,6 +26,7 @@ to accept / decline if deleted notification.
  */
 
 /**
+ * @author Tina
  * Fragment to display a list of invitations the user has accepted.
  * It fetches event data from Firestore, filters the invitations based on the user's status,
  * and binds the filtered list to a RecyclerView using an adapter.
@@ -105,7 +106,7 @@ public class InvitationsListFragment extends Fragment {
                             db.collection("events")
                                     .document(eventId)
                                     .collection("entrantsList")
-                                    .document(uniqueID)  // User document ID is the uniqueID
+                                    .document(uniqueID)
                                     .addSnapshotListener((entrantSnapshot, entrantError) -> {
                                         if (entrantError != null) {
                                             Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
