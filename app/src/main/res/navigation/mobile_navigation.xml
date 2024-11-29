@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/nav_image"
         android:name="com.example.employ_events.ui.admin.AdminImageListFragment"
-        android:label="Image List"
+        android:label="Admin: Browse Images"
         tools:layout="@layout/fragment_image_list">
     </fragment>
 
@@ -119,7 +119,7 @@
     <fragment
         android:id="@+id/eventListFragment"
         android:name="com.example.employ_events.ui.events.EventListFragment"
-        android:label="Event List"
+        android:label="Events"
         tools:layout="@layout/fragment_event_list">
 
         <!-- Action to navigate to AddEventFragment -->
@@ -198,7 +198,7 @@
     <fragment
         android:id="@+id/entrantNotifications"
         android:name="com.example.employ_events.ui.entrants.entrantNotifications"
-        android:label="Entrant Notifications Page"
+        android:label="Notifications"
         tools:layout="@layout/fragment_entrant_notifications">
     </fragment>
 
@@ -210,7 +210,7 @@
     <fragment
         android:id="@+id/sendNotificationScreen"
         android:name="com.example.employ_events.ui.notifications.SendNotificationScreen"
-        android:label="Send Notification Screen"
+        android:label="Send Notifications"
         tools:layout="@layout/fragment_send_notification_screen">
 
     </fragment>
@@ -225,7 +225,7 @@
     <fragment
         android:id="@+id/scan_qr_code"
         android:name="com.example.employ_events.ui.scanQrCode.ScanQrCodeFragment"
-        android:label="Download QR Code">
+        android:label="Scan QR Code">
         <action
             android:id="@+id/action_scan_qr_code_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment" />
@@ -240,7 +240,7 @@
     <fragment
         android:id="@+id/adminEventListFragment"
         android:name="com.example.employ_events.ui.admin.AdminEventListFragment"
-        android:label="Admin Browse Events"
+        android:label="Admin: Browse Events"
         tools:layout="@layout/fragment_admin_event_list">
         <action
             android:id="@+id/action_adminEventListFragment_to_manageEventFragment"
@@ -256,7 +256,7 @@
     <fragment
         android:id="@+id/adminBrowseProfilesFragment"
         android:name="com.example.employ_events.ui.admin.AdminBrowseProfilesFragment"
-        android:label="Admin Browse Profiles"
+        android:label="Admin: Browse Profiles"
         tools:layout="@layout/fragment_admin_profile_list">
         <action
             android:id="@+id/action_adminBrowseProfilesFragment_to_profileFragment"
@@ -272,7 +272,7 @@
     <fragment
         android:id="@+id/adminBrowseFacilitiesFragment"
         android:name="com.example.employ_events.ui.admin.AdminBrowseFacilitiesFragment"
-        android:label="Admin Browse Facilities"
+        android:label="Admin: Browse Facilities"
         tools:layout="@layout/fragment_admin_facility_list">
         <action
             android:id="@+id/action_adminBrowseFacilitiesFragment_to_facilityFragment"
