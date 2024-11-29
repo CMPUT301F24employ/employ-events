@@ -101,42 +101,41 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         binding = FragmentFacilityBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Retrieve uniqueID from SharedPreferences for Firestore lookup
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        uniqueID = sharedPreferences.getString("uniqueID", null);
-
         // Initialize Firestore database instance
         db = FirebaseFirestore.getInstance();
 
-        if (getArguments() != null) {
+        if (getArguments() != null) { // Coming from admin browse.
             uniqueID = getArguments().getString("organizer_id");
-            isAdmin = getArguments().getBoolean("IS_ADMIN", false);
+            isAdmin = getArguments().getBoolean("IS_ADMIN");
         }
+        else { // Regular user.
+            // Retrieve uniqueID from SharedPreferences for Firestore lookup
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            uniqueID = sharedPreferences.getString("uniqueID", null);
 
-        // Prompt user to create facility if they are not yet an organizer.
-        setupUserProfile(uniqueID);
+            isAdmin = false;
+
+            // Prompt user to create facility if they are not yet an organizer.
+            setupUserProfile(uniqueID);
+        }
 
         // Initialize the UI components for the fragment
         initializeViews();
 
-
         // Fetch the facility ID and display facility profile.
         getFacilityID(uniqueID, facilityID -> {
-            if (!isAdmin) {
-                if (facilityID != null) {
-                    DocumentReference facilityRef = db.collection("facilities").document(facilityID);
-                    facilityRef.get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            displayProfile(document, facilityViewModel);
-                        }
-                    });
-                } else {
-                    Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
-                }
+            if (facilityID != null) {
+                DocumentReference facilityRef = db.collection("facilities").document(facilityID);
+                facilityRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        displayProfile(document, facilityViewModel);
+                    }
+                });
+            } else {
+                Toast.makeText(getContext(), "Facility ID not found!", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         // Button to navigate to EventListFragment to view events
         binding.viewEventButton.setOnClickListener(view ->

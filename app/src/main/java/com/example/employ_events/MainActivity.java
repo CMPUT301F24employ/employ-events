@@ -9,14 +9,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.home.HomeFragment;
 import com.example.employ_events.ui.notifications.Notification;
 import com.example.employ_events.ui.profile.Profile;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -98,9 +96,8 @@ public class MainActivity extends AppCompatActivity
             menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
             menu.findItem(R.id.nav_image).setVisible(isAdmin);
             menu.findItem(R.id.adminBrowseProfilesFragment).setVisible(isAdmin);
-        }).addOnFailureListener(e -> {
-            Log.e("MainActivity", "Error fetching admin status: ", e);
-        });
+            menu.findItem(R.id.adminBrowseFacilitiesFragment).setVisible(isAdmin);
+        }).addOnFailureListener(e -> Log.e("MainActivity", "Error fetching admin status: ", e));
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

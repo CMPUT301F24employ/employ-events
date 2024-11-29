@@ -65,7 +65,7 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
                     if (task.isSuccessful()) {
                         facilityList.clear();
                         for (QueryDocumentSnapshot facilityDocument : task.getResult()) {
-                            String organizer_id = facilityDocument.getId();
+                            String organizer_id = facilityDocument.getString("organizer_id");
                             String name = facilityDocument.getString("name");
                             String email = facilityDocument.getString("email");
                             String address = facilityDocument.getString("address");
