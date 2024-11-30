@@ -73,7 +73,7 @@ public class SendNotificationScreen extends Fragment {
     }
 
     private void sendNotifications(String eventId, String message, int tabPosition) {
-        String ORGANIZER_CHANNEL_ID = "organizer_notification_channel";
+        String ORGANIZER_CHANNEL_ID = "admin_notification_channel";
         db.collection("events").document(eventId).collection("entrantsList").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -83,27 +83,23 @@ public class SendNotificationScreen extends Fragment {
                                 Boolean onWaitingList = document.getBoolean("onWaitingList");
                                 Boolean onAcceptedList = document.getBoolean("onAcceptedList");
                                 Boolean onCancelledList = document.getBoolean("onCancelledList");
-                                Boolean onRegisteredList = document.getBoolean("onRegisteredList");
                                 boolean shouldNotify = false;
+
                                 switch (tabPosition) {
                                     case 0:
-                                        shouldNotify = true;
+                                        shouldNotify = true; // All entrants
                                         break;
                                     case 1: // Waitlisted
                                         shouldNotify = Boolean.TRUE.equals(onWaitingList);
-                                        System.out.println("We are fetching the waitList");
                                         break;
                                     case 2: // Selected
                                         shouldNotify = Boolean.TRUE.equals(onAcceptedList);
-                                        System.out.println("We are fetching the acceptedList");
                                         break;
                                     case 3: // Cancelled
                                         shouldNotify = Boolean.TRUE.equals(onCancelledList);
-                                        System.out.println("We are fetching the cancelledList");
                                         break;
                                     case 4: // Registered
-                                        shouldNotify = Boolean.TRUE.equals(onRegisteredList);
-                                        System.out.println("We are fetching the registeredList");
+                                        shouldNotify = Boolean.TRUE.equals(onAcceptedList) && !Boolean.TRUE.equals(onCancelledList);
                                         break;
                                 }
 
@@ -111,6 +107,7 @@ public class SendNotificationScreen extends Fragment {
                                     String entrantId = document.getId();
                                     Notification notification = new Notification(eventId, message, false, ORGANIZER_CHANNEL_ID);
                                     addNotification(entrantId, notification);
+                                    notification.sendNotification(getContext()); // Trigger system notification
                                 }
                             }
                         } else {
@@ -120,6 +117,7 @@ public class SendNotificationScreen extends Fragment {
                         System.err.println("Error fetching entrants: " + task.getException());
                     }
                 });
+
     }
 
     private void addNotification(String userID, Notification notification) {
@@ -127,7 +125,10 @@ public class SendNotificationScreen extends Fragment {
                 .document(userID)
                 .collection("Notifications")
                 .add(new HashMap<String, Object>() {{
-                    put("Notification", notification);
+                    put("eventID", notification.getEventID());
+                    put("message", notification.getMessage());
+                    put("read", notification.isRead());
+                    put("CHANNEL_ID", notification.getCHANNEL_ID());
                 }})
                 .addOnSuccessListener(aVoid ->
                         System.out.println("Notification successfully added!")
