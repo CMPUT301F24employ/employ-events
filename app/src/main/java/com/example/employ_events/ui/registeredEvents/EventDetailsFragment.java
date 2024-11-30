@@ -1,9 +1,15 @@
 package com.example.employ_events.ui.registeredEvents;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,7 +66,7 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  */
 
 /**
- * @author Tina, Jasleen
+ * @author Tina, Jasleen, Aasvi
  * The EventDetailsFragment is responsible for displaying the details of an event.
  * It allows users to join or leave the event waiting list.
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
@@ -72,6 +78,7 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  * If permission is granted, the user's location is retrieved and stored in Firestore.
  * If permission is denied, the user is prompted to grant the required permission.
  * If the event requires geolocation, the user will receive a warning before joining the event.
+ * This fragment also asks the user for notification permission to ensure event-related updates can be delivered.
  */
 public class EventDetailsFragment extends Fragment{
 
@@ -89,6 +96,7 @@ public class EventDetailsFragment extends Fragment{
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private ActivityResultLauncher<String> requestNotificationPermissionLauncher;
 
     /**
      * @author Tina, Jasleen
@@ -116,6 +124,18 @@ public class EventDetailsFragment extends Fragment{
              }
          }
 
+         requestNotificationPermissionLauncher = registerForActivityResult(
+                 new ActivityResultContracts.RequestPermission(),
+                 isGranted -> {
+                     if (isGranted) {
+                         Toast.makeText(requireContext(), "Notification enabled!", Toast.LENGTH_SHORT).show();
+                     } else {
+                         Toast.makeText(requireContext(), "Notifications permission denied.", Toast.LENGTH_SHORT).show();
+                     }
+                 }
+         );
+         checkAndRequestNotificationPermission();
+
          requestPermissionLauncher = registerForActivityResult(
                  new ActivityResultContracts.RequestPermission(),
                  isGranted -> {
@@ -138,6 +158,19 @@ public class EventDetailsFragment extends Fragment{
 
 
         return root;
+    }
+
+    /**
+     * @author Aasvi
+     * Checks if notification permission is granted and requests if necessary
+     */
+    private void checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     /**

@@ -10,6 +10,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_facility">Facility</string>
     <string name="menu_profile">Profile</string>
+
     <string name="organizer_notification_status">Organizer Notifications</string>
     <string name="admin_notification_status">Administrator Notifications</string>
     <string name="user_phone_number">User Phone Number</string>
@@ -54,4 +55,19 @@
     <string name="manage_entrants">Manage Entrants</string>
     <string name="channel_name">SendingNotification</string>
     <string name="channel_description">To Send Notifications to Entrants</string>
+    <string name="menu_scan_qr_code">Scan QR Code</string>
+    <string name="menu_registered_events">Registered Events</string>
+    <string name="menu_invitations">Invitations</string>
+    <string name="menu_notifications">Notifications</string>
+    <string name="menu_admin_browse_images">Admin Browse Images</string>
+    <string name="menu_dmin_browse_events">Admin Browse Events</string>
+    <string name="menu_admin_browse_profiles">Admin Browse Profiles</string>
+    <string name="menu_admin_browse_facilities">Admin Browse Facilities</string>
+    <string name="menu_admin_browse_events">Admin: Browse Events</string>
+    <string name="organizer_channel_name">Organizer Notifications</string>
+    <string name="organizer_channel_description">Customized notifications from organizers.</string>
+    <string name="app_channel_name">App Notifications</string>
+    <string name="app_channel_description">Alerts for winning/losing event lotteries.</string>
+    <string name="admin_channel_name">Admin Notifications</string>
+    <string name="admin_channel_description">Customized notifications from organizers</string>
 </resources>

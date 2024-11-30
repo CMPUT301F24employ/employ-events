@@ -22,16 +22,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-/*
-Authors: Connor, Tina
-
-Purpose is to handle the scanning of an event qr code that brings the entrant
-to event details page.
-US 01.06.02	As an entrant I want to be able to be sign up for an event by scanning the QR code
-US 01.06.01	As an entrant I want to view event details within the app by scanning the promotional QR code
- */
 /**
- * Fragment to let entrants scan a qr code to view event details.
+ * @author Connor
+ * @author Tina
+ * ScanQRCodeFragment allows entrants scan a qr code then be navigated to the event details page.
+ * US 01.06.02	As an entrant I want to be able to be sign up for an event by scanning the QR code
+ * US 01.06.01	As an entrant I want to view event details within the app by scanning the promotional QR code
  */
 public class ScanQrCodeFragment extends Fragment {
 
@@ -57,7 +53,13 @@ public class ScanQrCodeFragment extends Fragment {
                 db.collection("events").document(eventID).get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         // If the event exists in the database, go to event details fragment and fill page with event details from firebase
-                        navigateToEventDetailsFrag(eventID);
+                        String qrCodeUrl = documentSnapshot.getString("QRCodeUrl");
+                        if (qrCodeUrl != null && !qrCodeUrl.isEmpty()) {
+                            navigateToEventDetailsFrag(eventID);
+                        } else {
+                            Toast.makeText(getContext(), "Error: Event not found in database!", Toast.LENGTH_SHORT).show();
+                        }
+
                     } else {
                         // Else make a toast saying there was an error
                         Toast.makeText(getContext(), "Error: Event not found in database!", Toast.LENGTH_SHORT).show();

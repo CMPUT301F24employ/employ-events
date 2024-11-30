@@ -40,7 +40,7 @@ Authors: Tina, Sahara, Aasvi, Jasleen, Connor
 
 The purpose of this fragment is to manage an event such as update the event banner, a button that
 brings you to the download event qr page, a button to bring you to manage entrants page for the event,
-and a button to delete the event if the user is an admin.
+and a button to delete the event/qr code if the user is an admin.
  */
 
 /**
@@ -51,7 +51,7 @@ public class ManageEventFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseStorage storage;
     private String bannerUri, eventId;
-    private Button editEventButton, viewEntrantsButton, qrCodeButton, deleteEventButton;
+    private Button editEventButton, viewEntrantsButton, qrCodeButton, deleteEventButton, deleteQRCodeButton;
     private TextView titleTV, descriptionTV, eventDateTV, registrationPeriodTV,
             eventCapacityTV, waitingListCapacityTV, eventFeeTV, geolocationRequiredTV;
     private ImageView bannerImage;
@@ -134,13 +134,35 @@ public class ManageEventFragment extends Fragment {
                 storageReference.delete().addOnSuccessListener(unused1 -> {
                     Toast.makeText(getContext(), "Event successfully deleted!", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Event successfully deleted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error: Failed to delete QR Code from storage!", Toast.LENGTH_SHORT).show();
                 });
 
             }).addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "Error deleting event qr code from storage!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error deleting event!", Toast.LENGTH_SHORT).show();
             });
         });
+
+        // Remove QR Code Hash Data
+        deleteQRCodeButton.setOnClickListener(view -> {
+            // Remove qr code url from event
+            db.collection("events").document(eventId).update("QRCodeUrl", "")
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "QRCodeUrl field successfully cleared from event.", Toast.LENGTH_SHORT).show();
+
+                        // Delete qr code from firebase storage
+                        StorageReference storageReference = storage.getReference().child("QRCodes/" + eventId + ".png");
+                        storageReference.delete().addOnSuccessListener(unused1 -> {
+                            Toast.makeText(getContext(), "Event QR Code successfully deleted!", Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Error: Failed to delete QR Code from storage!", Toast.LENGTH_SHORT).show();
+                        });
+
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error: Failed to clear QRCodeUrl field!", Toast.LENGTH_SHORT).show();
+                    });
+        });
+
         return root;
     }
 
@@ -161,6 +183,7 @@ public class ManageEventFragment extends Fragment {
         qrCodeButton = binding.qrCodeButton;
         viewEntrantsButton = binding.viewEntrantsButton;
         deleteEventButton = binding.deleteEventButton;
+        deleteQRCodeButton = binding.deleteQrButton;
 
         // Hiding these buttons if the user is an admin and only showing delete event button
         if (isAdmin) {
@@ -169,6 +192,7 @@ public class ManageEventFragment extends Fragment {
             viewEntrantsButton.setVisibility(View.GONE);
         } else {
             deleteEventButton.setVisibility(View.GONE);
+            deleteQRCodeButton.setVisibility(View.GONE);
         }
 
     }
