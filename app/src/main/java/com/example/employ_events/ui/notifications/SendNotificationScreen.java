@@ -1,87 +1,69 @@
 package com.example.employ_events.ui.notifications;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.employ_events.R;
+import androidx.fragment.app.Fragment;
+
 import com.example.employ_events.databinding.FragmentSendNotificationScreenBinding;
-import com.example.employ_events.ui.events.Event;
-import com.example.employ_events.ui.invitation.InvitationsListFragment;
-import com.example.employ_events.ui.profile.Profile;
+import com.example.employ_events.ui.notifications.Notification;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
-import java.util.Map;
 
-/**
- * A Fragment for sending notifications. It retrieves the event ID (if available) from the
- * arguments to display relevant notification details for the entrants of the event.
- */
 public class SendNotificationScreen extends Fragment {
 
     private FragmentSendNotificationScreenBinding binding;
     private Button sendInvitationButton;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    /**
-     * Inflates the fragment's view and retrieves the event ID from the arguments if available.
-     * Sets up an OnClickListener for the "Send Invitation" button to send notifications
-     * to entrants of the specified event.
-     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSendNotificationScreenBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        sendInvitationButton = binding.sendInvitationButton;
+        Button confirmButton = binding.confirmButton;
+        EditText messageInput = binding.messageInput;
+        TabLayout tabLayout = binding.tabLayout;
 
-        // Check if the event ID was passed as an argument to the fragment
+        // Keep track of the selected tab
+        int[] selectedTabPosition = {0}; // Default to the "All" tab
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                selectedTabPosition[0] = tab.getPosition();
+                //System.out.println(selectedTabPosition[0]);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
         if (getArguments() != null) {
             String eventId = getArguments().getString("EVENT_ID");
             if (eventId != null) {
+                // Send notification using custom message entered by the user
+                confirmButton.setOnClickListener(view -> {
+                    String message = messageInput.getText().toString().trim();
 
-                // Set an OnClickListener for the "Send Invitation" button
-                sendInvitationButton.setOnClickListener(view -> {
-                    // Fetch the list of entrants for the event from Firestore
-                    db.collection("events").document(eventId).collection("entrantsList").get()
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    QuerySnapshot querySnapshot = task.getResult();
-                                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                        for (QueryDocumentSnapshot document : querySnapshot) {
-                                            // Access data from each document in 'entrantsList'
-                                            String entrantId = document.getId();
-                                            Notification notification = new Notification(eventId, "You suck", false);
-                                            notification.sendNotification(this.getContext());
-                                            addNotification(entrantId, notification);
-                                        }
-                                    } else {
-                                        System.out.println("No entrants found in the subcollection.");
-                                    }
-                                } else {
-                                    System.err.println("Error fetching entrants: " + task.getException());
-                                }
-                            });
+                    if (message.isEmpty()) {
+                        Toast.makeText(getContext(), "Please enter a message", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    sendNotifications(eventId, message, selectedTabPosition[0]);
                 });
             }
         }
@@ -89,12 +71,55 @@ public class SendNotificationScreen extends Fragment {
         return root;
     }
 
-    /**
-     * Adds a notification to the user's profile in Firestore.
-     *
-     * @param userID     The ID of the user to add the notification to
-     * @param notification The Notification object containing the message to be saved
-     */
+    private void sendNotifications(String eventId, String message, int tabPosition) {
+        db.collection("events").document(eventId).collection("entrantsList").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                Boolean onWaitingList = document.getBoolean("onWaitingList");
+                                Boolean onAcceptedList = document.getBoolean("onAcceptedList");
+                                Boolean onCancelledList = document.getBoolean("onCancelledList");
+                                Boolean onRegisteredList = document.getBoolean("onRegisteredList");
+                                boolean shouldNotify = false;
+                                switch (tabPosition) {
+                                    case 0:
+                                        shouldNotify = true;
+                                        break;
+                                    case 1: // Waitlisted
+                                        shouldNotify = Boolean.TRUE.equals(onWaitingList);
+                                        System.out.println("We are fetching the waitList");
+                                        break;
+                                    case 2: // Selected
+                                        shouldNotify = Boolean.TRUE.equals(onAcceptedList);
+                                        System.out.println("We are fetching the acceptedList");
+                                        break;
+                                    case 3: // Cancelled
+                                        shouldNotify = Boolean.TRUE.equals(onCancelledList);
+                                        System.out.println("We are fetching the cancelledList");
+                                        break;
+                                    case 4: // Registered
+                                        shouldNotify = Boolean.TRUE.equals(onRegisteredList);
+                                        System.out.println("We are fetching the registeredList");
+                                        break;
+                                }
+
+                                if (shouldNotify) {
+                                    String entrantId = document.getId();
+                                    Notification notification = new Notification(eventId, message, false);
+                                    addNotification(entrantId, notification);
+                                }
+                            }
+                        } else {
+                            System.out.println("No entrants found in the subcollection.");
+                        }
+                    } else {
+                        System.err.println("Error fetching entrants: " + task.getException());
+                    }
+                });
+    }
+
     private void addNotification(String userID, Notification notification) {
         db.collection("userProfiles")
                 .document(userID)
@@ -103,10 +128,10 @@ public class SendNotificationScreen extends Fragment {
                     put("Notification", notification);
                 }})
                 .addOnSuccessListener(aVoid ->
-                        System.out.println("Document successfully written!")
+                        System.out.println("Notification successfully added!")
                 )
                 .addOnFailureListener(e ->
-                        System.err.println("Error writing document: " + e.getMessage())
+                        System.err.println("Error adding notification: " + e.getMessage())
                 );
     }
 }
