@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Show admin menu buttons for admins and hide for non admins.
         docRef.get().addOnSuccessListener(documentSnapshot -> {
-            isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
+            isAdmin = documentSnapshot.getBoolean("admin") != null && Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
             menu.findItem(R.id.nav_image).setVisible(isAdmin);
