@@ -31,7 +31,7 @@
             app:destination="@+id/entrantNotifications" />
         <action
             android:id="@+id/action_homeFragment_to_adminEventListFragment"
-            app:destination="@+id/adminEventListFragment" />
+            app:destination="@+id/nav_browse_event" />
         <action
             android:id="@+id/action_homeFragment_to_adminBrowseProfilesFragment"
             app:destination="@+id/adminBrowseProfilesFragment" />
@@ -238,7 +238,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/adminEventListFragment"
+        android:id="@+id/nav_browse_event"
         android:name="com.example.employ_events.ui.admin.AdminEventListFragment"
         android:label="Admin: Browse Events"
         tools:layout="@layout/fragment_admin_event_list">

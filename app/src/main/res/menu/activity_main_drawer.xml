@@ -43,7 +43,7 @@
 
         <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
         <item
-            android:id="@+id/adminEventListFragment"
+            android:id="@+id/nav_browse_event"
             android:icon="@drawable/ic_menu_list"
             android:title="@string/menu_admin_browse_events" />
 

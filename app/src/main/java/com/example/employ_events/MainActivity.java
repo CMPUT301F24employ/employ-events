@@ -1,7 +1,5 @@
 package com.example.employ_events;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
             Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.adminEventListFragment).setVisible(isAdmin);
+            menu.findItem(R.id.nav_browse_event).setVisible(isAdmin);
             menu.findItem(R.id.nav_image).setVisible(isAdmin);
             menu.findItem(R.id.adminBrowseProfilesFragment).setVisible(isAdmin);
             menu.findItem(R.id.adminBrowseFacilitiesFragment).setVisible(isAdmin);
