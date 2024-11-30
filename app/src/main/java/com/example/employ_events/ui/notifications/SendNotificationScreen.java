@@ -1,36 +1,17 @@
 package com.example.employ_events.ui.notifications;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
-
-import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentSendNotificationScreenBinding;
-import com.example.employ_events.ui.events.Event;
-import com.example.employ_events.ui.invitation.InvitationsListFragment;
-import com.example.employ_events.ui.profile.Profile;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A Fragment for sending notifications. It retrieves the event ID (if available) from the
@@ -71,7 +52,7 @@ public class SendNotificationScreen extends Fragment {
                                         for (QueryDocumentSnapshot document : querySnapshot) {
                                             // Access data from each document in 'entrantsList'
                                             String entrantId = document.getId();
-                                            Notification notification = new Notification(eventId, "You suck", false);
+                                            Notification notification = new Notification(eventId, "You suck", false, "organizer_notification_channel");
                                             notification.sendNotification(this.getContext());
                                             addNotification(entrantId, notification);
                                         }

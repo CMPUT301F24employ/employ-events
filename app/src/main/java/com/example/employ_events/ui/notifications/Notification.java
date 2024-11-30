@@ -1,6 +1,5 @@
 package com.example.employ_events.ui.notifications;
 
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -21,11 +20,9 @@ import androidx.core.content.ContextCompat;
  * Provides functionality for creating and sending notifications to users.
  */
 public class Notification {
-    private String eventID;
-    private String message;
+    private String eventID, message, CHANNEL_ID;
     private boolean invitation, cancellation, waitingList, read;
     private NotificationCompat.Builder builder;
-    private String CHANNEL_ID = "Organizer Notification";
     private Integer NOTIFICATION_ID = 0;
     private NotificationManager notificationManager;
     private Intent intent;
@@ -37,10 +34,11 @@ public class Notification {
      * @param message the message content of the notification
      * @param read    indicates whether the notification has been read
      */
-    public Notification(String eventID, String message, boolean read) {
+    public Notification(String eventID, String message, boolean read, String CHANNEL_ID) {
         this.eventID = eventID;
         this.message = message;
         this.read = read;
+        this.CHANNEL_ID = CHANNEL_ID;
     }
 
     /**
@@ -105,6 +103,14 @@ public class Notification {
      */
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public String getCHANNEL_ID() {
+        return CHANNEL_ID;
+    }
+
+    public void setCHANNEL_ID(String CHANNEL_ID) {
+        this.CHANNEL_ID = CHANNEL_ID;
     }
 
     /**

@@ -20,12 +20,14 @@ import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventEntrantsBinding;
 import com.example.employ_events.ui.entrants.Entrant;
 import com.example.employ_events.ui.entrants.EntrantsAdapter;
-import com.example.employ_events.ui.invitation.InvitationsAdapter;
+import com.example.employ_events.ui.notifications.Notification;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
@@ -53,6 +55,8 @@ US 02.06.04 As an organizer I want to cancel entrants that did not sign up for t
 US 02.05.03 As an organizer I want to be able to draw a replacement applicant from the pooling system when a previously
 selected applicant cancels or rejects the invitation.
 US 01.05.01 As an entrant I want another chance to be chosen from the waiting list if a selected user declines an invitation to sign up.
+US 01.04.01 As an entrant I want to receive notification when chosen from the waiting list (when I "win" the lottery)
+US 01.04.02 As an entrant I want to receive notification of not chosen on the app (when I "lose" the lottery)
  */
 
 /**
@@ -65,7 +69,7 @@ public class ManageEventEntrants extends Fragment {
     private FragmentManageEventEntrantsBinding binding;
     private FirebaseFirestore db;
     private Button sendNotification, sampleEntrants, removeEntrants, viewEntrantMap, removeAnEntrant;
-    private String eventId, eventCapacity;
+    private String eventId, eventCapacity, eventName;
     private RecyclerView entrantsList;
     private EntrantsAdapter entrantsAdapter;
     private TabLayout tabLayout;
@@ -139,11 +143,12 @@ public class ManageEventEntrants extends Fragment {
         // Initializes the entrant count.
         updateCounts();
 
-        // Sample entrants button functionality
+        // Sample entrants button functionality.
         sampleEntrants.setOnClickListener(v -> {
             if (eventId != null) {
                 fetchEventAndGenerateSample(eventId);
                 updateCounts();
+                sendLotteryNotification();
             } else {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
@@ -251,6 +256,7 @@ public class ManageEventEntrants extends Fragment {
                             if (!geolocation) {
                                 viewEntrantMap.setVisibility(View.GONE);
                             }
+                            eventName = document.getString("eventTitle");
                             eventCapacity = document.get("eventCapacity").toString();
                         }
                     }
@@ -415,6 +421,68 @@ public class ManageEventEntrants extends Fragment {
             @Override
             public void onTabReselected(TabLayout.Tab tab) { }
         });
+    }
+
+    /**
+     * @author Sahara
+     * Adds a notification to the user's profile in Firestore.
+     *
+     * @param userID     The ID of the user to add the notification to
+     * @param notification The Notification object containing the message to be saved
+     */
+    private void addNotification(String userID, Notification notification) {
+        db.collection("userProfiles")
+                .document(userID)
+                .collection("Notifications")
+                .add(new HashMap<String, Object>() {{
+                    put("Notification", notification);
+                }})
+                .addOnSuccessListener(aVoid ->
+                        System.out.println("Document successfully written!")
+                )
+                .addOnFailureListener(e ->
+                        System.err.println("Error writing document: " + e.getMessage())
+                );
+    }
+
+    /**
+     * @author Tina
+     * Sends a notification to lottery "winners" and "losers" :
+     * US 01.04.01 As an entrant I want to receive notification when chosen from the waiting list (when I "win" the lottery)
+     * US 01.04.02 As an entrant I want to receive notification of not chosen on the app (when I "lose" the lottery)
+     */
+    private void sendLotteryNotification() {
+        db.collection("events").document(eventId).collection("entrantsList").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                // Access data from each document in 'entrantsList'
+                                String entrantId = document.getId();
+                                boolean isSelected = Boolean.TRUE.equals(document.getBoolean("onSelectedList"));
+                                boolean notSelected = Boolean.TRUE.equals(document.getBoolean("onWaitingList"));
+                                if (isSelected) {
+                                    String message = "Congratulations, you have won the event lottery for " + eventName + "! Accept your invitation to secure your spot!";
+                                    Notification notification = new Notification(eventId, message, false, "app_notification_channel");
+                                    notification.sendNotification(this.getContext());
+                                    addNotification(entrantId, notification);
+                                }
+                                else if (notSelected){
+                                    String message = "Sorry, you didn't win the event lottery for " + eventName + ". You will automatically remain in the waiting list for another chance of being chosen!";
+                                    Notification notification = new Notification(eventId, message, false, "app_notification_channel");
+                                    notification.sendNotification(this.getContext());
+                                    addNotification(entrantId, notification);
+                                }
+
+                            }
+                        } else {
+                            System.out.println("No entrants found in the subcollection.");
+                        }
+                    } else {
+                        System.err.println("Error fetching entrants: " + task.getException());
+                    }
+                });
     }
 
     @Override
