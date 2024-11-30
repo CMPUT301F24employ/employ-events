@@ -26,14 +26,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.AddEventBinding;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -73,7 +69,7 @@ US 02.02.03 As an organizer I want to enable or disable the geolocation requirem
  */
 
 /**
- * @author Sahara, Tina
+ * @author Sahara, Tina, Connor
  * AddEventFragment is a Fragment that allows organizers to create a new event
  * by providing details such as title, description, dates, time, fee, capacity, and location.
  */
@@ -225,11 +221,19 @@ public class AddEventFragment extends Fragment {
                     newEvent.setLimited(limitString.isEmpty() ? null : Integer.valueOf(limitString));
                     newEvent.setFee(feeString.isEmpty() ? null : Integer.valueOf(feeString));
                     newEvent.setGeoLocation(geoLocation.isChecked());
+
                     // Upload banner and/or save event
+                    Runnable onComplete = () -> Navigation.findNavController(view)
+                            .navigate(R.id.action_addEventFragment_to_eventListFragment,
+                                    null,
+                                    new NavOptions.Builder()
+                                            .setPopUpTo(R.id.eventListFragment, true)
+                                            .build());
+
                     if (bannerUri != null) {
-                        uploadBannerAndSaveEvent(newEvent, view);
+                        uploadBannerAndSaveEvent(newEvent, onComplete);
                     } else {
-                        saveEvent(newEvent, view);
+                        saveEvent(newEvent, onComplete);
                     }
                 }
             } catch (Exception e) {
@@ -311,25 +315,29 @@ public class AddEventFragment extends Fragment {
         );
 
         // Set the minimum and maximum dates based on filter type
-        if (filter.equals("eventDate")) {
-            // Ensure the current date is being used for event date
-            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-        } else if (filter.equals("startDate")) {
-            // Ensure registration start date is no earlier than today
-            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-            if (eventDate != null) {
-                // Ensure registration start date is no later than event date
-                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
-            }
-        } else if (filter.equals("registrationDeadline")) {
-            // Ensure registration deadline is between registration start date and event date
-            if (registrationStartDeadline != null && eventDate != null) {
-                datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
-                datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
-            } else {
-                Toast.makeText(getContext(), "Please set the registration start date and event date first.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        switch (filter) {
+            case "eventDate":
+                // Ensure the current date is being used for event date
+                datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+                break;
+            case "startDate":
+                // Ensure registration start date is no earlier than today
+                datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+                if (eventDate != null) {
+                    // Ensure registration start date is no later than event date
+                    datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+                }
+                break;
+            case "registrationDeadline":
+                // Ensure registration deadline is between registration start date and event date
+                if (registrationStartDeadline != null && eventDate != null) {
+                    datePickerDialog.getDatePicker().setMinDate(registrationStartDeadline.getTime());
+                    datePickerDialog.getDatePicker().setMaxDate(eventDate.getTime());
+                } else {
+                    Toast.makeText(getContext(), "Please set the registration start date and event date first.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
         }
 
         // Show the date picker dialog
@@ -386,14 +394,13 @@ public class AddEventFragment extends Fragment {
     /**
      * Uploads the event banner to Firebase Storage and saves the event details in Firestore.
      * @param newEvent The Event object containing event details.
-     * @param view The view from which the operation is triggered.
      */
-    private void uploadBannerAndSaveEvent(Event newEvent, View view) {
+    private void uploadBannerAndSaveEvent(Event newEvent, Runnable onComplete) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
         storageRef.putFile(bannerUri)
                 .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     newEvent.setBannerUri(uri.toString());
-                    saveEvent(newEvent, view);
+                    saveEvent(newEvent, onComplete);
                 }))
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error uploading banner!", Toast.LENGTH_SHORT).show());
 
@@ -402,9 +409,8 @@ public class AddEventFragment extends Fragment {
     /**
      * Saves the event details to Firestore.
      * @param newEvent The Event object to be saved.
-     * @param view The view from which the operation is triggered.
      */
-    private void saveEvent(Event newEvent, View view) {
+    private void saveEvent(Event newEvent, Runnable onComplete) {
         db.collection("events").add(newEvent)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event Created Successfully", Toast.LENGTH_SHORT).show();
@@ -413,34 +419,15 @@ public class AddEventFragment extends Fragment {
                     Map<String, Object> data = new HashMap<>();
                     data.put("id", theID);
                     db.collection("events").document(theID).set(data, SetOptions.merge());
-                    createEntrantListSubcollection(documentReference);
                     try {
                         Bitmap qrCodeBitmap = makeQRBitmap(theID);
-                        uploadAndSaveQR(qrCodeBitmap, theID);
+                        uploadAndSaveQR(qrCodeBitmap, theID, onComplete);
 
                     } catch (WriterException e) {
                         throw new RuntimeException(e);
                     }
-                    NavController navController = Navigation.findNavController(view);
-                    NavOptions navOptions = new NavOptions.Builder()
-                            .setPopUpTo(R.id.manageEventFragment, false) // Clears stack up to ManageEventFragment
-                            .build();
-                    navController.navigate(R.id.action_addEventFragment_to_eventListFragment, null, navOptions);
-
-
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving event!", Toast.LENGTH_SHORT).show());
-    }
-
-    /**
-     * Prepares an entrantList subcollection under the event document.
-     * (No documents are added to it initially.)
-     *
-     * @param eventDocumentReference The reference to the newly created event document.
-     */
-    private void createEntrantListSubcollection(DocumentReference eventDocumentReference) {
-        // No initial data or document is added here; the subcollection is simply available for future use.
-
     }
 
     /*
@@ -474,7 +461,7 @@ public class AddEventFragment extends Fragment {
      * @param bMap The Bitmap object representing the QR code.
      * @param eventDocumentID The unique identifier for the event associated with the QR code.
      */
-    private void uploadAndSaveQR(Bitmap bMap, String eventDocumentID) {
+    private void uploadAndSaveQR(Bitmap bMap, String eventDocumentID, Runnable onComplete) {
         StorageReference storageReference = storage.getReference().child("QRCodes/" + eventDocumentID + ".png");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // Compress the bitmap to PNG format
@@ -499,7 +486,10 @@ public class AddEventFragment extends Fragment {
 
             // Save the QR code URL to the corresponding event document
             db.collection("events").document(eventDocumentID).set(qrData, SetOptions.merge())
-                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Your QR Code was succesfully generated!", Toast.LENGTH_SHORT).show())
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Your QR Code was successfully generated!", Toast.LENGTH_SHORT).show();
+                        if (onComplete != null) onComplete.run(); // Trigger the callback
+                    })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: Couldn't set event data to store qr code url!", Toast.LENGTH_SHORT).show());
             })
         ).addOnFailureListener(e -> Toast.makeText(getContext(), "Error retrieving event qr url!", Toast.LENGTH_SHORT).show());
