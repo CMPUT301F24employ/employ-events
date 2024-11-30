@@ -29,6 +29,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +75,7 @@ public class ManageEventEntrants extends Fragment {
     private EntrantsAdapter entrantsAdapter;
     private TabLayout tabLayout;
     private List<Entrant> allEntrants = new ArrayList<>();
-    private ListenerRegistration entrantsListener, entrantListener;
+    private ListenerRegistration entrantsListener;
     private TextView selectedRegisteredCount;
 
     /**
@@ -90,25 +91,20 @@ public class ManageEventEntrants extends Fragment {
 
         initializeViews();
 
-        EntrantsAdapter.OnItemClickListener listener = new EntrantsAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(String entrantUniqueID) {
-                Log.d("EntrantsFragment", "Entrant clicked with ID: " + entrantUniqueID);
+        EntrantsAdapter.OnItemClickListener listener = entrantUniqueID -> {
+            Log.d("EntrantsFragment", "Entrant clicked with ID: " + entrantUniqueID);
 
-                // When an entrant is clicked on the list and remove an entrant button is clicked:
-                // Prompt the user with a confirmation if they would like to remove this entrant.
-                removeAnEntrant.setOnClickListener(v -> {
-                    new AlertDialog.Builder(requireContext())
-                            .setTitle("Remove Entrant")
-                            .setMessage("Are you sure you want to remove this entrant?")
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                deleteAnEntrant(entrantUniqueID);
-                                entrantsAdapter.notifyDataSetChanged();
-                            })
-                            .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                            .show();
-                });
-            }
+            // When an entrant is clicked on the list and remove an entrant button is clicked:
+            // Prompt the user with a confirmation if they would like to remove this entrant.
+            removeAnEntrant.setOnClickListener(v -> new AlertDialog.Builder(requireContext())
+                    .setTitle("Remove Entrant")
+                    .setMessage("Are you sure you want to remove this entrant?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        deleteAnEntrant(entrantUniqueID);
+                        entrantsAdapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .show());
         };
 
         // Initialize the adapter with an empty list for now
@@ -135,20 +131,34 @@ public class ManageEventEntrants extends Fragment {
             });
         }
 
-
-
         // Hide the view entrants map button for non geolocation events.
         updateViewEntrantsMapVisibility();
 
         // Initializes the entrant count.
-        updateCounts();
+        updateCounts(success -> {
+            if (success) {
+                Log.d("UpdateCounts", "Entrant count initialized successfully.");
+            } else {
+                Log.e("UpdateCounts", "Failed to initialize entrant count.");
+            }
+        });
 
         // Sample entrants button functionality.
         sampleEntrants.setOnClickListener(v -> {
             if (eventId != null) {
-                fetchEventAndGenerateSample(eventId);
-                updateCounts();
-                sendLotteryNotification();
+                fetchEventAndGenerateSample(eventId, success -> {
+                    if (success) {
+                        updateCounts(success2 -> {
+                            if (success2) {
+                                sendLotteryNotification();
+                            } else {
+                                Toast.makeText(getContext(), "Failed to update counts", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Failed to generate sample entrants", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
@@ -165,12 +175,24 @@ public class ManageEventEntrants extends Fragment {
         // Remove unregistered entrants functionality.
         removeEntrants.setOnClickListener(v -> {
             if (eventId != null) {
-                fetchEventAndRemoveEntrants(eventId);
-                updateCounts();
+                fetchEventAndRemoveEntrants(eventId, success -> {
+                    if (success) {
+                        updateCounts(success2 -> {
+                            if (success2) {
+                                Toast.makeText(getContext(), "Entrants removed and counts updated.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Failed to update counts.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Failed to remove unregistered entrants.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         setupTabLayout();
 
@@ -192,6 +214,7 @@ public class ManageEventEntrants extends Fragment {
     }
 
     /**
+     * @author Tina
      * Cancels an individual entrant.
      * @param entrantUniqueID The unique ID of the entrant to be removed.
      */
@@ -213,19 +236,22 @@ public class ManageEventEntrants extends Fragment {
                 });
     }
 
-    private void updateCounts() {
-        entrantListener = db.collection("events").document(eventId)
+    /**
+     * @author Tina
+     * Updates the entrant count for the UI
+     * @param callback The callback to notify the caller of the operation's success or failure.
+     *                 The callback is invoked with a boolean indicating whether the operation
+     *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
+     */
+    private void updateCounts(OnCompleteListener<Boolean> callback) {
+        db.collection("events").document(eventId)
                 .collection("entrantsList")
-                .addSnapshotListener((snapshots, error) -> {
-                    if (error != null) {
-                        Log.e("LiveCounts", "Error listening for changes", error);
-                        return;
-                    }
-
-                    if (snapshots != null) {
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
                         int acceptedRegisteredCount = 0;
 
-                        for (DocumentSnapshot entrantDoc : snapshots.getDocuments()) {
+                        for (DocumentSnapshot entrantDoc : task.getResult().getDocuments()) {
                             // Increase count if entrant is selected or registered.
                             if (Boolean.TRUE.equals(entrantDoc.getBoolean("onAcceptedList")) ||
                                     Boolean.TRUE.equals(entrantDoc.getBoolean("onRegisteredList"))) {
@@ -233,14 +259,21 @@ public class ManageEventEntrants extends Fragment {
                             }
                         }
 
-                        // Update UI with live counts
+                        // Update UI with the counts
                         if (isAdded()) {
-                            String count = (acceptedRegisteredCount) + " Entrants / " + eventCapacity + " Entrant Capacity.";
+                            String count = acceptedRegisteredCount + " Entrants / " + eventCapacity + " Entrant Capacity.";
                             selectedRegisteredCount.setText(count);
                         }
+
+                        // Notify success
+                        callback.onComplete(true);
+                    } else {
+                        Log.e("UpdateCounts", "Error fetching entrants: ", task.getException());
+                        callback.onComplete(false); // Notify failure
                     }
                 });
     }
+
 
     /**
      * @author Tina
@@ -310,18 +343,16 @@ public class ManageEventEntrants extends Fragment {
      * @author Sahara, Tina
      * Fetches event data and generates a sample list of entrants based on event capacity.
      * @param eventId The unique identifier of the event
+     * @param callback The callback to notify the caller of the operation's success or failure.
+     *                 The callback is invoked with a boolean indicating whether the operation
+     *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
      */
-    private void fetchEventAndGenerateSample(String eventId) {
+    private void fetchEventAndGenerateSample(String eventId, OnCompleteListener<Boolean> callback) {
         DocumentReference eventRef = db.collection("events").document(eventId);
 
-        eventRef.addSnapshotListener((documentSnapshot, error) -> {
-            if (error != null) {
-                Toast.makeText(getContext(), "Error listening to event: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (documentSnapshot != null && documentSnapshot.exists()) {
-                Event event = documentSnapshot.toObject(Event.class);
+        eventRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                Event event = task.getResult().toObject(Event.class);
                 if (event != null) {
                     // Generate the sample entrants list
                     event.setEntrantsList((ArrayList<Entrant>) allEntrants);
@@ -332,40 +363,73 @@ public class ManageEventEntrants extends Fragment {
 
                     if (isSampleSuccessful) {
                         Toast.makeText(getContext(), "Sampling successful!", Toast.LENGTH_SHORT).show();
+                        callback.onComplete(true); // Notify success
                     } else {
                         Toast.makeText(getContext(), "Sampling unsuccessful :(", Toast.LENGTH_SHORT).show();
+                        callback.onComplete(false); // Notify failure
                     }
+                } else {
+                    Toast.makeText(getContext(), "Failed to parse event", Toast.LENGTH_SHORT).show();
+                    callback.onComplete(false);
                 }
             } else {
-                Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Event not found or error occurred", Toast.LENGTH_SHORT).show();
+                callback.onComplete(false);
             }
         });
     }
 
+
     /**
      * @author Tina
-     * Removes entrants with "selected" set to true.
-     * @param eventId The unique identifier of the event whose entrants need to be updated.
-     **/
-    private void fetchEventAndRemoveEntrants(String eventId) {
+     * Fetches the list of entrants for the given event and updates the status of each
+     * entrant who is on the accepted list by removing them from the accepted list and
+     * adding them to the cancelled list. The update is performed using a batch to ensure
+     * atomicity and efficiency.
+     *
+     * @param eventId The ID of the event whose entrants will be updated.
+     * @param callback The callback to notify the caller of the operation's success or failure.
+     *                 The callback is invoked with a boolean indicating whether the operation
+     *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
+     */
+    private void fetchEventAndRemoveEntrants(String eventId, OnCompleteListener<Boolean> callback) {
         db.collection("events")
                 .document(eventId)
                 .collection("entrantsList")
                 .whereEqualTo("onAcceptedList", true)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    for (DocumentSnapshot entrant : querySnapshot.getDocuments()) {
-                        entrant.getReference().update(
-                                        "onAcceptedList", false,
-                                        "onCancelledList", true
-                                ).addOnSuccessListener(aVoid ->
-                                        Log.d("ManageEventEntrants", "Entrant updated successfully"))
-                                .addOnFailureListener(e ->
-                                        Log.e("ManageEventEntrants", "Error updating entrant: " + e.getMessage()));
+                    if (querySnapshot.isEmpty()) {
+                        Log.d("ManageEventEntrants", "No entrants to update.");
+                        callback.onComplete(true); // No updates needed, but still considered success.
+                        return;
                     }
-                }).addOnFailureListener(e ->
-                        Log.e("ManageEventEntrants", "Error fetching entrants: " + e.getMessage()));
+
+                    WriteBatch batch = db.batch();
+
+                    for (DocumentSnapshot entrant : querySnapshot.getDocuments()) {
+                        batch.update(entrant.getReference(),
+                                "onAcceptedList", false,
+                                "onCancelledList", true);
+                    }
+
+                    // Commit the batch to execute updates
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("ManageEventEntrants", "All entrants updated successfully.");
+                                callback.onComplete(true); // Notify success
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("ManageEventEntrants", "Error updating entrants: " + e.getMessage());
+                                callback.onComplete(false); // Notify failure
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ManageEventEntrants", "Error fetching entrants: " + e.getMessage());
+                    callback.onComplete(false); // Notify failure
+                });
     }
+
 
     /**
      * @author Tina, Aasvi
@@ -460,7 +524,7 @@ public class ManageEventEntrants extends Fragment {
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 // Access data from each document in 'entrantsList'
                                 String entrantId = document.getId();
-                                boolean isSelected = Boolean.TRUE.equals(document.getBoolean("onSelectedList"));
+                                boolean isSelected = Boolean.TRUE.equals(document.getBoolean("onAcceptedList"));
                                 boolean notSelected = Boolean.TRUE.equals(document.getBoolean("onWaitingList"));
                                 if (isSelected) {
                                     String message = "Congratulations, you have won the event lottery for " + eventName + "! Accept your invitation to secure your spot!";
@@ -485,14 +549,16 @@ public class ManageEventEntrants extends Fragment {
                 });
     }
 
+    public interface OnCompleteListener<T> {
+        void onComplete(T result);
+    }
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (entrantsListener != null) {
             entrantsListener.remove();
-        }
-        if (entrantListener != null) {
-            entrantListener.remove();
         }
         binding = null;
     }
