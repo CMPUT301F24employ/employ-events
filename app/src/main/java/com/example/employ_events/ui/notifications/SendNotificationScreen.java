@@ -1,10 +1,14 @@
 package com.example.employ_events.ui.notifications;
 
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -13,6 +17,8 @@ import androidx.fragment.app.Fragment;
 import com.example.employ_events.databinding.FragmentSendNotificationScreenBinding;
 import com.example.employ_events.ui.notifications.Notification;
 import com.google.android.material.tabs.TabLayout;
+
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -58,12 +64,37 @@ public class SendNotificationScreen extends Fragment {
                 confirmButton.setOnClickListener(view -> {
                     String message = messageInput.getText().toString().trim();
 
+
                     if (message.isEmpty()) {
                         Toast.makeText(getContext(), "Please enter a message", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     sendNotifications(eventId, message, selectedTabPosition[0]);
+
+                // Set an OnClickListener for the "Send Invitation" button
+                sendInvitationButton.setOnClickListener(view -> {
+                    // Fetch the list of entrants for the event from Firestore
+                    db.collection("events").document(eventId).collection("entrantsList").get()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    QuerySnapshot querySnapshot = task.getResult();
+                                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                        for (QueryDocumentSnapshot document : querySnapshot) {
+                                            // Access data from each document in 'entrantsList'
+                                            String entrantId = document.getId();
+                                            Notification notification = new Notification(eventId, "You suck", false, "organizer_notification_channel");
+                                            notification.sendNotification(this.getContext());
+                                            addNotification(entrantId, notification);
+                                        }
+                                    } else {
+                                        System.out.println("No entrants found in the subcollection.");
+                                    }
+                                } else {
+                                    System.err.println("Error fetching entrants: " + task.getException());
+                                }
+                            });
+
                 });
             }
         }

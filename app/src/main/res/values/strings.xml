@@ -64,4 +64,10 @@
     <string name="menu_admin_browse_profiles">Admin Browse Profiles</string>
     <string name="menu_admin_browse_facilities">Admin Browse Facilities</string>
     <string name="menu_admin_browse_events">Admin: Browse Events</string>
+    <string name="organizer_channel_name">Organizer Notifications</string>
+    <string name="organizer_channel_description">Customized notifications from organizers.</string>
+    <string name="app_channel_name">App Notifications</string>
+    <string name="app_channel_description">Alerts for winning/losing event lotteries.</string>
+    <string name="admin_channel_name">Admin Notifications</string>
+    <string name="admin_channel_description">Customized notifications from organizers</string>
 </resources>

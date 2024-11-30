@@ -12,7 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 
+import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentHomeBinding;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,9 +25,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 /*
-Implemented a dashboard like home screen.
-Current issues: Meant to have buttons to navigate to respective screens but it bugs out
-the nav drawer when trying to press the menu home button.
+Authors: Tina
+Implemented a dashboard like home screen with live updating counts for user stats.
  */
 
 /**
@@ -75,10 +77,26 @@ public class HomeFragment extends Fragment {
         startListeningForEntrantCount();
         fetchInvitationWinJoinCount();
 
-        // Buttons are not functioning as expected, hide them for now.
-        facilityButton.setVisibility(View.GONE);
-        scanQrButton.setVisibility(View.GONE);
-        invitationsButton.setVisibility(View.GONE);
+        facilityButton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_home_to_nav_facility,
+                null,
+                new NavOptions.Builder()
+                        .setPopUpTo(R.id.nav_home, true)  // This will remove Home from the back stack
+                        .build()));
+
+        scanQrButton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_nav_home_to_scan_qr_code,
+                null,
+                new NavOptions.Builder()
+                        .setPopUpTo(R.id.nav_home, true)  // This will remove Home from the back stack
+                        .build()));
+
+        invitationsButton.setOnClickListener(v -> {
+            // Navigate to Facility and clear Home from the back stack (optional)
+            Navigation.findNavController(v).navigate(R.id.action_nav_home_to_nav_invitations,
+                    null,
+                    new NavOptions.Builder()
+                            .setPopUpTo(R.id.nav_home, true)  // This will remove Home from the back stack
+                            .build());
+        });
 
         return root;
     }

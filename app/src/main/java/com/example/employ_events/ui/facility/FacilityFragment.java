@@ -18,15 +18,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
+import com.example.employ_events.ui.profile.ProfileFragment;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /*
-Authors: Tina, Sahara
+Authors: Tina, Sahara, and Jasleen
 
 The purpose of this fragment is offer options through buttons
 to edit their facility profile or view their events.
@@ -146,6 +150,13 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
         binding.editFacilityButton.setOnClickListener(view ->
                         Navigation.findNavController(view).navigate(R.id.action_nav_facility_to_nav_edit_facility)
                 );
+
+        // Remove facility and everything associated with it
+        deleteFacilityButton.setOnClickListener(v -> {
+            if (uniqueID != null) {
+                deleteFacility(uniqueID);
+            }
+        });
 
         return root;
     }
@@ -280,6 +291,73 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         displayProfile(document, facilityViewModel); // Call your display method
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Deletes the facility and all associated events and data from Firebase.
+     * @param uniqueID The unique ID of the user, used to identify the facility.
+     */
+    private void deleteFacility(String uniqueID) {
+        // Fetch the facility ID
+        getFacilityID(uniqueID, facilityID -> {
+            if (facilityID != null) {
+                DocumentReference facilityRef = db.collection("facilities").document(facilityID);
+                facilityRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot facilityDocument = task.getResult();
+                        if (facilityDocument != null) {
+                            // Fetch events
+                            db.collection("events").whereEqualTo("facilityID", facilityID).get().addOnCompleteListener(eventTask -> {
+                                if (eventTask.isSuccessful()) {
+                                    // Check if the facility has any associated events, if not, then go ahead and delete facility
+                                    if (eventTask.getResult().isEmpty()) {
+                                        facilityRef.delete().addOnCompleteListener(deleteTask -> {
+                                            if (deleteTask.isSuccessful()) {
+                                                Toast.makeText(getContext(), "Facility successfully deleted!", Toast.LENGTH_SHORT).show();
+                                                NavHostFragment.findNavController(FacilityFragment.this).popBackStack();
+                                            } else {
+                                                Toast.makeText(getContext(), "Error deleting facility", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                    // If yes, then delete events, events from entrants lists, and then facility
+                                    else{
+                                        for (QueryDocumentSnapshot eventDoc : eventTask.getResult()) {
+                                            String eventID = eventDoc.getId();
+                                            db.collection("entrantsList").whereEqualTo("id", eventID).get().addOnCompleteListener(entrantsTask -> {
+                                                if (entrantsTask.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot entrantDoc : entrantsTask.getResult()) {
+                                                        // Remove the event from any entrants lists
+                                                        db.collection("entrantsList").document(entrantDoc.getId()).delete();
+                                                    }
+                                                }
+                                            });
+
+                                            //Delete the event and QR code
+                                            db.collection("events").document(eventID).delete();
+                                            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("QRCodes/" + eventDoc.getId() + ".png");
+                                            storageReference.delete();
+                                            }
+
+                                        // Delete the facility
+                                        facilityRef.delete().addOnCompleteListener(deleteTask -> {
+                                            if (deleteTask.isSuccessful()) {
+                                                Toast.makeText(getContext(), "Facility and associated events have been successfully deleted !", Toast.LENGTH_SHORT).show();
+                                                NavHostFragment.findNavController(FacilityFragment.this).popBackStack();
+                                            } else {
+                                                Toast.makeText(getContext(), "Error deleting facility and associated events.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                        }
                     }
                 });
             }
