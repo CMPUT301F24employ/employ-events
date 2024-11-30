@@ -86,10 +86,10 @@
         android:layout_marginTop="24dp">
 
         <Button
-            android:id="@+id/returnButton"
+            android:id="@+id/clearButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Return"
+            android:text="Clear"
             android:background="@android:color/transparent"
             android:textStyle="bold"
             android:textColor="@color/black"/>
