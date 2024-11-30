@@ -73,15 +73,13 @@
                 android:padding="8dp"
                 android:text="Create or manage your events!"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:visibility="gone" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <Button
                 android:id="@+id/manageFacilityButton"
-                android:layout_width="260dp"
+                android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:backgroundTint="#3D5AFE"
                 android:text="Manage Facility" />
 
         </LinearLayout>
@@ -132,15 +130,13 @@
                 android:padding="8dp"
                 android:text="Scan an event QR code to join an event!"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:visibility="gone" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <Button
                 android:id="@+id/scan_qr_code_button"
-                android:layout_width="260dp"
+                android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:backgroundTint="#3D5AFE"
                 android:text="Scan Event QR Code" />
 
     </LinearLayout>
@@ -182,12 +178,11 @@
                 android:padding="8dp"
                 android:text="View and reply to your invitations!"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:visibility="gone" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <Button
                 android:id="@+id/view_invitations_button"
-                android:layout_width="260dp"
+                android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:backgroundTint="#3D5AFE"
