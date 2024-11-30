@@ -38,12 +38,14 @@
 
         <Button
             android:id="@+id/uploadPFP"
+            android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload" />
 
         <Button
             android:id="@+id/removePFP"
+            android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Remove"
