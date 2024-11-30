@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /*
 Authors: Tina, Aasvi, Sahara.
@@ -91,6 +92,14 @@ public class ManageEventEntrants extends Fragment {
 
         initializeViews();
 
+        // Retrieve eventId from arguments passed to the fragment
+        if (getArguments() != null) {
+            eventId = getArguments().getString("EVENT_ID");
+        }
+        else {
+            return root;
+        }
+
         EntrantsAdapter.OnItemClickListener listener = entrantUniqueID -> {
             Log.d("EntrantsFragment", "Entrant clicked with ID: " + entrantUniqueID);
 
@@ -112,35 +121,29 @@ public class ManageEventEntrants extends Fragment {
         entrantsList.setLayoutManager(new LinearLayoutManager(getContext()));
         entrantsList.setAdapter(entrantsAdapter);
 
-
-        // Retrieve eventId from arguments passed to the fragment
-        if (getArguments() != null) {
-            eventId = getArguments().getString("EVENT_ID");
-        }
-
-        if (eventId != null) {
-            // Fetch the entrants for the event
-            fetchEntrants(eventId);
-
-            // Button functionality to navigate to notification screen
-            sendNotification.setOnClickListener(view -> {
-                Bundle args = new Bundle();
-                args.putString("EVENT_ID", eventId);
-                NavHostFragment.findNavController(ManageEventEntrants.this)
-                        .navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
-            });
-        }
-
-        // Hide the view entrants map button for non geolocation events.
-        updateViewEntrantsMapVisibility();
-
-        // Initializes the entrant count.
-        updateCounts(success -> {
+        // Hide the view entrants map button for non geolocation events and initialize entrant counts.
+        updateViewEntrantsMapVisibility(success -> {
             if (success) {
-                Log.d("UpdateCounts", "Entrant count initialized successfully.");
-            } else {
-                Log.e("UpdateCounts", "Failed to initialize entrant count.");
+                updateCounts(success1 -> {
+                    if (success1) {
+                        Log.d("UpdateCounts", "Entrant count initialized successfully.");
+                    } else {
+                        Log.e("UpdateCounts", "Failed to initialize entrant count.");
+                    }
+                });
             }
+        });
+
+        // Fetch the entrants for the event
+        fetchEntrants(eventId);
+        setupTabLayout();
+
+        // Button functionality to navigate to notification screen
+        sendNotification.setOnClickListener(view -> {
+            Bundle args = new Bundle();
+            args.putString("EVENT_ID", eventId);
+            NavHostFragment.findNavController(ManageEventEntrants.this)
+                    .navigate(R.id.action_manageEventEntrantsFragment_to_sendNotificationsScreen, args);
         });
 
         // Sample entrants button functionality.
@@ -192,9 +195,6 @@ public class ManageEventEntrants extends Fragment {
                 Toast.makeText(getContext(), "Event ID not found", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-        setupTabLayout();
 
         return root;
     }
@@ -279,7 +279,7 @@ public class ManageEventEntrants extends Fragment {
      * @author Tina
      * Checks the events geolocation requirement and hides the entrants map button if not required.
      */
-    private void updateViewEntrantsMapVisibility() {
+    private void updateViewEntrantsMapVisibility(OnCompleteListener<Boolean> callback) {
         db.collection("events").document(eventId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -290,7 +290,8 @@ public class ManageEventEntrants extends Fragment {
                                 viewEntrantMap.setVisibility(View.GONE);
                             }
                             eventName = document.getString("eventTitle");
-                            eventCapacity = document.get("eventCapacity").toString();
+                            eventCapacity = Objects.requireNonNull(document.getLong("eventCapacity")).toString();
+                            callback.onComplete(true); // Notify success
                         }
                     }
         });
