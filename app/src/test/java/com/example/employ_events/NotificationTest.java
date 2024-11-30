@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  */
 public class NotificationTest {
 
-
+    private String organizer_cid = "organizer_notification_channel";
     private Notification notification; // Our Notification class
 
     /**
@@ -22,7 +22,7 @@ public class NotificationTest {
     @Before
     public void setUp() {
         // Create a new instance of Notification with some sample data
-        notification = new Notification("eventID", "This is a test message - you have been invited!", false);
+        notification = new Notification("eventID", "This is a test message - you have been invited!", false, organizer_cid);
     }
 
     /**
