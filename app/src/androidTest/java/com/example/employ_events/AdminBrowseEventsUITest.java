@@ -4,7 +4,9 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -32,7 +34,7 @@ import org.junit.runners.MethodSorters;
 /*
 BEFORE TESTING MAKE SURE:
  - You have a profile set up that has admin set to true on firebase
- - You have a facility set up that does not have an event with a name that matches the eventName variable
+ - There is no event in firebase with a name that matches the eventName variable
  */
 
 // Makes tests run in alphabetical order
@@ -100,12 +102,22 @@ public class AdminBrowseEventsUITest {
         onView(withId(R.id.nav_browse_event)).perform(click());
 
         // Check to see if the event is in the recycler view
-        onView(withId(R.id.all_events_recycler_view)).check(matches(ViewMatchers.hasDescendant(withText(eventName))));
+        onView(withId(R.id.all_events_recycler_view)).check(matches(hasDescendant(withText(eventName))));
     }
 
     // US 03.01.01 As an administrator, I want to be able to remove events.
     @Test
-    public void D_deleteEventTest() {
+    public void D_deleteEventTest() throws InterruptedException {
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+        onView(withId(R.id.nav_browse_event)).perform(click());
+
+        onView(withId(R.id.all_events_recycler_view)).perform(click());
+//        onView(withId(R.id.all_events_recycler_view)).perform(actionOnItem(hasDescendant(withText(eventName)), click()));
+
+//
+//        // Click on the event in the recycler view
+//        onView(withId(R.id.all_events_recycler_view)).perform(actionOnItem(hasDescendant(withText("Cool")), click()));
+        Thread.sleep(3000);
 
     }
 

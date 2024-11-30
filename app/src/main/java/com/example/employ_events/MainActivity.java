@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             Menu menu = navigationView.getMenu();
             menu.findItem(R.id.nav_browse_event).setVisible(isAdmin);
             menu.findItem(R.id.nav_image).setVisible(isAdmin);
-            menu.findItem(R.id.adminBrowseProfilesFragment).setVisible(isAdmin);
+            menu.findItem(R.id.nav_browse_profiles).setVisible(isAdmin);
             menu.findItem(R.id.adminBrowseFacilitiesFragment).setVisible(isAdmin);
         }).addOnFailureListener(e -> Log.e("MainActivity", "Error fetching admin status: ", e));
 

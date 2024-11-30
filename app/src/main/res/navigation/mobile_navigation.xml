@@ -34,7 +34,7 @@
             app:destination="@+id/nav_browse_event" />
         <action
             android:id="@+id/action_homeFragment_to_adminBrowseProfilesFragment"
-            app:destination="@+id/adminBrowseProfilesFragment" />
+            app:destination="@+id/nav_browse_profiles" />
         <action
             android:id="@+id/action_nav_home_to_nav_invitations"
             app:destination="@id/nav_invitations" />
@@ -254,7 +254,7 @@
         tools:layout="@layout/fragment_profile" />
 
     <fragment
-        android:id="@+id/adminBrowseProfilesFragment"
+        android:id="@+id/nav_browse_profiles"
         android:name="com.example.employ_events.ui.admin.AdminBrowseProfilesFragment"
         android:label="Admin: Browse Profiles"
         tools:layout="@layout/fragment_admin_profile_list">

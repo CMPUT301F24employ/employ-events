@@ -25,6 +25,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+
+/**
+ * @author Jasleen
+ * AdminBrowseProfilesFragment allows admins to browse all the profiles in firebase. They are also able to click on
+ * the profile to then delete it which resultingly deletes the facility and events associated with it.
+ * Cannot delete admin profiles.
+ * US 03.05.01 As an administrator, I want to be able to browse profiles.
+ * US 03.02.01 As an administrator, I want to be able to remove profiles.
+ * @see com.example.employ_events.ui.profile.ProfileFragment
+ * Delete profile logic in ProfileFragment
+ */
 public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdapter.ProfileClickListener{
 
     private FragmentAdminProfileListBinding binding;
@@ -32,6 +43,18 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     private ArrayList<Profile> profileList;
     private ProfileAdapter profileAdapter;
 
+    /**
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     * @return the root view of the fragment
+     *
+     * Sets up the recycler view and queries & adds the profiles to the view.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAdminProfileListBinding.inflate(inflater, container, false);

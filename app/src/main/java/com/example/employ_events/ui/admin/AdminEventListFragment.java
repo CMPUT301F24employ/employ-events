@@ -27,6 +27,10 @@ import java.util.ArrayList;
  * AdminEventListFragment allows users who are admins (according to their firebase profile) to browse all the events
  * stored in firebase. Admins are also able to click on an event to be able to delete the event or its qr code.
  * US 03.04.01 As an administrator, I want to be able to browse events.
+ * US 03.01.01 As an administrator, I want to be able to remove events.
+ * US 03.03.02 As an administrator, I want to be able to remove hashed QR code data.
+ * @see com.example.employ_events.ui.events.ManageEventFragment
+ * Delete event logic in ManageEventFragment
  */
 public class AdminEventListFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 

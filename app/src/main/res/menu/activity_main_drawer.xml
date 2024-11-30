@@ -48,7 +48,7 @@
             android:title="@string/menu_admin_browse_events" />
 
         <item
-            android:id="@+id/adminBrowseProfilesFragment"
+            android:id="@+id/nav_browse_profiles"
             android:icon="@drawable/ic_menu_list"
             android:title="@string/menu_admin_browse_profiles" />
 
