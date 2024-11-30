@@ -33,6 +33,7 @@ public class SendNotificationScreen extends Fragment {
         Button confirmButton = binding.confirmButton;
         EditText messageInput = binding.messageInput;
         TabLayout tabLayout = binding.tabLayout;
+        //sendInvitationButton = binding.sendInvitationButton;
 
 
         // Keep track of the selected tab
@@ -73,7 +74,7 @@ public class SendNotificationScreen extends Fragment {
     }
 
     private void sendNotifications(String eventId, String message, int tabPosition) {
-        String ORGANIZER_CHANNEL_ID = "admin_notification_channel";
+        String ORGANIZER_CHANNEL_ID = "organizer_notification_channel";
         db.collection("events").document(eventId).collection("entrantsList").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
