@@ -35,6 +35,7 @@ import static org.hamcrest.Matchers.not;
 /*
 BEFORE TESTING MAKE SURE:
  - You have a profile set up that has admin set to true on firebase
+ - You might have to run test one by one
  */
 public class AdminBrowseImageAndFacilityTest {
     @Rule
@@ -115,7 +116,7 @@ public class AdminBrowseImageAndFacilityTest {
         // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
         onView(withContentDescription("Open navigation drawer")).perform(click());
         Thread.sleep(1500);
-        //Click on the admin facilityies browse
+        //Click on the admin facilities browse
         onView(withId(R.id.adminBrowseFacilitiesFragment)).perform(click());
         Thread.sleep(1500);
         //Check if you are on the right screen
