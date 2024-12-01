@@ -99,39 +99,40 @@ public class InvitationsListFragment extends Fragment {
                     if (querySnapshot != null) {
                         invitationsList.clear();  // Clear the list to prevent duplicate entries
                         for (QueryDocumentSnapshot document : querySnapshot) {
-                            String eventId = document.getId();
-                            String eventName = document.getString("eventTitle");
+                            if (document.exists()) {
+                                String eventId = document.getId();
+                                String eventName = document.getString("eventTitle");
 
-                            // Set up a listener for each user's document in the entrantsList subcollection
-                            db.collection("events")
-                                    .document(eventId)
-                                    .collection("entrantsList")
-                                    .document(uniqueID)
-                                    .addSnapshotListener((entrantSnapshot, entrantError) -> {
-                                        if (entrantError != null) {
-                                            Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
-                                            return;
-                                        }
+                                // Set up a listener for each user's document in the entrantsList subcollection
+                                db.collection("events")
+                                        .document(eventId)
+                                        .collection("entrantsList")
+                                        .document(uniqueID)
+                                        .addSnapshotListener((entrantSnapshot, entrantError) -> {
+                                            if (entrantError != null) {
+                                                Log.e("FirestoreError", "Error listening to entrantsList: ", entrantError);
+                                                return;
+                                            }
 
-                                        if (entrantSnapshot != null && entrantSnapshot.exists()) {
-                                            Boolean onAcceptedList = entrantSnapshot.getBoolean("onAcceptedList");
-                                            if (onAcceptedList != null && onAcceptedList) {
-                                                // Add to list only if not already present
-                                                EventItem eventItem = new EventItem(eventId, eventName);
-                                                if (!invitationsList.contains(eventItem)) {
-                                                    invitationsList.add(eventItem);
+                                            if (entrantSnapshot != null && entrantSnapshot.exists()) {
+                                                Boolean onAcceptedList = entrantSnapshot.getBoolean("onAcceptedList");
+                                                if (onAcceptedList != null && onAcceptedList) {
+                                                    // Add to list only if not already present
+                                                    EventItem eventItem = new EventItem(eventId, eventName);
+                                                    if (!invitationsList.contains(eventItem)) {
+                                                        invitationsList.add(eventItem);
+                                                        adapter.notifyDataSetChanged();  // Update the adapter
+                                                    }
+                                                } else {
+                                                    // Remove if no longer on accepted list
+                                                    invitationsList.removeIf(event -> event.getEventId().equals(eventId));
                                                     adapter.notifyDataSetChanged();  // Update the adapter
                                                 }
-                                            } else {
-                                                // Remove if no longer on accepted list
-                                                invitationsList.removeIf(event -> event.getEventId().equals(eventId));
-                                                adapter.notifyDataSetChanged();  // Update the adapter
                                             }
-                                        }
-                                    });
+                                        });
+                            }
                         }
                     }
                 });
     }
-
 }

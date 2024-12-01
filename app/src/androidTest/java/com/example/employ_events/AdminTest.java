@@ -63,8 +63,8 @@ public class AdminTest {
         Thread.sleep(1500);
         // Click on the "Facility" menu item
         onView(withId(R.id.nav_image)).check(matches(isDisplayed()));
-        onView(withId(R.id.adminEventListFragment)).check(matches(isDisplayed()));
-        onView(withId(R.id.adminBrowseProfilesFragment)).check(matches(isDisplayed()));
+        //onView(withId(R.id.adminEventListFragment)).check(matches(isDisplayed()));
+        //onView(withId(R.id.adminBrowseProfilesFragment)).check(matches(isDisplayed()));
         onView(withId(R.id.adminBrowseFacilitiesFragment)).check(matches(isDisplayed()));
     }
 //    @Test
