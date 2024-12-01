@@ -301,6 +301,7 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     }
 
     /**
+     * @author Jasleen
      * Deletes the facility and all associated events and data from Firebase.
      * @param uniqueID The unique ID of the user, used to identify the facility.
      */
