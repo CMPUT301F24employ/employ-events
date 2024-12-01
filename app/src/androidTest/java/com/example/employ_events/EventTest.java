@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.example.employ_events.ui.entrants.Entrant;
-import com.example.employ_events.ui.events.Event;
+import com.example.employ_events.model.Entrant;
+import com.example.employ_events.model.Event;
 
 import org.junit.Before;
 import org.junit.Test;

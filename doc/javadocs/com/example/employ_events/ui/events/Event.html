@@ -73,7 +73,7 @@ loadScripts(document, 'script');</script>
 <h1 title="Class Event" class="title">Class Event</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">com.example.employ_events.ui.events.Event</div>
+<div class="inheritance">com.example.employ_events.model.Event</div>
 </div>
 <section class="class-description" id="class-description">
 <hr>
@@ -125,7 +125,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addEntrant(com.example.employ_events.ui.entrants.Entrant)" class="member-name-link">addEntrant</a><wbr>(<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&nbsp;entrant)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addEntrant(com.example.employ_events.model.Entrant)" class="member-name-link">addEntrant</a><wbr>(<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&nbsp;entrant)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Adds an entrant to the waiting list if waiting list capacity allows.</div>
 </div>
@@ -144,7 +144,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the description of the event.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEntrantsList()" class="member-name-link">getEntrantsList</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the list of entrants for the event.</div>
@@ -210,7 +210,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the description of the event.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setEntrantsList(java.util.ArrayList)" class="member-name-link">setEntrantsList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&gt;&nbsp;entrantsList)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setEntrantsList(java.util.ArrayList)" class="member-name-link">setEntrantsList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&gt;&nbsp;entrantsList)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setEventCapacity(java.lang.Integer)" class="member-name-link">setEventCapacity</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&nbsp;eventCapacity)</code></div>
@@ -583,9 +583,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addEntrant(com.example.employ_events.ui.entrants.Entrant)">
+<section class="detail" id="addEntrant(com.example.employ_events.model.Entrant)">
 <h3>addEntrant</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">addEntrant</span><wbr><span class="parameters">(<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&nbsp;entrant)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">addEntrant</span><wbr><span class="parameters">(<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&nbsp;entrant)</span></div>
 <div class="block">Adds an entrant to the waiting list if waiting list capacity allows.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -598,13 +598,13 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="setEntrantsList(java.util.ArrayList)">
 <h3>setEntrantsList</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setEntrantsList</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&gt;&nbsp;entrantsList)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setEntrantsList</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&gt;&nbsp;entrantsList)</span></div>
 </section>
 </li>
 <li>
 <section class="detail" id="getEntrantsList()">
 <h3>getEntrantsList</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.entrants">Entrant</a>&gt;</span>&nbsp;<span class="element-name">getEntrantsList</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html" title="class or interface in java.util" class="external-link">ArrayList</a>&lt;<a href="../entrants/Entrant.html" title="class in com.example.employ_events.ui.adapter">Entrant</a>&gt;</span>&nbsp;<span class="element-name">getEntrantsList</span>()</div>
 <div class="block">Returns the list of entrants for the event.</div>
 <dl class="notes">
 <dt>Returns:</dt>
