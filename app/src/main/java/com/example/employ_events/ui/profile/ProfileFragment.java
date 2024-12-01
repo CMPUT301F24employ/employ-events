@@ -1,5 +1,6 @@
 package com.example.employ_events.ui.profile;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentProfileBinding;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,7 +48,7 @@ public class ProfileFragment extends Fragment{
 
     private FragmentProfileBinding binding;
     private TextView name, email, phone_number;
-    private Button editProfileButton, deleteProfileButton;
+    private Button editProfileButton, deleteProfileButton, notificationSettingsButton;
     private ImageView pfp;
     private String uniqueID;
     private boolean isAdmin = false;
@@ -96,6 +98,9 @@ public class ProfileFragment extends Fragment{
                             .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
             deleteProfileButton.setOnClickListener(v -> deleteProfileAndFacility());
+
+            // Show notification settings dialog when button is clicked.
+            notificationSettingsButton.setOnClickListener(v -> showNotificationSettingsDialog());
         }
 
         return root;
@@ -112,6 +117,7 @@ public class ProfileFragment extends Fragment{
         email = binding.profileEmail;
         editProfileButton = binding.editProfileButton;
         pfp = binding.userPFP;
+        notificationSettingsButton = binding.buttonNotificationsSettings;
         deleteProfileButton = binding.deleteProfileButton;
 
         // Hiding edit button if the user is an admin and only showing delete profile button
@@ -272,6 +278,77 @@ public class ProfileFragment extends Fragment{
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show());
         });
+    }
+
+
+    /**
+     * @author Tina
+     * Displays a dialog where the user can toggle notification settings for admin and organizer notifications.
+     * Fetches current settings from Firebase Firestore and updates the switches accordingly.
+     * When the user clicks "Save", the settings are saved back to Firestore.
+     */
+    private void showNotificationSettingsDialog() {
+        // Inflate the dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.notifications_setting, null);
+
+        // Get references to the dialog's views
+        SwitchMaterial switchAdminNotifications = dialogView.findViewById(R.id.switch_admin_notifications);
+        SwitchMaterial switchOrganizerNotifications = dialogView.findViewById(R.id.switch_organizer_notifications);
+
+        // Fetch user data from Firestore
+        DocumentReference userDocRef = db.collection("userProfiles").document(uniqueID);
+        userDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // Set the switches based on Firestore data
+                    Boolean adminNotifications = document.getBoolean("adminNotifications");
+                    Boolean organizerNotifications = document.getBoolean("organizerNotifications");
+
+                    // If the fields are not null, set the switches
+                    if (adminNotifications != null) {
+                        switchAdminNotifications.setChecked(adminNotifications);
+                    }
+                    if (organizerNotifications != null) {
+                        switchOrganizerNotifications.setChecked(organizerNotifications);
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), "Failed to load settings.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Build the dialog
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Notification Settings")
+                .setView(dialogView)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    // When user clicks "Save", update Firestore with the new preferences
+                    updateNotificationPreference("adminNotifications", switchAdminNotifications.isChecked());
+                    updateNotificationPreference("organizerNotifications", switchOrganizerNotifications.isChecked());
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // If the user clicks "Cancel", just dismiss the dialog without saving
+                    Toast.makeText(requireContext(), "Changes canceled", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                })
+                .create()
+                .show();
+    }
+
+    /**
+     * @author Tina
+     * Updates the notification preference for the user in Firestore.
+     *
+     * @param preferenceType The type of preference to update (either "adminNotifications" or "organizerNotifications").
+     * @param isEnabled Whether the notification preference should be enabled (true) or disabled (false).
+     */
+    private void updateNotificationPreference(String preferenceType, boolean isEnabled) {
+        // Update Firestore with the new preference
+        DocumentReference userDocRef = db.collection("userProfiles").document(uniqueID);
+        userDocRef.update(preferenceType, isEnabled)
+                .addOnSuccessListener(aVoid -> Toast.makeText(requireContext(), "Settings saved", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to update settings", Toast.LENGTH_SHORT).show());
     }
 
 

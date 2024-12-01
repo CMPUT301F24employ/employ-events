@@ -28,11 +28,6 @@
             android:title="@string/menu_invitations" />
 
         <item
-            android:id="@+id/entrantNotifications"
-            android:icon="@drawable/white_notification"
-            android:title="@string/menu_notifications" />
-
-        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/baseline_person_24"
             android:title="@string/menu_profile" />
@@ -41,7 +36,6 @@
             android:icon="@drawable/ic_menu_list"
             android:title="@string/menu_admin_browse_images" />
 
-        <!--Both the id of the item here and the fragment in the mobile navigation should have the same name-->
         <item
             android:id="@+id/nav_browse_event"
             android:icon="@drawable/ic_menu_list"
