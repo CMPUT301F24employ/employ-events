@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.example.employ_events.ui.notifications.Notification;
-import com.example.employ_events.ui.profile.Profile;
+import com.example.employ_events.model.Notification;
+import com.example.employ_events.model.Profile;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;

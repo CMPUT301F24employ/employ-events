@@ -7,20 +7,20 @@
 
     <fragment
         android:id="@+id/nav_create_facility"
-        android:name="com.example.employ_events.ui.facility.CreateFacilityFragment"
+        android:name="com.example.employ_events.ui.fragment.facility.CreateFacilityFragment"
         tools:layout="@layout/create_facility">
     </fragment>
 
     <fragment
         android:id="@+id/nav_image"
-        android:name="com.example.employ_events.ui.admin.AdminImageListFragment"
+        android:name="com.example.employ_events.ui.fragment.admin.AdminImageListFragment"
         android:label="Admin: Browse Images"
         tools:layout="@layout/fragment_image_list">
     </fragment>
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.employ_events.ui.home.HomeFragment"
+        android:name="com.example.employ_events.ui.fragment.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -48,7 +48,7 @@
 
     <fragment
         android:id="@+id/nav_facility"
-        android:name="com.example.employ_events.ui.facility.FacilityFragment"
+        android:name="com.example.employ_events.ui.fragment.facility.FacilityFragment"
         android:label="@string/menu_facility"
         tools:layout="@layout/fragment_facility">
         <action
@@ -67,7 +67,7 @@
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.example.employ_events.ui.profile.ProfileFragment"
+        android:name="com.example.employ_events.ui.fragment.profile.ProfileFragment"
         android:label="@string/menu_profile"
         tools:layout="@layout/fragment_profile" >
         <action
@@ -77,7 +77,7 @@
 
     <fragment
         android:id="@+id/nav_edit_profile"
-        android:name="com.example.employ_events.ui.profile.EditProfileFragment"
+        android:name="com.example.employ_events.ui.fragment.profile.EditProfileFragment"
         android:label="@string/edit_profile"
         tools:layout="@layout/fragment_edit_profile" >
         <action
@@ -87,7 +87,7 @@
 
     <fragment
         android:id="@+id/nav_edit_facility"
-        android:name="com.example.employ_events.ui.facility.EditFacilityFragment"
+        android:name="com.example.employ_events.ui.fragment.facility.EditFacilityFragment"
         android:label="Edit Facility"
         tools:layout="@layout/fragment_edit_facility" >
         <action
@@ -98,7 +98,7 @@
 
     <fragment
         android:id="@+id/addEventFragment"
-        android:name="com.example.employ_events.ui.events.AddEventFragment"
+        android:name="com.example.employ_events.ui.fragment.event.AddEventFragment"
         android:label="Add Event"
         tools:layout="@layout/add_event">
         <action
@@ -108,7 +108,7 @@
 
     <fragment
         android:id="@+id/nav_registered_events"
-        android:name="com.example.employ_events.ui.registeredEvents.RegisteredEventsFragment"
+        android:name="com.example.employ_events.ui.fragment.event.RegisteredEventsFragment"
         android:label="Registered Events"
         tools:layout="@layout/fragment_registered_events" >
         <action
@@ -118,7 +118,7 @@
 
     <fragment
         android:id="@+id/eventListFragment"
-        android:name="com.example.employ_events.ui.events.EventListFragment"
+        android:name="com.example.employ_events.ui.fragment.event.EventListFragment"
         android:label="Events"
         tools:layout="@layout/fragment_event_list">
 
@@ -142,7 +142,7 @@
 
     <fragment
         android:id="@+id/eventDetailsFragment"
-        android:name="com.example.employ_events.ui.registeredEvents.EventDetailsFragment"
+        android:name="com.example.employ_events.ui.fragment.event.EventDetailsFragment"
         android:label="Event Details"
         tools:layout="@layout/event_details">
 
@@ -158,7 +158,7 @@
 
     <fragment
         android:id="@+id/manageEventFragment"
-        android:name="com.example.employ_events.ui.events.ManageEventFragment"
+        android:name="com.example.employ_events.ui.fragment.event.ManageEventFragment"
         android:label="Manage Event"
         tools:layout="@layout/fragment_manage_event">
         <action
@@ -174,7 +174,7 @@
 
     <fragment
         android:id="@+id/editEventFragment"
-        android:name="com.example.employ_events.ui.events.EditEventFragment"
+        android:name="com.example.employ_events.ui.fragment.event.EditEventFragment"
         android:label="Edit Event"
         tools:layout="@layout/edit_event">
         <action
@@ -184,7 +184,7 @@
 
     <fragment
         android:id="@+id/manageEventEntrantsFragment"
-        android:name="com.example.employ_events.ui.events.ManageEventEntrants"
+        android:name="com.example.employ_events.ui.fragment.event.ManageEventEntrantsFragment"
         android:label="Manage Entrants"
         tools:layout="@layout/fragment_manage_event_entrants">
         <action
@@ -197,7 +197,7 @@
 
     <fragment
         android:id="@+id/sendNotificationScreen"
-        android:name="com.example.employ_events.ui.notifications.SendNotificationScreen"
+        android:name="com.example.employ_events.ui.fragment.notification.SendNotificationFragment"
         android:label="Send Notifications"
         tools:layout="@layout/fragment_send_notification_screen">
 
@@ -205,14 +205,14 @@
 
     <fragment
         android:id="@+id/download_qr_code"
-        android:name="com.example.employ_events.ui.events.DownloadQRCode"
+        android:name="com.example.employ_events.ui.fragment.qrcode.DownloadQRCodeFragment"
         android:label="Download QR Code"
         tools:layout="@layout/download_qr_code">
     </fragment>
 
     <fragment
         android:id="@+id/scan_qr_code"
-        android:name="com.example.employ_events.ui.scanQrCode.ScanQrCodeFragment"
+        android:name="com.example.employ_events.ui.fragment.qrcode.ScanQrCodeFragment"
         android:label="Scan QR Code">
         <action
             android:id="@+id/action_scan_qr_code_to_eventDetailsFragment"
@@ -221,13 +221,13 @@
 
     <fragment
         android:id="@+id/event_entrants_map"
-        android:name="com.example.employ_events.ui.events.EventEntrantsMap"
+        android:name="com.example.employ_events.ui.fragment.event.EventEntrantsMapFragment"
         android:label="Entrants Map">
     </fragment>
 
     <fragment
         android:id="@+id/nav_browse_event"
-        android:name="com.example.employ_events.ui.admin.AdminEventListFragment"
+        android:name="com.example.employ_events.ui.fragment.admin.AdminEventListFragment"
         android:label="Admin: Browse Events"
         tools:layout="@layout/fragment_admin_event_list">
         <action
@@ -237,13 +237,13 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.employ_events.ui.profile.ProfileFragment"
+        android:name="com.example.employ_events.ui.fragment.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/nav_browse_profiles"
-        android:name="com.example.employ_events.ui.admin.AdminBrowseProfilesFragment"
+        android:name="com.example.employ_events.ui.fragment.admin.AdminBrowseProfilesFragment"
         android:label="Admin: Browse Profiles"
         tools:layout="@layout/fragment_admin_profile_list">
         <action
@@ -253,13 +253,13 @@
 
     <fragment
         android:id="@+id/facilityFragment"
-        android:name="com.example.employ_events.ui.facility.FacilityFragment"
+        android:name="com.example.employ_events.ui.fragment.facility.FacilityFragment"
         android:label="@string/menu_facility"
         tools:layout="@layout/fragment_facility" />
 
     <fragment
         android:id="@+id/adminBrowseFacilitiesFragment"
-        android:name="com.example.employ_events.ui.admin.AdminBrowseFacilitiesFragment"
+        android:name="com.example.employ_events.ui.fragment.admin.AdminBrowseFacilitiesFragment"
         android:label="Admin: Browse Facilities"
         tools:layout="@layout/fragment_admin_facility_list">
         <action
@@ -269,7 +269,7 @@
 
     <fragment
         android:id="@+id/invitation_fragment"
-        android:name="com.example.employ_events.ui.invitation.InvitationFragment"
+        android:name="com.example.employ_events.ui.fragment.invitation.InvitationFragment"
         tools:layout="@layout/event_invitation"
         android:label="Invitation">
         <action
@@ -282,7 +282,7 @@
 
     <fragment
         android:id="@+id/nav_invitations"
-        android:name="com.example.employ_events.ui.invitation.InvitationsListFragment"
+        android:name="com.example.employ_events.ui.fragment.invitation.InvitationsListFragment"
         tools:layout="@layout/fragment_invitations_list"
         android:label="Invitations">
 

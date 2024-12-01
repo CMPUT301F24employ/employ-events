@@ -19,8 +19,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import com.example.employ_events.ui.entrants.Entrant;
-import com.example.employ_events.ui.events.Event;
+import com.example.employ_events.model.Entrant;
+import com.example.employ_events.model.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
