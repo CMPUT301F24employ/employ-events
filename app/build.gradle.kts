@@ -77,4 +77,6 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation ("com.google.firebase:firebase-storage:21.0.1")
 
+    implementation(files("/Users/tinale/Library/Android/sdk/platforms/android-34/android.jar"))
+
 }
