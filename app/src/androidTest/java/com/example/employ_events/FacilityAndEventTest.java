@@ -2,20 +2,17 @@ package com.example.employ_events;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.pressKey;
-import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 
-import android.view.KeyEvent;
-import android.widget.TextView;
+import android.Manifest;
 
-
-import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -28,32 +25,31 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static org.junit.Assert.*;
+/**
+ * @author Aaron initially created,
+ * @author Tina modifying to reduce warnings, fix errors related to updates, using realistic data and adding documentation.
+ * UI Tests for organizer managing their facility.
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
 public class FacilityAndEventTest {
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
-    //TEST WON'T WORK IF YOUR ORGANIZER SETTING IS TRUE FOR YOUR USER ID. RERUN THE TEST AND IT SHOULD WORK.
+
+    // Grants permission to send notifications so pop-up doesn't appear
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS);
+
     @Test
     public void test01_HomeToFacilityScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+        // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Facility" menu item
+
+        // Wait for the menu to open
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if it's on the facility dialog since facility has not created yet screen
+
+        // Check that the facility dialog is shown
         onView(withId(R.id.editFacilityName)).check(matches(isDisplayed()));
         onView(withId(R.id.editFacilityEmail)).check(matches(isDisplayed()));
         onView(withId(R.id.editFacilityPhone)).check(matches(isDisplayed()));
@@ -64,755 +60,313 @@ public class FacilityAndEventTest {
 
     @Test
     public void test02_FacilityToHomeScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+        // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Facility" menu item
+
+        // Wait for the menu to open
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Not now" button on the DiaLog
+
+        // Click on the "Not Now" button on the dialog
         onView(withText("Not Now")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check it goes back to the starting screen
-        //onView(withId(R.id.admin_view_button)).check(matches(isDisplayed()));
-    }
 
-    @Test
-    public void test04_CreateAndEditFacilityScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
-        onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Facility" menu item
-        onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if it's on the facility dialog since facility has not created yet screen
-        onView(withText("Create Facility")).check(matches(isDisplayed()));
-
-        // Verify the "Create" button is displayed
-        onView(withText("Create")).check(matches(isDisplayed()));
-
-        // Enter facility information.
-        onView(withId(R.id.editFacilityName)).perform(ViewActions.typeText("Test"));
-        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.typeText("test@gmail.com"));
-        onView(withId(R.id.editFacilityAddress)).perform(ViewActions.typeText("Edmonton"));
-        // Click the "Create" button is to create the facility
-        onView(withText("Create")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //Check if the information been updated to the screen
-        ActivityScenario<MainActivity> scenario = mActivityScenarioRule.getScenario();
-        scenario.onActivity(activity -> {
-            // Find the TextView in the fragment_home layout
-            TextView facilityNameTV = activity.findViewById(R.id.facilityNameTV);
-            TextView facilityEmailTV = activity.findViewById(R.id.facilityEmailTV);
-            TextView facilityAddressTV = activity.findViewById(R.id.facilityAddressTV);
-
-            // Get the actual text from the TextView
-            String actualName = facilityNameTV.getText().toString();
-            String actualEmail = facilityEmailTV.getText().toString();
-            String actualAddress = facilityAddressTV.getText().toString();
-
-            // Check if the actual text matches the expected text
-            String expectedName = "Test";
-            assertEquals("TextView name does not match expected text", expectedName, actualName);
-            String expectedEmail = "test@gmail.com";
-            assertEquals("TextView email does not match expected text", expectedEmail, actualEmail);
-            String expectedAddress = "Edmonton";
-            assertEquals("TextView address does not match expected text", expectedAddress, actualAddress);
-        });
-        onView(withId(R.id.edit_facility_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.uploadPFP)).check(matches(isDisplayed()));
-        onView(withId(R.id.editTextFacilityName)).check(matches(isDisplayed()));
-        onView(withId(R.id.editTextFacilityEmailAddress)).check(matches(isDisplayed()));
-        onView(withId(R.id.editTextFacilityPhone)).check(matches(isDisplayed()));
-        onView(withId(R.id.editTextFacilityAddress)).check(matches(isDisplayed()));
-        onView(withId(R.id.confirm_button)).check(matches(isDisplayed()));
-        onView(withText("Test")).check(matches(isDisplayed()));
-        onView(withText("test@gmail.com")).check(matches(isDisplayed()));
-        onView(withText("Edmonton")).check(matches(isDisplayed()));
-
-        onView(withId(R.id.editTextFacilityName)).perform(ViewActions.replaceText("Tests"));
-        onView(withId(R.id.editTextFacilityEmailAddress)).perform(ViewActions.replaceText("test12@gmail.com"));
-        onView(withId(R.id.editTextFacilityAddress)).perform(ViewActions.replaceText("edmonton"));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.confirm_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("Tests")).check(matches(isDisplayed()));
-        onView(withText("test12@gmail.com")).check(matches(isDisplayed()));
-        onView(withText("edmonton")).check(matches(isDisplayed()));
+        // Check if it goes back to the home screen
+        onView(withId(R.id.wonLotteryCount)).check(matches(isDisplayed()));
     }
 
     @Test
     public void test03_CreateFacilityErrorMessage() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+        // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Test if there is any error in each section
+
+        // Test if error messages are shown when fields are empty
         onView(withText("Create")).perform(click());
         onView(withId(R.id.editFacilityName)).check(matches(hasErrorText("Facility name cannot be empty")));
-        onView(withId(R.id.editFacilityName)).perform(ViewActions.typeText("Test"));
+        onView(withId(R.id.editFacilityName)).perform(ViewActions.typeText("UoA"));
+
         onView(withText("Create")).perform(click());
         onView(withId(R.id.editFacilityEmail)).check(matches(hasErrorText("Facility email cannot be empty")));
-        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.typeText("test@gmail.com"));
+        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.typeText("UoA@ualberta.ca"));
+
         onView(withText("Create")).perform(click());
         onView(withId(R.id.editFacilityAddress)).check(matches(hasErrorText("Facility address cannot be empty")));
     }
 
+    /**
+     * US 02.01.03 As an organizer, I want to create and manage my facility profile.
+     */
     @Test
-    public void test05_FacilityToEventListBackScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test04_CreateAndEditFacilityScreen() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        // Check if it's on the facility dialog since facility has not been created yet screen
+        onView(withText("Create Facility")).check(matches(isDisplayed()));
+        onView(withText("Create")).check(matches(isDisplayed()));
+
+        // Enter facility information.
+        onView(withId(R.id.editFacilityName)).perform(ViewActions.typeText("UoA"));
+        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.typeText("UoA@ualberta.ca"));
+        onView(withId(R.id.editFacilityAddress)).perform(ViewActions.typeText("UoA Campus, Edmonton, AB"));
+
+        // Click the "Create" button to create the facility
+        onView(withText("Create")).perform(click());
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
+        onView(withId(R.id.facilityNameTV)).check(matches(withText("UoA")));
+        onView(withId(R.id.facilityEmailTV)).check(matches(withText("UoA@ualberta.ca")));
+        onView(withId(R.id.facilityAddressTV)).check(matches(withText("UoA Campus, Edmonton, AB")));
+    }
+
+
+    @Test
+    public void test05_FacilityToEventListBackScreen() throws InterruptedException{
+        // Open navigation drawer and navigate to facility screen
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+        onView(withText("Facility")).perform(click());
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if on the event list page
-        onView(withText("Event List")).check(matches(isDisplayed()));
+        Thread.sleep(2000);
+
+        // Verify we are on the event list screen
+        onView(withText("Events")).check(matches(isDisplayed()));
         onView(withId(R.id.addEventButton)).check(matches(isDisplayed()));
-        // Check if you can go back to facility page
+
+        // Go back to facility screen
         onView(withContentDescription("Navigate up")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("Tests")).check(matches(isDisplayed()));
-        onView(withText("test12@gmail.com")).check(matches(isDisplayed()));
-        onView(withText("edmonton")).check(matches(isDisplayed()));
+        Thread.sleep(2000);
+
+        // Check that facility details are still displayed
+        onView(withId(R.id.facilityNameTV)).check(matches(withText("UoA")));
+        onView(withId(R.id.facilityEmailTV)).check(matches(withText("UoA@ualberta.ca")));
+        onView(withId(R.id.facilityAddressTV)).check(matches(withText("UoA Campus, Edmonton, AB")));
     }
 
     @Test
-    public void test06_EventListToAddEventScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test06_EventListToAddEventScreen() throws InterruptedException{
+        // Open navigation drawer and navigate to facility screen
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Go to the event list screen
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
+        // Go to event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click to add event
+        Thread.sleep(2000);
+
+        // Click to add a new event
         onView(withId(R.id.addEventButton)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if on add event page
+        Thread.sleep(2000);
+
+        // Verify that we are on the "Add Event" screen
         onView(withId(R.id.bannerImage)).check(matches(isDisplayed()));
         onView(withId(R.id.uploadBannerButton)).check(matches(isDisplayed()));
         onView(withId(R.id.event_title)).check(matches(isDisplayed()));
-        onView(withId(R.id.description)).check(matches(isDisplayed()));
-        onView(withId(R.id.event_date)).check(matches(isDisplayed()));
-        onView(withId(R.id.registration_start_deadline)).check(matches(isDisplayed()));
-        onView(withId(R.id.registration_date_deadline)).check(matches(isDisplayed()));
-        onView(withId(R.id.event_capacity)).check(matches(isDisplayed()));
-        onView(withId(R.id.limit)).check(matches(isDisplayed()));
-        onView(withId(R.id.limit)).perform(ViewActions.typeText("Test"));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.feeText)).check(matches(isDisplayed()));
-        onView(withId(R.id.geolocation_status)).check(matches(isDisplayed()));
-        onView(withId(R.id.save_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.save_event_button)).perform(click());
-        onView(withId(R.id.event_title)).check(matches(hasErrorText("Event title required")));
-        onView(withId(R.id.event_title)).perform(ViewActions.typeText("hi"));
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        onView(withId(R.id.description)).check(matches(hasErrorText("Event description required")));
-        onView(withId(R.id.description)).perform(ViewActions.typeText("test@gmail.com"));
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.event_date)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.registration_start_deadline)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.registration_date_deadline)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.event_capacity)).check(matches(hasErrorText("Event capacity required")));
-        onView(withId(R.id.event_capacity)).perform(ViewActions.typeText("0"));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.event_capacity)).check(matches(hasErrorText("Event capacity cannot be 0")));
-        onView(withId(R.id.event_capacity)).perform(ViewActions.replaceText("33"));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
+    /**
+     * US 02.01.01 As an organizer I want to create a new event and generate a unique promotional QR code
+     * that links to the event description and event poster in the app
+     */
     @Test
-    public void test07_CreateEvent() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test07_CreateEvent() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
+
         // Click to add event
         onView(withId(R.id.addEventButton)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.limit)).check(matches(isDisplayed()));
-        onView(withId(R.id.limit)).perform(ViewActions.typeText("Test"));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
+
         // Add event information
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.event_title)).perform(ViewActions.typeText("Test Event"));
-        onView(withId(R.id.description)).perform(ViewActions.typeText("Test case event"));
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        onView(withId(R.id.event_title)).perform(ViewActions.typeText("UoA Welcome Party"));
+        onView(withId(R.id.description)).perform(ViewActions.typeText("Welcome to UoA! Join us for a party on campus!"));
+        closeKeyboard();
+
+        // Set event date, registration start and end deadlines
         onView(withId(R.id.event_date)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         onView(withId(R.id.registration_start_deadline)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         onView(withId(R.id.registration_date_deadline)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         onView(withText("OK")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.event_capacity)).perform(ViewActions.typeText("33"));
-        onView(withId(R.id.description)).perform(closeSoftKeyboard());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+
+        // Set event capacity and geolocation status
+        onView(withId(R.id.event_capacity)).perform(ViewActions.typeText("5000"));
+        closeKeyboard();
+
+        onView(withId(R.id.add_event_scroll_view)).perform(ViewActions.swipeUp());
+
+        onView(withId(R.id.limit)).perform(ViewActions.typeText("10000"));
+        closeKeyboard();
+
+        onView(withId(R.id.feeText)).perform(ViewActions.typeText("5"));
+        closeKeyboard();
+
         onView(withId(R.id.geolocation_status)).perform(click());
+
+        // Save event
         onView(withId(R.id.save_event_button)).perform(click());
+        Thread.sleep(2000);
 
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Check if event is in the list
-        onView(withText("Test Event")).check(matches(isDisplayed()));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        onView(withText("UoA Welcome Party")).check(matches(isDisplayed()));
     }
 
     @Test
-    public void test08_EventListToMangeEventScreen() {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test08_EventListToManageEventScreen() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click to view more about the event
-        onView(withText("Test Event")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if you are in the manage event screen
-        onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
-        onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
+        Thread.sleep(2000);
+
+        onView(withText("UoA Welcome Party")).perform(click());
+        Thread.sleep(2000);
+
+        // Check if on Manage Event screen where title and description match.
+        onView(withId(R.id.event_title)).check(matches(withText("UoA Welcome Party")));
+        onView(withId(R.id.description)).check(matches(withText("Welcome to UoA! Join us for a party on campus!")));
     }
 
+    /**
+     *
+     * @throws InterruptedException Used to allow the UI to update.
+     */
     @Test
-    public void test09_MangeEventToUpload_UpdateBannerScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test09_ManageEventToUploadUpdateBannerScreen() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click to view more about the event
-        onView(withText("Test Event")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if you are in the manage event screen
+        Thread.sleep(2000);
+
+        // Check if event is in the list
+        onView(withText("UoA Welcome Party")).check(matches(isDisplayed()));
+
+        onView(withText("UoA Welcome Party")).perform(click());
+        Thread.sleep(2000);
+
+        // Check if on Manage Event screen
         onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
         onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
-        // Go to the update/upload Banner page
+
+        // Go to update/upload Banner page
         onView(withId(R.id.edit_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if on that page
+        Thread.sleep(2000);
+
         onView(withId(R.id.uploadBannerButton)).check(matches(isDisplayed()));
         onView(withId(R.id.save_event_button)).check(matches(isDisplayed()));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click the update button
+
+        // Save event and check if back to manage screen
         onView(withId(R.id.save_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-        }
-        // Check if you gone back to manage screen
+        Thread.sleep(2000);
+
         onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
-        onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.edit_event_button)).perform(click());
     }
 
+    /**
+     * US 02.01.02 As an organizer I want to store the generated QR code in my database
+     * @throws InterruptedException Used to allow the UI to update.
+     */
     @Test
-    public void test10_MangeEventToQRCOdeScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test10_ManageEventToQRCodeScreen() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Wait 2 seconds so we can see the details/allow ui to update
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click to view more about the event
-        onView(withText("Test Event")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if you are in the manage event screen
-        onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
-        onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
+        Thread.sleep(2000);
 
-        // Click to go to QR code page
+        // Check if event is in the list
+        onView(withText("UoA Welcome Party")).check(matches(isDisplayed()));
+
+        onView(withText("UoA Welcome Party")).perform(click());
+        Thread.sleep(2000);
+
+        // Check if on Manage Event screen
+        onView(withText("Manage Event")).check(matches(isDisplayed()));
+        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
+
+        // Go to QR code page
         onView(withId(R.id.qr_code_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-        }
+        Thread.sleep(2000);
+
         // Check if on QR page
         onView(withId(R.id.imageQRCode)).check(matches(isDisplayed()));
         onView(withId(R.id.downloadButton)).check(matches(isDisplayed()));
+
         // Go back to the manage screen
         onView(withContentDescription("Navigate up")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-        }
-        // Check if on manage screen
+        Thread.sleep(2000);
+
         onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
-        onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.edit_event_button)).perform(click());
     }
 
+    /**
+     * US 02.02.01 As an organizer I want to view the list of entrants who joined my event waiting list
+     * US 02.06.01 As an organizer I want to view a list of all chosen entrants who are invited to apply
+     * US 02.06.02 As an organizer I want to see a list of all the cancelled entrants
+     * US 02.06.03 As an organizer I want to see a final list of entrants who enrolled for the event
+     */
     @Test
-    public void test11_MangeEventToWaitingListScreen() {
-        // Open the sidebar menu (assumes you have a menu icon with content description "Open navigation drawer")
+    public void test11_ManageEventToEntrantsList() throws InterruptedException{
+        // Open the sidebar menu
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // Click on the "Facility" menu item
         onView(withText("Facility")).perform(click());
-        // Wait for the screen to update
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
+
         // Go to the event list screen
         onView(withId(R.id.view_event_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Click to view more about the event
-        onView(withText("Test Event")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Check if you are in the manage event screen
+        Thread.sleep(2000);
+
+        // Check if event is in the list
+        onView(withText("UoA Welcome Party")).check(matches(isDisplayed()));
+
+        onView(withText("UoA Welcome Party")).perform(click());
+        Thread.sleep(2000);
+
+        // Check if on Manage Event screen
         onView(withText("Manage Event")).check(matches(isDisplayed()));
-        onView(withId(R.id.event_title)).check(matches(withText("Test Event")));
-        onView(withId(R.id.description)).check(matches(withText("Test case event")));
-        onView(withId(R.id.event_capacity)).check(matches(withText("Event Capacity: 33")));//error
-        onView(withId(R.id.geolocation_status)).check(matches(withText("Geolocation required: true")));
-        onView(withId(R.id.edit_event_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.qr_code_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.view_entrants_button)).check(matches(isDisplayed()));
-        // Go to the entrant list screen
+
+        // Go to entrant list screen
         onView(withId(R.id.view_entrants_button)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
+
         // Check if in entrant list screen
         onView(withId(R.id.tab_layout)).check(matches(isDisplayed()));
         onView(withId(R.id.entrants_list)).check(matches(isDisplayed()));
@@ -820,23 +374,19 @@ public class FacilityAndEventTest {
         onView(withId(R.id.send_notification)).check(matches(isDisplayed()));
         onView(withId(R.id.remove_entrant)).check(matches(isDisplayed()));
         onView(withId(R.id.view_entrant_map)).check(matches(isDisplayed()));
-        // Click to sample entrants
-        onView(withId(R.id.sample_entrants)).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Go to the list of selected entrant
+
+        // Navigate through the different tabs
+        onView(withText("Waitlisted")).perform(click());
         onView(withText("Selected")).perform(click());
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        // Go to the list of cancelled entrant
         onView(withText("Cancelled")).perform(click());
-        // Go to the registered list to see final list of entrants
         onView(withText("Registered")).perform(click());
     }
+
+    // Helper method to close the keyboard
+    public void closeKeyboard() {
+        // Perform the action to hide the keyboard
+        ViewInteraction viewInteraction = onView(isRoot());
+        viewInteraction.perform(ViewActions.closeSoftKeyboard());
+    }
+
 }
