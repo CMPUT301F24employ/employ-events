@@ -1,7 +1,6 @@
 package com.example.employ_events.ui.admin;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+/*
+ * US 03.07.01 As an administrator I want to remove facilities that violate app policy
+ */
 
+/**
+ * @author Jasleen, Connor, Tina
+ * Fragment that displays a list of facilities for an admin user.
+ * This fragment fetches facilities from Firestore and shows them in a RecyclerView.
+ * Admins can click on a facility to view more details.
+ */
 public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityBrowseAdapter.FacilityClickListener {
 
     private FragmentAdminFacilityListBinding binding;
@@ -30,6 +38,10 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     private ArrayList<Facility> facilityList;
     private FacilityBrowseAdapter facilityAdapter;
 
+    /**
+     * Inflates the fragment layout and initializes the Firestore instance,
+     * the list of facilities, and the RecyclerView adapter.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAdminFacilityListBinding.inflate(inflater, container, false);
@@ -81,6 +93,12 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
                 });
     }
 
+    /**
+     * Callback method for when a facility item in the RecyclerView is clicked.
+     * This method navigates to a detail screen for the selected facility.
+     *
+     * @param facility The Facility object that was clicked.
+     */
     @Override
     public void onItemClick(Facility facility) {
         if (getView() != null) {

@@ -59,10 +59,10 @@
     <string name="menu_registered_events">Registered Events</string>
     <string name="menu_invitations">Invitations</string>
     <string name="menu_notifications">Notifications</string>
-    <string name="menu_admin_browse_images">Admin Browse Images</string>
-    <string name="menu_dmin_browse_events">Admin Browse Events</string>
-    <string name="menu_admin_browse_profiles">Admin Browse Profiles</string>
-    <string name="menu_admin_browse_facilities">Admin Browse Facilities</string>
+    <string name="menu_admin_browse_images">Admin: Browse Images</string>
+    <string name="menu_dmin_browse_events">Admin: Browse Events</string>
+    <string name="menu_admin_browse_profiles">Admin: Browse Profiles</string>
+    <string name="menu_admin_browse_facilities">Admin: Browse Facilities</string>
     <string name="menu_admin_browse_events">Admin: Browse Events</string>
     <string name="organizer_channel_name">Organizer Notifications</string>
     <string name="organizer_channel_description">Customized notifications from organizers.</string>

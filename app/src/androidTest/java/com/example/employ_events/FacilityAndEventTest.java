@@ -163,9 +163,9 @@ public class FacilityAndEventTest {
         onView(withText("test@gmail.com")).check(matches(isDisplayed()));
         onView(withText("Edmonton")).check(matches(isDisplayed()));
 
-        onView(withId(R.id.editTextFacilityName)).perform(ViewActions.replaceText("Tests"));
-        onView(withId(R.id.editTextFacilityEmailAddress)).perform(ViewActions.replaceText("test12@gmail.com"));
-        onView(withId(R.id.editTextFacilityAddress)).perform(ViewActions.replaceText("edmonton"));
+        onView(withId(R.id.editFacilityName)).perform(ViewActions.replaceText("Tests"));
+        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.replaceText("test12@gmail.com"));
+        onView(withId(R.id.editFacilityAddress)).perform(ViewActions.replaceText("edmonton"));
         try {
             Thread.sleep(1500);
         } catch (InterruptedException e) {
