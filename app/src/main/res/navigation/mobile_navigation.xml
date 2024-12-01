@@ -196,18 +196,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/entrantNotifications"
-        android:name="com.example.employ_events.ui.entrants.entrantNotifications"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_entrant_notifications">
-    </fragment>
-
-    <fragment
-        android:id="@+id/drawNotificationCard"
-        android:name="com.example.employ_events.ui.entrants.DrawNotificationCard">
-    </fragment>
-
-    <fragment
         android:id="@+id/sendNotificationScreen"
         android:name="com.example.employ_events.ui.notifications.SendNotificationScreen"
         android:label="Send Notifications"
