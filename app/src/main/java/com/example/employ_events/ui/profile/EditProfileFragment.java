@@ -69,7 +69,7 @@ public class EditProfileFragment extends Fragment {
     private CollectionReference profilesRef;
     private ImageView userPFP;
     private Uri pfpUri;
-    private boolean pfp = false;
+    private boolean pfp = false, custom = false;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
@@ -109,6 +109,7 @@ public class EditProfileFragment extends Fragment {
                             userPFP.setVisibility(View.VISIBLE);
                             removeButton.setVisibility(View.VISIBLE);
                             pfp = true;
+                            custom = true;
                         }
                     }
                 }
@@ -131,6 +132,7 @@ public class EditProfileFragment extends Fragment {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     displayProfile(document, editProfileViewModel);
+                    custom = Boolean.TRUE.equals(document.getBoolean("customPFP"));
                 }
             }
         });
@@ -147,6 +149,7 @@ public class EditProfileFragment extends Fragment {
             userPFP.setImageDrawable(null); // Clear the displayed image
             removeButton.setVisibility(View.GONE); // Hide the remove button
             pfp = false;
+            custom = false;
         });
 
         // Navigate to the profile screen when the changes are confirmed.
@@ -271,12 +274,15 @@ public class EditProfileFragment extends Fragment {
             profile.setEmail(email);
             profile.setPhoneNumber(phone.isEmpty() ? null : phone);
             if (pfp && pfpUri != null) { // User uploaded a custom profile picture
+                profile.setCustomPFP(true);
                 uploadPFPAndSaveProfile(profile, onComplete); // Upload custom PFP
             }
-            else if (pfp) {
+            else if (pfp && custom) {
+                profile.setCustomPFP(true);
                 saveProfile(profile, uniqueID, onComplete); // Save profile data to Firestore
             }
             else {
+                profile.setCustomPFP(false);
                 String imagePath;
                 if (!Character.isLetter(name.charAt(0))) {
                     imagePath = "autoPFP/Other.png"; // Use fallback for non-letter initials
@@ -331,10 +337,10 @@ public class EditProfileFragment extends Fragment {
         data.put("email", editProfile.getEmail());
         data.put("phoneNumber", editProfile.getPhoneNumber());
         data.put("customPFP", editProfile.isCustomPFP());
-        if (pfp && pfpUri != null) {
-            data.put("pfpURI", editProfile.getPfpURI());
+        if (pfp && pfpUri == null && custom) {
+
         }
-        else if (!pfp) {
+        else {
             data.put("pfpURI", editProfile.getPfpURI());
         }
 
