@@ -9,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -25,11 +23,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /*
  */
 
 /**
+ * @author Tina, Jasleen, Aasvi.
  * Fragment to display a list of registered events. Fetches data from Firestore and displays it in a RecyclerView.
  */
 public class RegisteredEventsFragment extends Fragment {
@@ -80,6 +80,7 @@ public class RegisteredEventsFragment extends Fragment {
     }
 
     /**
+     * @author Tina, Aasvi, Jasleen.
      * Fetches registered events from the Firestore 'waitinglist' collection and updates the adapter with the data.
      */
     private void loadRegisteredEvents(ArrayList<Event> eventDataList, RegisteredArrayAdapter adapter) {
@@ -87,16 +88,14 @@ public class RegisteredEventsFragment extends Fragment {
             Log.e("loadRegisteredEvents", "uniqueID is null. Cannot query Firestore.");
             return; // Exit early if uniqueID is null
         }
-
-        db.collection("events").get().addOnCompleteListener(task -> {
+        Date currentDate = new Date();
+        db.collection("events")
+                .whereGreaterThanOrEqualTo("eventDate", currentDate)
+                .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 eventDataList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     String eventId = document.getId();
-                    if (eventId == null) {
-                        Log.e("loadRegisteredEvents", "eventId is null for a document.");
-                        continue; // Skip if eventId is null
-                    }
 
                     db.collection("events")
                             .document(eventId)
@@ -108,28 +107,20 @@ public class RegisteredEventsFragment extends Fragment {
                                     Boolean onCancelledList = entrantTask.getResult().getBoolean("onCancelledList");
                                     if (onCancelledList != null && !onCancelledList) {
                                         Event event = document.toObject(Event.class);
-                                        if (event != null) {
-                                            event.setId(eventId); // Ensure eventId is set
-                                            eventDataList.add(event);
-                                            adapter.notifyDataSetChanged();
-                                        } else {
-                                            Log.e("loadRegisteredEvents", "Event object is null for eventId: " + eventId);
-                                        }
+                                        event.setId(eventId); // Ensure eventId is set
+                                        eventDataList.add(event);
+                                        adapter.notifyDataSetChanged();
                                     }
                                 } else if (!entrantTask.getResult().exists()) {
                                     Log.w("loadRegisteredEvents", "No entry found for uniqueID: " + uniqueID);
                                 }
-                            }).addOnFailureListener(e -> {
-                                Log.e("loadRegisteredEvents", "Failed to fetch entrants for eventId: " + eventId, e);
-                            });
+                            }).addOnFailureListener(e -> Log.e("loadRegisteredEvents", "Failed to fetch entrants for eventId: " + eventId, e));
                 }
             } else {
                 Log.e("loadRegisteredEvents", "Failed to fetch events collection.", task.getException());
             }
         });
     }
-
-
 
     /**
      * Called when the view hierarchy associated with the fragment is being removed.

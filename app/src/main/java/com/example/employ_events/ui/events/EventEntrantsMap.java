@@ -89,6 +89,7 @@ public class EventEntrantsMap extends Fragment {
      */
     private void fetchEntrantLocations(MapView mapView) {
         db.collection("events").document(eventID).collection("entrantsList")
+                .whereNotEqualTo("onCancelledList", true)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

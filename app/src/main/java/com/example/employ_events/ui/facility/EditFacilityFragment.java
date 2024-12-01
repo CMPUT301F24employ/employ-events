@@ -61,6 +61,8 @@ public class EditFacilityFragment extends Fragment {
     private Button confirmButton, uploadButton, removeButton;
     private ImageView facilityPFP;
     private Uri facilityPfpUri;
+    private boolean pfp = false;
+    String uniqueID;
     private FirebaseFirestore db;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -77,7 +79,6 @@ public class EditFacilityFragment extends Fragment {
 
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID;
         uniqueID = sharedPreferences.getString("uniqueID", null);
 
         // Initialize Firestore database instance
@@ -110,6 +111,7 @@ public class EditFacilityFragment extends Fragment {
                         facilityPFP.setImageURI(facilityPfpUri);
                         facilityPFP.setVisibility(View.VISIBLE);
                         removeButton.setVisibility(View.VISIBLE);
+                        pfp = true;
                     }
                 }
         );
@@ -133,6 +135,8 @@ public class EditFacilityFragment extends Fragment {
                             facilityPfpUri = null;
                             facilityPFP.setImageDrawable(null); // Clear the displayed image
                             removeButton.setVisibility(View.GONE); // Hide the remove button
+                            facilityPFP.setVisibility(View.INVISIBLE);
+                            pfp = false;
                         });
 
                         confirmButton.setOnClickListener(view -> editProfile(uniqueID, facilityID, () -> NavHostFragment.findNavController(EditFacilityFragment.this)
@@ -202,14 +206,18 @@ public class EditFacilityFragment extends Fragment {
             editFacilityViewModel.getText().observe(getViewLifecycleOwner(), editAddress::setText);
         }
         // Check if there's a profile picture URI available in Firestore
-        if (document.get("facilityPfpUri") != null) {
-            String uri = Objects.requireNonNull(document.get("facilityPfpUri")).toString();
+        if (document.contains("facilityPfpUri") && document.get("facilityPfpUri") != null) {
+            String uri = document.get("facilityPfpUri").toString();
             loadImageFromUrl(uri);
+            pfp = true;
             // Show the remove button if there's a profile picture
             removeButton.setVisibility(View.VISIBLE);
         } else {
+            pfp = false;
+            facilityPfpUri = null;
             // If no profile picture, hide the remove button
             removeButton.setVisibility(View.GONE);
+            facilityPFP.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -224,6 +232,7 @@ public class EditFacilityFragment extends Fragment {
             Glide.with(requireContext())
                     .load(imageUrl)
                     .into(facilityPFP);
+            facilityPFP.setVisibility(View.VISIBLE);
         }
     }
 
@@ -257,11 +266,10 @@ public class EditFacilityFragment extends Fragment {
             profile.setPhone_number(phone.isEmpty() ? null : phone);
             profile.setAddress(address);
             // Handle profile picture logic
-            if (facilityPfpUri != null) {
+            if (pfp && facilityPfpUri != null) {
                 // If the user has uploaded a new profile picture, upload it.
                 uploadPFPAndSaveProfile(profile, facilityID, onComplete);
             } else {
-                profile.setFacilityPfpUri(null);
                 // If no new profile picture, save the profile data.
                 saveProfile(profile, facilityID, onComplete);
             }
@@ -299,7 +307,12 @@ public class EditFacilityFragment extends Fragment {
         data.put("email", editProfile.getEmail());
         data.put("phone_number", editProfile.getPhone_number());
         data.put("address", editProfile.getAddress());
-        data.put("facilityPfpUri", editProfile.getFacilityPfpUri());
+        if (pfp && facilityPfpUri != null) {
+            data.put("facilityPfpUri", editProfile.getFacilityPfpUri());
+        }
+        else if (!pfp) {
+            data.put("facilityPfpUri", null);
+        }
 
         db.collection("facilities").document(facilityID).set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {

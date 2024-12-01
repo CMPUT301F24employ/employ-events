@@ -8,10 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.employ_events.databinding.FragmentSendNotificationScreenBinding;
-import com.example.employ_events.ui.notifications.Notification;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -22,17 +22,17 @@ import java.util.HashMap;
 public class SendNotificationScreen extends Fragment {
 
     private FragmentSendNotificationScreenBinding binding;
-    private Button sendInvitationButton;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSendNotificationScreenBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         Button confirmButton = binding.confirmButton;
         EditText messageInput = binding.messageInput;
         TabLayout tabLayout = binding.tabLayout;
+        Button clearButton = binding.clearButton;
         //sendInvitationButton = binding.sendInvitationButton;
 
 
@@ -67,6 +67,10 @@ public class SendNotificationScreen extends Fragment {
 
                     sendNotifications(eventId, message, selectedTabPosition[0]);
                 });
+
+                // Clear current input.
+                clearButton.setOnClickListener(view -> messageInput.setText(""));
+
             }
         }
 

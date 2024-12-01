@@ -6,11 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.employ_events.R;
+import com.bumptech.glide.Glide;
 import com.example.employ_events.databinding.FragmentEditProfileBinding;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -37,8 +34,6 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -74,7 +69,7 @@ public class EditProfileFragment extends Fragment {
     private CollectionReference profilesRef;
     private ImageView userPFP;
     private Uri pfpUri;
-    private boolean isInitialLoad = true;
+    private boolean pfp = false;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
@@ -113,7 +108,7 @@ public class EditProfileFragment extends Fragment {
                             userPFP.setImageURI(pfpUri);
                             userPFP.setVisibility(View.VISIBLE);
                             removeButton.setVisibility(View.VISIBLE);
-                            isInitialLoad = false;
+                            pfp = true;
                         }
                     }
                 }
@@ -136,7 +131,6 @@ public class EditProfileFragment extends Fragment {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     displayProfile(document, editProfileViewModel);
-                    isInitialLoad = Boolean.TRUE.equals(document.getBoolean("customPFP"));
                 }
             }
         });
@@ -152,7 +146,7 @@ public class EditProfileFragment extends Fragment {
             pfpUri = null; // Clear the pfp URI
             userPFP.setImageDrawable(null); // Clear the displayed image
             removeButton.setVisibility(View.GONE); // Hide the remove button
-            isInitialLoad = false;
+            pfp = false;
         });
 
         // Navigate to the profile screen when the changes are confirmed.
@@ -194,13 +188,17 @@ public class EditProfileFragment extends Fragment {
             editProfileViewModel.getText().observe(getViewLifecycleOwner(), editPhone::setText);
         }
 
-        boolean isCustomPFP = document.getBoolean("customPFP") != null && Boolean.TRUE.equals(document.getBoolean("customPFP"));
-        if (isCustomPFP && document.get("pfpURI") != null) {
+        if (document.contains("pfpURI") && document.get("pfpURI") != null) {
             // Load custom profile picture
             String uri = Objects.requireNonNull(document.get("pfpURI")).toString();
             loadImageFromUrl(uri);
             removeButton.setVisibility(View.VISIBLE);
-        } else {
+            pfp = true;
+        }
+        else {
+            removeButton.setVisibility(View.GONE);
+            pfp = false;
+            pfpUri = null;
             // Load auto-generated profile picture based on user initial
             String name = document.get("name") != null ? Objects.requireNonNull(document.get("name")).toString() : "-";
             loadDefaultProfileImage(name);
@@ -237,25 +235,19 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
-     * @param url The URL of the image to be loaded.
+     * @author Tina
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
      */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
-
-                // Check if the fragment is attached before updating the UI
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> userPFP.setImageBitmap(bitmap));
-                }
-            } catch (IOException e) {
-                Log.e("EditProfileFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(userPFP);
+            userPFP.setVisibility(View.VISIBLE);
+        }
     }
-
 
     /**
      * Edits the user's profile based on the input fields and updates the Firestore database.
@@ -278,11 +270,13 @@ public class EditProfileFragment extends Fragment {
             profile.setName(name);
             profile.setEmail(email);
             profile.setPhoneNumber(phone.isEmpty() ? null : phone);
-            if (pfpUri != null) { // User uploaded a custom profile picture
-                profile.setCustomPFP(true); // Set custom PFP flag to true
+            if (pfp && pfpUri != null) { // User uploaded a custom profile picture
                 uploadPFPAndSaveProfile(profile, onComplete); // Upload custom PFP
-            } else if (!isInitialLoad) { // If not the initial load and no PFP is selected
-                // Handle removal of custom PFP
+            }
+            else if (pfp) {
+                saveProfile(profile, uniqueID, onComplete); // Save profile data to Firestore
+            }
+            else {
                 String imagePath;
                 if (!Character.isLetter(name.charAt(0))) {
                     imagePath = "autoPFP/Other.png"; // Use fallback for non-letter initials
@@ -291,7 +285,6 @@ public class EditProfileFragment extends Fragment {
                     imagePath = "autoPFP/" + initial + ".png"; // Use auto-generated PFP based on initials
                 }
                 profile.setPfpURI("https://firebasestorage.googleapis.com/v0/b/employ-events.appspot.com/o/" + Uri.encode(imagePath) + "?alt=media");
-                profile.setCustomPFP(false); // Set custom PFP flag to false
                 saveProfile(profile, uniqueID, onComplete); // Save profile data to Firestore
             }
         }
@@ -337,8 +330,14 @@ public class EditProfileFragment extends Fragment {
         data.put("name", editProfile.getName());
         data.put("email", editProfile.getEmail());
         data.put("phoneNumber", editProfile.getPhoneNumber());
-        data.put("pfpURI", editProfile.getPfpURI());
         data.put("customPFP", editProfile.isCustomPFP());
+        if (pfp && pfpUri != null) {
+            data.put("pfpURI", editProfile.getPfpURI());
+        }
+        else if (!pfp) {
+            data.put("pfpURI", editProfile.getPfpURI());
+        }
+
         profilesRef.document(uniqueID).set(data, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     if (onComplete != null) {

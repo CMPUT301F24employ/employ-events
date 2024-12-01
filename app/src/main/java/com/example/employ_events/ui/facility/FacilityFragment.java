@@ -199,6 +199,9 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
             String uri = document.getString("facilityPfpUri");
             loadImageFromUrl(uri);
         }
+        else {
+            facilityPFP.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**

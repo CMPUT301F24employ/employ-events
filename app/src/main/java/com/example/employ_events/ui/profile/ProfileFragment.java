@@ -2,10 +2,7 @@ package com.example.employ_events.ui.profile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentProfileBinding;
 import com.google.firebase.firestore.CollectionReference;
@@ -28,11 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Objects;
 
 /*
@@ -44,6 +37,7 @@ If a user is an admin, it allows them to remove profiles.
  */
 
 /**
+ * @author Tina, Jasleen
  * A fragment that displays the user's profile information.
  * It retrieves the profile data from Firestore based on a unique identifier and
  * populates the UI elements with the fetched data.
@@ -54,7 +48,9 @@ public class ProfileFragment extends Fragment{
     private TextView name, email, phone_number;
     private Button editProfileButton, deleteProfileButton;
     private ImageView pfp;
+    private String uniqueID;
     private boolean isAdmin = false;
+    private FirebaseFirestore db;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,10 +63,10 @@ public class ProfileFragment extends Fragment{
 
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String uniqueID = sharedPreferences.getString("uniqueID", null);
+        uniqueID = sharedPreferences.getString("uniqueID", null);
 
         // Initialize Firestore database instance and set reference to "userProfiles" collection
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         CollectionReference profilesRef = db.collection("userProfiles");
 
         if (getArguments() != null) {
@@ -82,31 +78,26 @@ public class ProfileFragment extends Fragment{
         initializeViews();
 
         // Display the profile information if uniqueID is available
-        assert uniqueID != null;
-        DocumentReference docRef = profilesRef.document(uniqueID);
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    // Populate UI with profile information
-                    displayProfile(document, profileViewModel);
+        if (uniqueID != null) {
+            DocumentReference docRef = profilesRef.document(uniqueID);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Populate UI with profile information
+                        displayProfile(document, profileViewModel);
+                    }
                 }
-            }
-        });
+            });
 
+            // Navigate to the edit profile screen when the button is clicked
+            editProfileButton.setOnClickListener(v->
+                    NavHostFragment.findNavController(ProfileFragment.this)
+                            .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
-        // Navigate to the edit profile screen when the button is clicked
-        editProfileButton.setOnClickListener(v->
-                NavHostFragment.findNavController(ProfileFragment.this)
-                        .navigate(R.id.action_nav_profile_to_nav_edit_profile));
+            deleteProfileButton.setOnClickListener(v -> deleteProfileAndFacility());
+        }
 
-        // Remove profile and everything associated with it
-        String finalUniqueID = uniqueID;
-        deleteProfileButton.setOnClickListener(v -> {
-            if (finalUniqueID != null) {
-                deleteProfileAndFacility(finalUniqueID, db);
-            }
-        });
         return root;
     }
 
@@ -160,26 +151,24 @@ public class ProfileFragment extends Fragment{
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
-     * @param url The URL of the image to be loaded.
+     * @author Tina
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
      */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(input);
-                requireActivity().runOnUiThread(() -> pfp.setImageBitmap(bitmap));
-            } catch (IOException e) {
-                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(pfp);
+        }
     }
 
-    private void deleteProfileAndFacility(String uniqueID, FirebaseFirestore db) {
+    /**
+     * @author Jasleen
+     * Deletes a users profile and affiliated facility and events, along with removing them from event entrantLists.
+     */
+    private void deleteProfileAndFacility() {
         DocumentReference profileRef = db.collection("userProfiles").document(uniqueID);
         profileRef.get().addOnCompleteListener(profileTask -> {
             if (profileTask.isSuccessful() && profileTask.getResult() != null) {
@@ -187,7 +176,7 @@ public class ProfileFragment extends Fragment{
 
                 // Check if the profile has the "admin" field set to true
                 // If yes, then the profile cannot be deleted, otherwise everything proceeds as normal
-                isAdmin = profileDoc.getBoolean("admin");
+                isAdmin = Boolean.TRUE.equals(profileDoc.getBoolean("admin"));
                 if (Boolean.TRUE.equals(isAdmin)) {
                     Toast.makeText(getContext(), "Sorry, you cannot delete admin profiles.", Toast.LENGTH_SHORT).show();
                     return;
@@ -246,9 +235,7 @@ public class ProfileFragment extends Fragment{
                                                         Toast.makeText(getContext(), "Profile and associated facility have been successfully deleted!", Toast.LENGTH_SHORT).show();
                                                         NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
                                                     })
-                                                    .addOnFailureListener(e -> {
-                                                        Toast.makeText(getContext(), "Error deleting profile and associated facility.", Toast.LENGTH_SHORT).show();
-                                                    });
+                                                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Error deleting profile and associated facility.", Toast.LENGTH_SHORT).show());
                                         });
                             }
 
@@ -276,18 +263,14 @@ public class ProfileFragment extends Fragment{
                                             Toast.makeText(getContext(), "No associated facility found. Profile deleted successfully!", Toast.LENGTH_SHORT).show();
                                             NavHostFragment.findNavController(ProfileFragment.this).popBackStack();
                                         })
-                                        .addOnFailureListener(e -> {
-                                            Toast.makeText(getContext(), "Error deleting profile.", Toast.LENGTH_SHORT).show();
-                                        });
+                                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Error deleting profile.", Toast.LENGTH_SHORT).show());
                             }
                         }
                         else {
                             Toast.makeText(getContext(), "Error fetching associated facilities.", Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show();
-                    });
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Error retrieving associated facilities.", Toast.LENGTH_SHORT).show());
         });
     }
 
