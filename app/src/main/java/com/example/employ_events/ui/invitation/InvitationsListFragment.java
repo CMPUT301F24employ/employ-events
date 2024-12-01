@@ -18,6 +18,8 @@ import com.example.employ_events.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
 Authors: Tina
@@ -49,7 +51,7 @@ public class InvitationsListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_invitations_list, container, false);
 
         // Initialize RecyclerView
-        recyclerView = rootView.findViewById(R.id.recyclerView);
+        recyclerView = rootView.findViewById(R.id.invitationsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Retrieve uniqueID from SharedPreferences for Firestore lookup
@@ -97,7 +99,10 @@ public class InvitationsListFragment extends Fragment {
                     }
 
                     if (querySnapshot != null) {
-                        invitationsList.clear();  // Clear the list to prevent duplicate entries
+                        // Create a set of event IDs to ensure no duplicates in the invitations list
+                        Set<String> eventIds = new HashSet<>();
+                        invitationsList.clear();  // Clear the list to avoid duplicates
+
                         for (QueryDocumentSnapshot document : querySnapshot) {
                             if (document.exists()) {
                                 String eventId = document.getId();
@@ -119,14 +124,15 @@ public class InvitationsListFragment extends Fragment {
                                                 if (onAcceptedList != null && onAcceptedList) {
                                                     // Add to list only if not already present
                                                     EventItem eventItem = new EventItem(eventId, eventName);
-                                                    if (!invitationsList.contains(eventItem)) {
+                                                    if (!eventIds.contains(eventId)) {
                                                         invitationsList.add(eventItem);
-                                                        adapter.notifyDataSetChanged();  // Update the adapter
+                                                        eventIds.add(eventId);
+                                                        adapter.notifyItemInserted(invitationsList.size() - 1);  // Use item position
                                                     }
                                                 } else {
                                                     // Remove if no longer on accepted list
                                                     invitationsList.removeIf(event -> event.getEventId().equals(eventId));
-                                                    adapter.notifyDataSetChanged();  // Update the adapter
+                                                    adapter.notifyDataSetChanged();  // Update the entire list
                                                 }
                                             }
                                         });
@@ -135,4 +141,5 @@ public class InvitationsListFragment extends Fragment {
                     }
                 });
     }
+
 }
