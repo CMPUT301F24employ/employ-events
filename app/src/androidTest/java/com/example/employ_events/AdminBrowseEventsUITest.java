@@ -309,7 +309,8 @@ public class AdminBrowseEventsUITest {
         onView(withId(R.id.view_event_button)).perform(click());
         onView(withText(eventName2)).perform(click());
         Thread.sleep(1000);
+
         // Check to see that image isn't loaded
-        //onView(withId(R.id.qr_code_button)).perform(click());
+        onView(withId(R.id.qr_code_button)).perform(click());
     }
 }
