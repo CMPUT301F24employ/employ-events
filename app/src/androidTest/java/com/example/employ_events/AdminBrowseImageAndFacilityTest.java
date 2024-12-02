@@ -124,7 +124,7 @@ public class AdminBrowseImageAndFacilityTest {
         // Click on the facility that you just made
         onView(withText("Tests")).perform(click());
         Thread.sleep(1500);
-        // Check if the infromation are right
+        // Check if the information is right
         onView(withText("Tests")).check(matches(isDisplayed()));
         onView(withText("test12@gmail.com")).check(matches(isDisplayed()));
         onView(withText("edmonton")).check(matches(isDisplayed()));
