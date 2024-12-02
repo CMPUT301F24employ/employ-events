@@ -22,7 +22,7 @@ public class EventViewModel extends ViewModel {
     /**
      * Returns the LiveData instance containing text data for the event.
      *
-     * @return LiveData<String> containing event-related text data
+     * @return LiveData containing event-related text data
      */
     public LiveData<String> getText() {
         return mText;
