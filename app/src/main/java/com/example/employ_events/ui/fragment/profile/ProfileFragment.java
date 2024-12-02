@@ -98,6 +98,7 @@ public class ProfileFragment extends Fragment{
                     NavHostFragment.findNavController(ProfileFragment.this)
                             .navigate(R.id.action_nav_profile_to_nav_edit_profile));
 
+            // Delete user profile and everything associated with it
             deleteProfileButton.setOnClickListener(v -> deleteProfileAndFacility());
 
             // Show notification settings dialog when button is clicked.
@@ -221,7 +222,7 @@ public class ProfileFragment extends Fragment{
 
                                             // Removing a user from the entrantsList in all events they have joined
                                             db.collection("events")
-                                                    .get()  // Fetch all events in the system
+                                                    .get()
                                                     .addOnCompleteListener(allEventsTask -> {
                                                         if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
                                                             // Iterate through all events to find the ones where the user is an entrant
@@ -246,13 +247,14 @@ public class ProfileFragment extends Fragment{
                                         });
                             }
 
+                            // If no associated facility is found, only profile is deleted
                             else {
+
                                 // Removing a user from the entrantsList in all events they have joined
                                 db.collection("events")
                                         .get()
                                         .addOnCompleteListener(allEventsTask -> {
                                             if (allEventsTask.isSuccessful() && allEventsTask.getResult() != null) {
-                                                // Iterate through all events to find the ones where the user is an entrant
                                                 for (DocumentSnapshot eventDoc : allEventsTask.getResult().getDocuments()) {
                                                     db.collection("events")
                                                             .document(eventDoc.getId())
@@ -263,7 +265,7 @@ public class ProfileFragment extends Fragment{
                                             }
                                         });
 
-                                // If no associated facility is found, only profile is deleted
+                                // Delete user profile
                                 batch.delete(profileRef);
                                 batch.commit()
                                         .addOnSuccessListener(unused -> {

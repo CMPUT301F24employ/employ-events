@@ -22,11 +22,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 /*
- * US 03.07.01 As an administrator I want to remove facilities that violate app policy
+Author: Jasleen
+
+The purpose of this fragment is to allow admins to view/scroll through a list of facilities.
+Additionally, they have the option of deleting a facility, and by doing so, all associated events, events from entrants lists, and
+QR hashed data is deleted as well.
+
+US 03.07.01 As an administrator I want to remove facilities that violate app policy
  */
 
 /**
- * @author Jasleen, Connor, Tina
+ * @author Jasleen
  * Fragment that displays a list of facilities for an admin user.
  * This fragment fetches facilities from Firestore and shows them in a RecyclerView.
  * Admins can click on a facility to view more details.
@@ -39,6 +45,7 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     private FacilityBrowseAdapter facilityAdapter;
 
     /**
+     * @author Jasleen
      * Inflates the fragment layout and initializes the Firestore instance,
      * the list of facilities, and the RecyclerView adapter.
      */
@@ -58,6 +65,7 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
+     * @author Jasleen
      * Sets up the RecyclerView for displaying the facilities.
      */
     private void setupRecyclerView() {
@@ -68,6 +76,7 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
+     * @author Jasleen and Tina
      * Loads facilities from Firestore and updates the RecyclerView.
      */
     private void loadFacilities() {
@@ -94,6 +103,7 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
+     * @author Jasleen
      * Callback method for when a facility item in the RecyclerView is clicked.
      * This method navigates to a detail screen for the selected facility.
      *

@@ -26,14 +26,22 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/*
+Author: Jasleen
+
+The purpose of this fragment is to allow admins to scroll through a list of all profiles and view them by clicking on it.
+Additionally, admins can delete a user profile from the app and firebase, and by doing so, associated facility,
+all events, profile from entrants lists, and event QR codes are deleted as well.
+Admins cannot delete their own profile or other admins.
+
+US 03.05.01 As an administrator, I want to be able to browse profiles.
+US 03.02.01 As an administrator, I want to be able to remove profiles.
+ */
 
 /**
  * @author Jasleen
  * AdminBrowseProfilesFragment allows admins to browse all the profiles in firebase. They are also able to click on
  * the profile to then delete it which resultingly deletes the facility and events associated with it.
- * Cannot delete admin profiles.
- * US 03.05.01 As an administrator, I want to be able to browse profiles.
- * US 03.02.01 As an administrator, I want to be able to remove profiles.
  * @see ProfileFragment
  * Delete profile logic in ProfileFragment
  */
@@ -45,6 +53,7 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     private ProfileAdapter profileAdapter;
 
     /**
+     * @author Jasleen
      * Sets up the recycler view and queries & adds the profiles to the view.
      */
     @Override
@@ -65,6 +74,7 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
+     * @author Jasleen
      * Sets up the RecyclerView for displaying the profiles.
      */
     private void setupRecyclerView() {
@@ -75,6 +85,7 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
+     * @author Jasleen
      * Loads profiles from Firestore and updates the RecyclerView.
      */
     private void loadProfiles() {
@@ -100,9 +111,9 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
+     * @author Jasleen
      * Callback method for when a profile item in the RecyclerView is clicked.
      * This method navigates to a detail screen for the selected profile.
-     *
      * @param profile The Profile object that was clicked.
      */
     @Override
@@ -117,6 +128,7 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
+     * @author Jasleen
      * Sets the 'admin' field in Firebase to true for the current user.
      * This restricts admins from deleting their own profile.
      */
