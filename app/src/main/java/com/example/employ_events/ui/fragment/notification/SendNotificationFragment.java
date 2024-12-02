@@ -20,11 +20,24 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 
+/**
+ * A fragment that allows the user to send notifications to event entrants.
+ * The user can enter a custom message, select a category of recipients,
+ * and send notifications to entrants in Firestore.
+ */
 public class SendNotificationFragment extends Fragment {
 
     private FragmentSendNotificationScreenBinding binding;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Called to inflate the fragment's layout and initialize the UI components.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          The parent view that the fragment's UI will attach to.
+     * @param savedInstanceState A Bundle containing the fragment's previously saved state.
+     * @return The root view of the inflated layout.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSendNotificationScreenBinding.inflate(inflater, container, false);
@@ -78,6 +91,20 @@ public class SendNotificationFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Sends notifications to the event's entrants based on the selected category.
+     *
+     * @param eventId   The ID of the event whose entrants will receive notifications.
+     * @param message   The custom message to include in the notification.
+     * @param tabPosition The selected tab position to determine the category of recipients:
+     *                    <ul>
+     *                    <li>0 - All entrants</li>
+     *                    <li>1 - Waitlisted entrants</li>
+     *                    <li>2 - Accepted entrants</li>
+     *                    <li>3 - Cancelled entrants</li>
+     *                    <li>4 - Registered entrants (accepted but not cancelled)</li>
+     *                    </ul>
+     */
     private void sendNotifications(String eventId, String message, int tabPosition) {
         String ORGANIZER_CHANNEL_ID = "organizer_notification_channel";
         db.collection("events").document(eventId).collection("entrantsList").get()
@@ -126,6 +153,12 @@ public class SendNotificationFragment extends Fragment {
 
     }
 
+    /**
+     * Adds a notification to the specified user's Firestore profile.
+     *
+     * @param userID       The ID of the user to whom the notification will be added.
+     * @param notification The Notification object containing the event ID, message, read status, and channel ID.
+     */
     private void addNotification(String userID, Notification notification) {
         db.collection("userProfiles")
                 .document(userID)

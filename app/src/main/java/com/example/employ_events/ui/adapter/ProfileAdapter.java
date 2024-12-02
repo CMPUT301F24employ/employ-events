@@ -16,12 +16,21 @@ import com.example.employ_events.model.Profile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for managing a list of profiles in a RecyclerView.
+ */
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
 
     private final ArrayList<Profile> profileList;
     private final Context context;
     private ProfileClickListener listener;
 
+    /**
+     * Constructor for initializing the adapter with context, profile list, and click listener.
+     * @param context     the context in which the adapter is used
+     * @param profileList the initial list of profiles
+     * @param listener    the click listener for handling profile item clicks
+     */
     public ProfileAdapter(Context context, ArrayList<Profile> profileList, ProfileClickListener listener) {
         this.context = context;
         this.profileList = new ArrayList<>(profileList);
@@ -35,7 +44,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         void onItemClick(Profile profile);
     }
 
-
+    /**
+     * Called when a new ViewHolder is created.
+     * @param parent   the parent ViewGroup
+     * @param viewType the type of view to be created
+     * @return a new ProfileViewHolder instance
+     */
     @NonNull
     @Override
     public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,6 +57,11 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         return new ProfileViewHolder(view);
     }
 
+    /**
+     * Binds data to a ViewHolder at a specific position.
+     * @param holder   the ViewHolder to bind data to
+     * @param position the position of the item in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull ProfileViewHolder holder, int position) {
 
@@ -58,17 +77,28 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         holder.phoneNumberTextView.setText(profile.getPhoneNumber() != null ? profile.getPhoneNumber() : "No phone number provided");
     }
 
+    /**
+     * Returns the total number of items in the profile list.
+     * @return the number of items
+     */
     @Override
     public int getItemCount() {
         return profileList.size();
     }
 
+    /**
+     * Updates the current profile list with new data and refreshes the RecyclerView.
+     * @param profiles the new list of profiles to display
+     */
     public void updateProfileList(List<Profile> profiles) {
         this.profileList.clear();
         this.profileList.addAll(profiles);
         notifyDataSetChanged();
     }
 
+    /**
+     * ViewHolder class for managing views within a profile item.
+     */
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
 
         CardView profileCard;
@@ -76,6 +106,10 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         private final TextView emailTextView;
         private final TextView phoneNumberTextView;
 
+        /**
+         * Constructor for initializing the views of a profile item.
+         * @param itemView the root view of the profile item layout
+         */
         public ProfileViewHolder(@NonNull View itemView) {
             super(itemView);
             profileCard = itemView.findViewById(R.id.profile_card);
