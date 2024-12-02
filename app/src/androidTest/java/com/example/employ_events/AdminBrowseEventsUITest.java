@@ -46,6 +46,8 @@ import org.junit.runners.MethodSorters;
  * US 03.04.01 As an administrator, I want to be able to browse events.
  * US 03.01.01 As an administrator, I want to be able to remove events.
  * US 03.03.02 As an administrator, I want to be able to remove hashed QR code data
+ * Issues: Cannot test to see if qr code image is not loaded in manage event after delete qr code button is clicked.
+ * A toast confirming this is present but cannot test for a toast either.
  * @author Connor
  */
 // Makes tests run in alphabetical order
