@@ -184,7 +184,8 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="5dp"
-            android:text="Edit\nProfile" />
+            android:text="Edit\nProfile"
+            app:icon="@drawable/baseline_edit_24" />
 
         <Button
             android:id="@+id/button_notifications_settings"
@@ -194,7 +195,7 @@
             android:layout_margin="5dp"
             android:text="Notification\nSettings"
 
-            />
+            app:icon="@drawable/baseline_edit_notifications_24" />
 
         <Button
             android:id="@+id/delete_profile_button"
@@ -202,7 +203,8 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="5dp"
-            android:text="Delete\nProfile" />
+            android:text="Delete\nProfile"
+            app:icon="@drawable/baseline_remove_moderator_24" />
     </GridLayout>
 
 

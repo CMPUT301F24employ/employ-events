@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -80,7 +81,8 @@
                 android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Manage Facility" />
+                android:text="Manage Facility"
+                app:icon="@drawable/baseline_holiday_village_24" />
 
         </LinearLayout>
 
@@ -137,7 +139,8 @@
                 android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Scan Event QR Code" />
+                android:text="Scan Event\nQR Code"
+                app:icon="@drawable/baseline_qr_code_scanner_24" />
 
     </LinearLayout>
 
@@ -186,7 +189,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:backgroundTint="#3D5AFE"
-                android:text="View Invitations" />
+                android:text="View Invitations"
+                app:icon="@drawable/baseline_mark_email_unread_24" />
 
         </LinearLayout>
 
