@@ -32,7 +32,6 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 
 /**
- * @author Tina
  * Test class for the InvitationsListFragment, InvitationFragment, and InvitationsAdapter.
  * This test uses Firebase Firestore for creating test profiles and events and leverages Espresso for UI testing.
  * Tests include:
@@ -42,6 +41,7 @@ import java.util.Date;
  * - Verifying the acceptance of an invitation clears that invitation and navs back to list.
  * US 01.05.02 As an entrant I want to be able to accept the invitation to register/sign up when chosen to participate in an event
  * US 01.05.03 As an entrant I want to be able to decline an invitation when chosen to participate in an event
+ * @author Tina
  */
 @RunWith(AndroidJUnit4.class)
 public class InvitationsUITest {

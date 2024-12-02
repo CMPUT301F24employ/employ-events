@@ -61,7 +61,6 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  */
 
 /**
- * @author Tina, Jasleen, Aasvi
  * The EventDetailsFragment is responsible for displaying the details of an event.
  * It allows users to join or leave the event waiting list.
  * This fragment retrieves event data from Firestore and handles user profile validation for joining the event.
@@ -74,6 +73,9 @@ https://developer.android.com/develop/sensors-and-location/location/permissions
  * If permission is denied, the user is prompted to grant the required permission.
  * If the event requires geolocation, the user will receive a warning before joining the event.
  * This fragment also asks the user for notification permission to ensure event-related updates can be delivered.
+ * @author Tina
+ * @author Jasleen
+ * @author Aasvi
  */
 public class EventDetailsFragment extends Fragment{
 
@@ -94,9 +96,10 @@ public class EventDetailsFragment extends Fragment{
     private ActivityResultLauncher<String> requestNotificationPermissionLauncher;
 
     /**
-     * @author Tina, Jasleen
      * Inflates the fragment's view and sets up the UI components.
      * It also fetches event data from Firestore and checks the user's status in the event's entrants list.
+     * @author Jasleen
+     * @author Tina
      */
      public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -154,8 +157,8 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Aasvi
      * Checks if notification permission is granted and requests if necessary
+     * @author Aasvi
      */
     private void checkAndRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -167,8 +170,8 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Update the buttons visibility on resume.
+     * @author Tina
      */
     @Override
     public void onResume() {
@@ -179,9 +182,9 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Loads the event details by creating a new event - current event,
      * and calling the display details and button visibility methods.
+     * @author Tina
      */
     private void loadEventDetails() {
         DocumentReference eventRef = eventsRef.document(eventID);
@@ -206,8 +209,8 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Updates join button visibility based on current date and user status.
+     * @author Tina
      */
     private void updateJoinButtonVisibility() {
         leaveButton.setVisibility(View.GONE);
@@ -262,9 +265,10 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina, Jasleen
      * Leaves the event waiting list by deleting the user's entrant record.
      * Gives user a warning and requires confirmation prior to leaving.
+     * @author Tina
+     * @author Jasleen
      */
     private void leaveEvent() {
         new AlertDialog.Builder(requireContext())
@@ -290,8 +294,9 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina, Jasleen
      * Joins the event by adding the user to the entrants list.
+     * @author Jasleen
+     * @author Tina
      */
     private void joinEvent() {
         // Start by getting user profile
@@ -351,9 +356,9 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Displays the event details by populating the UI views with data from the Firestore document.
      * @param document The Firestore document containing the event data.
+     * @author Tina
      */
     private void displayDetails(DocumentSnapshot document) {
         waitingListCapacity.setVisibility(View.GONE);
@@ -405,9 +410,9 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Loads an image from a URL and displays it in the bannerImage.
      * @param imageUrl The URL of the image to be loaded.
+     * @author Tina
      */
     private void loadImageFromUrl(String imageUrl) {
         if (isAdded()) {
@@ -419,11 +424,11 @@ public class EventDetailsFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Handles the profile required check when join is clicked.
      * If user has a profile, handles event geolocation:
      * - required -> warning -> handle geolocation requirement.
      * - not required -> join event.
+     * @author Tina
      */
     private void handleJoinButtonClick() {
         db.collection("userProfiles").document(uniqueID).get()

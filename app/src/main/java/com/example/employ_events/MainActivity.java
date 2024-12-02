@@ -36,7 +36,14 @@ import java.util.UUID;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-
+/**
+ * MainActivity serves as the entry point of the application.
+ *
+ * @author Tina
+ * @author Sahara
+ * @author Connor
+ * @author Aasvi
+ */
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -124,8 +131,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * @author Sahara, Tina
      * Initializes the notifications channels for: organizers, admins, app notifications.
+     * @author Sahara
+     * @author Tina
      */
     private void createNotificationChannels() {
         // Create the NotificationManager instance
@@ -165,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * @author Aasvi
      * Requests permission from user for notifications.
+     * @author Aasvi
      */
     private void requestNotificationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -179,8 +187,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * @author Sahara
      * Monitors user notifications from firebase.
+     * @author Sahara
      */
     private void monitorNotifications() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);

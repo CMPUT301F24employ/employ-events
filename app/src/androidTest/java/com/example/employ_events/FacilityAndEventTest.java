@@ -26,9 +26,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 /**
- * @author Aaron initially created,
- * @author Tina modifying to reduce warnings, fix errors related to updates, using realistic data and adding documentation.
  * UI Tests for organizer managing their facility.
+ * @author Aaron
+ * - Initially created
+ * @author Tina
+ * - Modifying to reduce warnings, fix errors related to updates, using realistic data and adding documentation.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)

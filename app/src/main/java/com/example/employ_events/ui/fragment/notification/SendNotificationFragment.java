@@ -21,10 +21,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 
 /**
- * @author: Sahara
  * A fragment that allows the user to send notifications to event entrants.
  * The user can enter a custom message, select a category of recipients,
  * and send notifications to entrants in Firestore.
+ * @author Sahara
+ * @author Tina
  */
 public class SendNotificationFragment extends Fragment {
 
@@ -38,6 +39,8 @@ public class SendNotificationFragment extends Fragment {
      * @param container          The parent view that the fragment's UI will attach to.
      * @param savedInstanceState A Bundle containing the fragment's previously saved state.
      * @return The root view of the inflated layout.
+     * @author Sahara
+     * @author Tina
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,6 +98,7 @@ public class SendNotificationFragment extends Fragment {
     /**
      * Sends notifications to the event's entrants based on the selected category.
      *
+     * @author Sahara
      * @param eventId   The ID of the event whose entrants will receive notifications.
      * @param message   The custom message to include in the notification.
      * @param tabPosition The selected tab position to determine the category of recipients:
@@ -160,6 +164,7 @@ public class SendNotificationFragment extends Fragment {
      *
      * @param userID       The ID of the user to whom the notification will be added.
      * @param notification The Notification object containing the event ID, message, read status, and channel ID.
+     * @author Sahara
      */
     private void addNotification(String userID, Notification notification) {
         db.collection("userProfiles")

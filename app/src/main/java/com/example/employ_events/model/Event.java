@@ -12,9 +12,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * @author Sahara, Tina
  * Represents an event with various attributes such as title, date, registration deadlines,
  * fees, and capacity. It can manage a list of entrants and determine selections from that list.
+ * @author Sahara
+ * @author Tina
  */
 public class Event {
     //Constructors -> may not need all of them depending on AddEventFragment implementation

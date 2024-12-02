@@ -30,11 +30,11 @@ Implemented a dashboard like home screen with live updating counts for user stat
  */
 
 /**
- * @author Tina
  * Fragment representing the home screen. Dashboard showing user stats such as:
  * - Organizer event count and entrant count
  * - Entrant joined event count and lottery win count
  * - Pending invitations count
+ * @author Tina
  */
 public class HomeFragment extends Fragment {
 

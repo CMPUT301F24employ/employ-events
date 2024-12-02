@@ -70,9 +70,11 @@ US 02.02.03 As an organizer I want to enable or disable the geolocation requirem
  */
 
 /**
- * @author Sahara, Tina, Connor
  * AddEventFragment is a Fragment that allows organizers to create a new event
  * by providing details such as title, description, dates, time, fee, capacity, and location.
+ * @author Sahara
+ * @author Connor
+ * @author Tina
  */
 public class AddEventFragment extends Fragment {
 
@@ -90,6 +92,10 @@ public class AddEventFragment extends Fragment {
     private static final String PERMISSION_READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
     private FirebaseStorage storage;
 
+    /**
+     * @author Sahara
+     * @author Tina
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = AddEventBinding.inflate(inflater, container, false);
@@ -268,6 +274,8 @@ public class AddEventFragment extends Fragment {
      * Displays a DatePicker and TimePicker for selecting event dates and times.
      * @param button The button that triggers the date and time picker.
      * @param filter The type of date being set (event date, registration start date, or registration deadline).
+     * @author Sahara
+     * @author Tina
      */
     private void showDateTimePicker(Button button, String filter) {
         Calendar calendar = Calendar.getInstance();
@@ -349,6 +357,7 @@ public class AddEventFragment extends Fragment {
      * Retrieves the facility ID associated with the given unique ID.
      * @param uniqueID The unique ID of the user.
      * @param listener Callback to return the facility ID.
+     * @author Tina
      */
     private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
         Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
@@ -366,6 +375,7 @@ public class AddEventFragment extends Fragment {
     /**
      * Fetches the facility ID for the current user and stores it in the facilityID variable.
      * @param uniqueID The unique ID of the user.
+     * @author Tina
      */
     public void fetchFacilityID(String uniqueID) {
         getFacilityID(uniqueID, id -> {
@@ -375,6 +385,7 @@ public class AddEventFragment extends Fragment {
 
     /**
      * Callback interface for fetching facility ID.
+     * @author Tina
      */
     public interface OnFacilityIDFetchedListener {
         void onFacilityIDFetched(String facilityID);
@@ -382,6 +393,7 @@ public class AddEventFragment extends Fragment {
 
     /**
      * Launches the image picker intent to select a profile picture.
+     * @author Tina
      */
     private void pickImage() {
         // Check for storage permission
@@ -395,6 +407,7 @@ public class AddEventFragment extends Fragment {
     /**
      * Uploads the event banner to Firebase Storage and saves the event details in Firestore.
      * @param newEvent The Event object containing event details.
+     * @author Tina
      */
     private void uploadBannerAndSaveEvent(Event newEvent, Runnable onComplete) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("banners/" + System.currentTimeMillis() + ".jpg");
@@ -410,6 +423,7 @@ public class AddEventFragment extends Fragment {
     /**
      * Saves the event details to Firestore.
      * @param newEvent The Event object to be saved.
+     * @author Tina
      */
     private void saveEvent(Event newEvent, Runnable onComplete) {
         db.collection("events").add(newEvent)
@@ -442,6 +456,7 @@ public class AddEventFragment extends Fragment {
      * @param eventDocumentID The unique identifier for the event.
      * @return A Bitmap object representing the QR code.
      * @throws WriterException If there is an error in generating the QR code.
+     * @author Connor
      */
     private Bitmap makeQRBitmap(String eventDocumentID) throws WriterException {
         QRCodeWriter writer = new QRCodeWriter();
@@ -461,6 +476,7 @@ public class AddEventFragment extends Fragment {
      * Uploads the QR code bitmap to Firebase Storage and saves the URL in Firestore.
      * @param bMap The Bitmap object representing the QR code.
      * @param eventDocumentID The unique identifier for the event associated with the QR code.
+     * @author Connor
      */
     private void uploadAndSaveQR(Bitmap bMap, String eventDocumentID, Runnable onComplete) {
         StorageReference storageReference = storage.getReference().child("QRCodes/" + eventDocumentID + ".png");
@@ -498,6 +514,7 @@ public class AddEventFragment extends Fragment {
 
     /**
      * Checks if storage permission is granted and requests it if necessary.
+     * @author Tina
      */
     private void checkAndRequestStoragePermission() {
         String permission = PERMISSION_READ_MEDIA_IMAGES;

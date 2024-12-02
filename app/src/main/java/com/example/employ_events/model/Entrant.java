@@ -8,9 +8,11 @@ This class is used to create an entrant for events. No outstanding issues at the
  */
 
 /**
- * @author Sahara, Aasvi
  * Represents an entrant for an event. An entrant has a name, unique ID, email,
  * and status regarding their placement on various lists (waiting list, cancelled list, etc.).
+ * @author Sahara
+ * @author Aasvi
+ * @author Tina
  */
 public class Entrant {
     private String name, uniqueID, email;

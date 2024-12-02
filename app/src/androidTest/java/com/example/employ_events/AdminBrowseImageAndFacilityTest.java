@@ -40,8 +40,8 @@ BEFORE TESTING MAKE SURE:
  - You might have to run test one by one
  */
 /**
- * @author Aaron
  * Admin browse image and browse facility ui test
+ * @author Aaron
  **/
 public class AdminBrowseImageAndFacilityTest {
     @Rule

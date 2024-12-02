@@ -13,9 +13,9 @@ import com.example.employ_events.model.EventItem;
 import java.util.ArrayList;
 
 /**
- * @author Tina
  * Adapter for displaying a list of event invitations in a RecyclerView.
  * This adapter binds each event's data to a view and handles click events.
+ * @author Tina
  */
 public class InvitationsAdapter extends RecyclerView.Adapter<InvitationsAdapter.ViewHolder> {
     private Context context;

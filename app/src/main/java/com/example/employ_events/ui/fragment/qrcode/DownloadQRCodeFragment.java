@@ -32,15 +32,16 @@ import java.net.URL;
 import java.util.Objects;
 
 /*
-Authors: Tina, Connor
+Authors: Connor
 
 The purpose of this fragment is to let organizers download their event specific
 QR code so they may distribute it.
  */
 
 /**
- * @author Connor, Tina
  * Fragment to download and display a QR code image from a Firebase Firestore URL.
+ * @author Tina
+ * @author Connor
  */
 public class DownloadQRCodeFragment extends Fragment {
     private DownloadQrCodeBinding binding;
@@ -52,6 +53,7 @@ public class DownloadQRCodeFragment extends Fragment {
     /**
      * Initializes the fragment view, loads the QR code URL from Firestore,
      * and sets up a download button to save the QR code image to storage.
+     * @author Tina
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -79,9 +81,7 @@ public class DownloadQRCodeFragment extends Fragment {
             }
         }
 
-        downloadButton.setOnClickListener(view -> {
-            loadImageFromUrl(qrUri, true);
-        });
+        downloadButton.setOnClickListener(view -> loadImageFromUrl(qrUri, true));
 
         return root;
     }
@@ -91,6 +91,7 @@ public class DownloadQRCodeFragment extends Fragment {
      * Calls {@link #saveImageToStorage(Bitmap)} to save the image once it is loaded.
      *
      * @param url The URL of the image to load.
+     * @author Tina
      */
     private void loadImageFromUrl(String url, boolean save) {
         new Thread(() -> {
@@ -115,6 +116,7 @@ public class DownloadQRCodeFragment extends Fragment {
     /**
      * Saves a Bitmap image to external storage in the Pictures directory.
      * @param bitmap The Bitmap image to save.
+     * @author Connor
      */
     private void saveImageToStorage(Bitmap bitmap) {
         ContentResolver resolver = requireContext().getContentResolver();

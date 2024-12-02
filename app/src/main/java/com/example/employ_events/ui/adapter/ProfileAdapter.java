@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Jasleen
  * Adapter for displaying a list of profiles in a RecyclerView.
  * This adapter binds each profile's data to its corresponding view and handles item click events using a ProfileClickListener.
+ * @author Jasleen
  */
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
 
@@ -28,9 +28,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     private ProfileClickListener listener;
 
     /**
-     * @author Jasleen
      * Constructor for initializing the adapter with context, profile list, and click listener.
-     *
+     * @author Jasleen
      * @param context     the context in which the adapter is used
      * @param profileList the initial list of profiles
      * @param listener    the click listener for handling profile item clicks
@@ -42,17 +41,16 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     /**
-     * @author Jasleen
      * Interface for handling profile item click events.
+     * @author Jasleen
      */
     public interface ProfileClickListener {
         void onItemClick(Profile profile);
     }
 
     /**
-     * @author Jasleen
      * Inflates the layout for a profile item and creates a new ViewHolder instance.
-     *
+     * @author Jasleen
      * @param parent   the parent ViewGroup
      * @param viewType the type of view to be created
      * @return a new ProfileViewHolder instance
@@ -65,9 +63,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     /**
-     * @author Jasleen
      * Binds data to a ViewHolder at a specific position.
-     *
+     * @author Jasleen
      * @param holder   the ViewHolder to bind data to
      * @param position the position of the item in the list
      */
@@ -87,9 +84,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     /**
-     * @author Jasleen
      * Returns the total number of items in the profile list.
-     *
+     * @author Jasleen
      * @return the number of items
      */
     @Override
@@ -98,9 +94,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     /**
-     * @author Jasleen
      * Updates the current profile list with new data and refreshes the RecyclerView.
-     *
+     * @author Jasleen
      * @param profiles the new list of profiles to display
      */
     public void updateProfileList(List<Profile> profiles) {
@@ -110,8 +105,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     /**
-     * @author Jasleen
      * ViewHolder class for managing views within a profile item.
+     * @author Jasleen
      */
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
 
@@ -121,9 +116,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         private final TextView phoneNumberTextView;
 
         /**
-         * @author Jasleen
          * Constructor for initializing the views of a profile item.
-         *
+         * @author Jasleen
          * @param itemView the root view of the profile item layout
          */
         public ProfileViewHolder(@NonNull View itemView) {

@@ -20,6 +20,7 @@ No outstanding issues at the moment.
 
 /**
  * Adapter for managing and displaying a list of image in a RecyclerView
+ * @author Aaron
  */
 public class ImageBrowseAdapter extends RecyclerView.Adapter<ImageBrowseAdapter.ViewHolder> {
     Context context;

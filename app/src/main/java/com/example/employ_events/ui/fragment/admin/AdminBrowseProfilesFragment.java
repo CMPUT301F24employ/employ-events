@@ -39,9 +39,10 @@ US 03.02.01 As an administrator, I want to be able to remove profiles.
  */
 
 /**
- * @author Jasleen
+ *
  * AdminBrowseProfilesFragment allows admins to browse all the profiles in firebase. They are also able to click on
  * the profile to then delete it which resultingly deletes the facility and events associated with it.
+ * @author Jasleen
  * @see ProfileFragment
  * Delete profile logic in ProfileFragment
  */
@@ -53,8 +54,8 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     private ProfileAdapter profileAdapter;
 
     /**
-     * @author Jasleen
      * Sets up the recycler view and queries & adds the profiles to the view.
+     * @author Jasleen
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,8 +75,8 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
-     * @author Jasleen
      * Sets up the RecyclerView for displaying the profiles.
+     * @author Jasleen
      */
     private void setupRecyclerView() {
         RecyclerView recyclerView = binding.allProfilesRecyclerView;
@@ -85,8 +86,8 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
-     * @author Jasleen
      * Loads profiles from Firestore and updates the RecyclerView.
+     * @author Jasleen
      */
     private void loadProfiles() {
         db.collection("userProfiles")
@@ -111,9 +112,9 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
-     * @author Jasleen
      * Callback method for when a profile item in the RecyclerView is clicked.
      * This method navigates to a detail screen for the selected profile.
+     * @author Jasleen
      * @param profile The Profile object that was clicked.
      */
     @Override
@@ -128,9 +129,9 @@ public class AdminBrowseProfilesFragment extends Fragment implements ProfileAdap
     }
 
     /**
-     * @author Jasleen
      * Sets the 'admin' field in Firebase to true for the current user.
      * This restricts admins from deleting their own profile.
+     * @author Jasleen
      */
     private void setAdminStatusTrue() {
         String uniqueID = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("uniqueID", null);

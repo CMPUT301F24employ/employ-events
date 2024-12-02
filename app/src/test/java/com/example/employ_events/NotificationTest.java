@@ -6,9 +6,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * @author Tina
  * Unit test class for the Notification class.
  * Tests various aspects of the Notification class, such as constructors, getters, and setters.
+ * @author Tina
  */
 public class NotificationTest {
 

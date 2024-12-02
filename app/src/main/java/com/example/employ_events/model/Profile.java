@@ -7,8 +7,9 @@ The purpose of this class is to define a user and set/get their profile informat
 import java.util.ArrayList;
 
 /**
- * @author Tina, Sahara
  * This is a class that defines a user's Profile.
+ * @author Tina
+ * @author Sahara
  */
 public class Profile {
     private String uniqueID, name, email, pfpURI, phoneNumber;

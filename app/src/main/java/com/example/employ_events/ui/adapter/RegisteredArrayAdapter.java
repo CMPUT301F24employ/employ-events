@@ -14,13 +14,12 @@ import com.example.employ_events.model.Event;
 
 import java.util.ArrayList;
 
-/*
-Yet to be completed. We hope to use this in displaying the list of registered events.
- */
-
 /**
  * RecyclerView.Adapter implementation to display a list of registered events.
  * This adapter binds event data to views that are displayed within a RecyclerView.
+ * @author Aasvi
+ * @author Tina
+ * @author Jasleen
  */
 public class RegisteredArrayAdapter extends RecyclerView.Adapter<RegisteredArrayAdapter.ViewHolder> {
     private final ArrayList<Event> registeredEvents;

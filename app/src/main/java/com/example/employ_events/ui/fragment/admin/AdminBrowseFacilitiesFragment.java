@@ -32,10 +32,10 @@ US 03.07.01 As an administrator I want to remove facilities that violate app pol
  */
 
 /**
- * @author Jasleen
  * Fragment that displays a list of facilities for an admin user.
  * This fragment fetches facilities from Firestore and shows them in a RecyclerView.
  * Admins can click on a facility to view more details.
+ * @author Jasleen
  */
 public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityBrowseAdapter.FacilityClickListener {
 
@@ -45,9 +45,9 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     private FacilityBrowseAdapter facilityAdapter;
 
     /**
-     * @author Jasleen
      * Inflates the fragment layout and initializes the Firestore instance,
      * the list of facilities, and the RecyclerView adapter.
+     * @author Jasleen
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,8 +65,8 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
-     * @author Jasleen
      * Sets up the RecyclerView for displaying the facilities.
+     * @author Jasleen
      */
     private void setupRecyclerView() {
         RecyclerView recyclerView = binding.allFacilitiesRecyclerView;
@@ -76,8 +76,9 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
-     * @author Jasleen and Tina
      * Loads facilities from Firestore and updates the RecyclerView.
+     * @author Jasleen
+     * @author Tina
      */
     private void loadFacilities() {
         db.collection("facilities")
@@ -103,10 +104,9 @@ public class AdminBrowseFacilitiesFragment extends Fragment implements FacilityB
     }
 
     /**
-     * @author Jasleen
      * Callback method for when a facility item in the RecyclerView is clicked.
      * This method navigates to a detail screen for the selected facility.
-     *
+     * @author Jasleen
      * @param facility The Facility object that was clicked.
      */
     @Override
