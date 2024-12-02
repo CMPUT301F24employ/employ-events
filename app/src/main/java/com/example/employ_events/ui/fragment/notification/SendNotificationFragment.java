@@ -117,6 +117,7 @@ public class SendNotificationFragment extends Fragment {
                                 Boolean onWaitingList = document.getBoolean("onWaitingList");
                                 Boolean onAcceptedList = document.getBoolean("onAcceptedList");
                                 Boolean onCancelledList = document.getBoolean("onCancelledList");
+                                Boolean onRegisteredList = document.getBoolean("onRegisteredList");
                                 boolean shouldNotify = false;
 
                                 switch (tabPosition) {
@@ -133,7 +134,7 @@ public class SendNotificationFragment extends Fragment {
                                         shouldNotify = Boolean.TRUE.equals(onCancelledList);
                                         break;
                                     case 4: // Registered
-                                        shouldNotify = Boolean.TRUE.equals(onAcceptedList) && !Boolean.TRUE.equals(onCancelledList);
+                                        shouldNotify = Boolean.TRUE.equals(onRegisteredList);
                                         break;
                                 }
 
