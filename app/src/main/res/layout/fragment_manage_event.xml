@@ -129,17 +129,21 @@
                 android:id="@+id/edit_event_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
                 android:layout_columnWeight="1"
-                android:text="Update\nEvent Banner"/>
+                android:layout_margin="3dp"
+                android:text="Update\nEvent Banner"
+                android:textSize="12sp"
+                app:icon="@drawable/baseline_file_upload_24" />
 
             <Button
                 android:id="@+id/qr_code_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
                 android:layout_columnWeight="1"
-                android:text="View\nQR CODE" />
+                android:layout_margin="3dp"
+                android:text="View\nQR CODE"
+                android:textSize="12sp"
+                app:icon="@drawable/baseline_qr_code_24" />
 
             <Button
                 android:id="@+id/view_entrants_button"
@@ -147,15 +151,19 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:layout_margin="3dp"
-                android:text="@string/manage_entrants" />
+                android:text="@string/manage_entrants"
+                android:textSize="12sp"
+                app:icon="@drawable/baseline_person_search_24" />
 
             <Button
                 android:id="@+id/delete_qr_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
                 android:layout_columnWeight="1"
-                android:text="Delete\nQR Code" />
+                android:layout_margin="3dp"
+                android:text="Delete\nQR Code"
+                android:textSize="12sp"
+                app:icon="@drawable/baseline_remove_moderator_24" />
 
             <Button
                 android:id="@+id/delete_event_button"
@@ -163,7 +171,9 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:layout_margin="3dp"
-                android:text="Delete\nEvent" />
+                android:text="Delete\nEvent"
+                android:textSize="12sp"
+                app:icon="@drawable/baseline_remove_moderator_24" />
 
 
         </GridLayout>

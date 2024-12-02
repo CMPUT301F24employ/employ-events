@@ -2,6 +2,7 @@
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue_light_background"
@@ -101,20 +102,22 @@
                 <Button
                     android:id="@+id/decline_invitation_button"
                     android:layout_width="0dp"
-                    android:maxWidth="320dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="5dp"
-                    android:text="Decline" />
+                    android:maxWidth="320dp"
+                    android:text="Decline"
+                    app:icon="@drawable/baseline_event_busy_24" />
 
                 <Button
                     android:id="@+id/accept_invitation_button"
                     android:layout_width="0dp"
-                    android:maxWidth="320dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="5dp"
-                    android:text="Accept" />
+                    android:maxWidth="320dp"
+                    android:text="Accept"
+                    app:icon="@drawable/baseline_event_available_24" />
             </GridLayout>
 
         </LinearLayout>

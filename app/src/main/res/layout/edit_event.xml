@@ -1,5 +1,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue_light_background"
@@ -59,13 +60,13 @@
         <!-- Save Event Button -->
         <Button
             android:id="@+id/save_event_button"
-            android:layout_width="320dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background"
             android:text="Confirm Changes"
             android:textColor="@android:color/white"
-            />
+            app:icon="@drawable/baseline_check_24" />
 
     </LinearLayout>
 </ScrollView>
