@@ -40,10 +40,11 @@ If a user is an admin, it allows them to remove profiles.
  */
 
 /**
- * @author Tina, Jasleen
  * A fragment that displays the user's profile information.
  * It retrieves the profile data from Firestore based on a unique identifier and
  * populates the UI elements with the fetched data.
+ * @author Tina
+ * @author Jasleen
  */
 public class ProfileFragment extends Fragment{
 
@@ -135,6 +136,7 @@ public class ProfileFragment extends Fragment{
      * Displays the user's profile information in the UI.
      * @param document            The Firestore document containing the user's profile data.
      * @param profileViewModel The ViewModel associated with this fragment.
+     * @author Tina
      */
     private void displayProfile(DocumentSnapshot document, ProfileViewModel profileViewModel) {
         // Set views for each field if available.
@@ -159,9 +161,9 @@ public class ProfileFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Loads an image from a URL and displays it in the bannerImage.
      * @param imageUrl The URL of the image to be loaded.
+     * @author Tina
      */
     private void loadImageFromUrl(String imageUrl) {
         if (isAdded()) {
@@ -173,8 +175,8 @@ public class ProfileFragment extends Fragment{
     }
 
     /**
-     * @author Jasleen
      * Deletes a users profile and affiliated facility and events, along with removing them from event entrantLists.
+     * @author Jasleen
      */
     private void deleteProfileAndFacility() {
         DocumentReference profileRef = db.collection("userProfiles").document(uniqueID);
@@ -285,10 +287,10 @@ public class ProfileFragment extends Fragment{
 
 
     /**
-     * @author Tina
      * Displays a dialog where the user can toggle notification settings for admin and organizer notifications.
      * Fetches current settings from Firebase Firestore and updates the switches accordingly.
      * When the user clicks "Save", the settings are saved back to Firestore.
+     * @author Tina
      */
     private void showNotificationSettingsDialog() {
         // Inflate the dialog layout
@@ -340,11 +342,11 @@ public class ProfileFragment extends Fragment{
     }
 
     /**
-     * @author Tina
      * Updates the notification preference for the user in Firestore.
      *
      * @param preferenceType The type of preference to update (either "adminNotifications" or "organizerNotifications").
      * @param isEnabled Whether the notification preference should be enabled (true) or disabled (false).
+     * @author Tina
      */
     private void updateNotificationPreference(String preferenceType, boolean isEnabled) {
         // Update Firestore with the new preference
@@ -353,7 +355,6 @@ public class ProfileFragment extends Fragment{
                 .addOnSuccessListener(aVoid -> Toast.makeText(requireContext(), "Settings saved", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to update settings", Toast.LENGTH_SHORT).show());
     }
-
 
     @Override
     public void onDestroyView() {

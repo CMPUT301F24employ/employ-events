@@ -56,6 +56,7 @@ US 02.01.03 As an organizer, I want to create and manage my facility profile
 /**
  * A fragment that allows users to edit their facility's profile information.
  * This fragment interacts with Firestore to retrieve and update facility profiles.
+ * @author Tina
  */
 public class EditFacilityFragment extends Fragment {
     private FragmentEditFacilityBinding binding;
@@ -224,7 +225,6 @@ public class EditFacilityFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Loads an image from a URL and displays it in the bannerImage.
      * @param imageUrl The URL of the image to be loaded.
      */

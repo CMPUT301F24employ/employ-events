@@ -4,6 +4,7 @@ The purpose of this class is to define a image and set/get the image information
  */
 /**
  * Represents a facility with various attributes including name, image UrL
+ * @author Aaron
  */
 public class Image {
     String name, url;

@@ -30,10 +30,10 @@ to accept / decline if deleted notification.
  */
 
 /**
- * @author Tina
  * Fragment to display a list of invitations the user has accepted.
  * It fetches event data from Firestore, filters the invitations based on the user's status,
  * and binds the filtered list to a RecyclerView using an adapter.
+ * @author Tina
  */
 public class InvitationsListFragment extends Fragment {
 

@@ -62,6 +62,7 @@ US 01.02.01	As an entrant, I want to provide my personal information such as nam
  * A fragment that allows users to edit their profile information.
  * This fragment interacts with Firestore to retrieve and update user profiles.
  * This fragment auto generates a profile picture if no custom one is provided.
+ * @author Tina
  */
 public class EditProfileFragment extends Fragment {
 
@@ -240,7 +241,6 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Loads an image from a URL and displays it in the bannerImage.
      * @param imageUrl The URL of the image to be loaded.
      */

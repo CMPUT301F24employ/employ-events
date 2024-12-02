@@ -24,7 +24,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
 /**
- * @author Connor
  * AdminEventListFragment allows users who are admins (according to their firebase profile) to browse all the events
  * stored in firebase. Admins are also able to click on an event to be able to delete the event or its qr code.
  * US 03.04.01 As an administrator, I want to be able to browse events.
@@ -32,6 +31,7 @@ import java.util.ArrayList;
  * US 03.03.02 As an administrator, I want to be able to remove hashed QR code data.
  * @see ManageEventFragment
  * Delete event logic in ManageEventFragment
+ * @author Connor
  */
 public class AdminEventListFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
@@ -41,6 +41,8 @@ public class AdminEventListFragment extends Fragment implements FacilityEventsAd
     private FacilityEventsAdapter eventsAdapter;
 
     /**
+     * Sets up the recycler view and queries & adds the events to the view.
+     *
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -49,8 +51,6 @@ public class AdminEventListFragment extends Fragment implements FacilityEventsAd
      * @param savedInstanceState If non-null, this fragment is being re-constructed
      * from a previous saved state as given here.
      * @return the root view of the fragment
-     *
-     * Sets up the recycler view and queries & adds the events to the view.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,9 +98,9 @@ public class AdminEventListFragment extends Fragment implements FacilityEventsAd
     }
 
     /**
-     * @param event The event whose details will be displayed in the next fragment
      * This method brings the admin to the manage event fragment where they will be able to delete the qr code or the entire event.
      * @see ManageEventFragment
+     * @param event The event whose details will be displayed in the next fragment
      */
     @Override
     public void onItemClick(Event event) {

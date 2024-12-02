@@ -22,6 +22,9 @@ No outstanding issues at the moment.
 
 /**
  * Adapter for managing and displaying a list of entrants in a RecyclerView
+ * @author Aasvi
+ * @author Sahara
+ * @author Tina
  */
 public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.EntrantViewHolder> {
     private final ArrayList<Entrant> entrantList;
