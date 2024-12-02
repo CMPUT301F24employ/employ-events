@@ -41,17 +41,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-
 /**
  * US 03.04.01 As an administrator, I want to be able to browse events.
  * US 03.01.01 As an administrator, I want to be able to remove events.
  * US 03.03.02 As an administrator, I want to be able to remove hashed QR code data
  * Issues: Cannot test to see if qr code image is not loaded in manage event after delete qr code button is clicked.
  * A toast confirming this is present but cannot test for a toast either.
+ * IMPORTANT: Sometimes the test will fail the first time, not sure why, so it's best to run it again. It will pass the second time.
+ * And make sure there are no duplicate events in Firebase.
  * @author Connor
  */
+
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+
 // Makes tests run in alphabetical order
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AdminBrowseEventsUITest {

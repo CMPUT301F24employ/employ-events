@@ -26,10 +26,7 @@ import com.example.employ_events.model.Facility;
 import com.example.employ_events.model.Profile;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +37,7 @@ import java.util.Date;
 
 /**
  * Test class for AdminBrowseProfilesFragment, ProfileFragment, and ProfileAdapter.
- * This test uses Firebase Firestore for creating a test profile and leverages Espresso for UI testing.
+ * This test uses Firebase Firestore for creating test profiles, facility, and event, and leverages Espresso for UI testing.
  * Tests include:
  * - The Admin Browse Profiles tab exists
  * - Checking if the RecyclerView is visible and displays the correct information.
@@ -48,6 +45,7 @@ import java.util.Date;
  * - Tests if an admin is able to delete a user profile and it's associated data (if there is any) such as facility and events.
  * US 03.05.01 As an administrator, I want to be able to browse profiles.
  * US 03.02.01 As an administrator, I want to be able to remove profiles.
+ * ISSUES: Having issues testing for toasts and scrolling through the list to find the profile.
  * @author Jasleen
  * @author Tina
  * @author Connor
@@ -58,13 +56,8 @@ import java.util.Date;
 
 /*
     BEFORE TESTING MAKE SURE:
-    - There are no duplicate profiles, facilities, and events on firebase
-    - And the following user profile exists as that is the one this test targets
-        Name:
-        Email:
-        Phone Number:
-    - If this profile exists, then it's corresponding facility and event will too.
-
+    There are no duplicate profiles, facilities, and events on firebase.
+    Otherwise, some tests will fail.
  */
 
 // Makes tests run in alphabetical order
@@ -157,7 +150,8 @@ public class AdminBrowseProfilesUITest {
     }
 
 
-    /** Tests if Admin Browse Profiles tab exists in navigation bar
+    /**
+     * Tests if Admin Browse Profiles tab exists in navigation bar
      * @author Jasleen
      */
     @Test
@@ -171,7 +165,10 @@ public class AdminBrowseProfilesUITest {
     }
 
 
-    // Tests if the information I'm seeing in the list, matches the information I see on firebase
+    /**
+     * Tests if the information I'm seeing in the list, matches the information I see on firebase
+     * @author Jasleen
+     */
     @Test
     public void C_BrowseProfilesTest() throws InterruptedException {
         onView(withContentDescription("Open navigation drawer")).perform(click());
@@ -191,7 +188,6 @@ public class AdminBrowseProfilesUITest {
      */
     @Test
     public void D_DeleteAdminProfileTest() throws InterruptedException {
-        // Unfortunately, I am having trouble testing for toasts, so the only way I can verify if the profile is not deleted is by checking if it still exists in the browse list.
         onView(withContentDescription("Open navigation drawer")).perform(click());
         Thread.sleep(2000);
 
@@ -209,6 +205,7 @@ public class AdminBrowseProfilesUITest {
         onView(withId(R.id.delete_profile_button)).check(matches(isDisplayed())).perform(click());
         Thread.sleep(2000);
 
+        // Unfortunately, I am having trouble testing for toasts, so the only way I can verify if the profile is not deleted is by checking if it still exists in the browse list.
         // Going back to the list and verifying if the profile still exists, meaning it did not get deleted
         onView(withContentDescription("Navigate up")).check(matches(isDisplayed())).perform(click());
         Thread.sleep(2000);

@@ -39,7 +39,7 @@ import org.junit.runners.MethodSorters;
  *  US 01.03.01	As an entrant I want to upload a profile picture for a more personalized experience
  *  US 01.03.02	As an entrant I want remove profile picture if need be
  *  US 01.03.03	As an entrant I want my profile picture to be deterministically generated from my profile name if I haven't uploaded a profile image yet.
- *   @author Jasleen
+ *  @author Jasleen
  */
 
 @LargeTest
