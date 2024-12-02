@@ -180,8 +180,8 @@
         android:text="Edit\nProfile"
         app:icon="@drawable/baseline_edit_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_notifications_settings"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_notifications_settings"/>
 
     <Button
         android:id="@+id/button_notifications_settings"
@@ -189,12 +189,12 @@
         android:layout_height="53dp"
         android:layout_columnWeight="1"
         android:layout_margin="5dp"
-        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:text="Notification\nSettings"
         app:icon="@drawable/baseline_edit_notifications_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edit_profile_button" />
 
     <Button
         android:id="@+id/delete_profile_button"
