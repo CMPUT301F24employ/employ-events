@@ -16,9 +16,12 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 
 
+import android.Manifest;
+
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.rule.GrantPermissionRule;
 
 
 import org.junit.FixMethodOrder;
@@ -27,29 +30,36 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
-/*
-    Unable to test for upload and remove image and deterministically generated from profile name.
-    Not sure how to test if drawable changed from "@drawable/white_person" to whatever the user uploaded
-    or if it was determined by their initial or something.
-    I am able to test if the pfp exists, but not if it changes.
-
-    The following are the corresponding user stories to these issues:
-    US 01.03.01	As an entrant I want to upload a profile picture for a more personalized experience
-    US 01.03.02	As an entrant I want remove profile picture if need be
-    US 01.03.03	As an entrant I want my profile picture to be deterministically generated from my profile name if I haven't uploaded a profile image yet.
+/**
+ *  Test class for ProfileFragment and EditProfileFragment.
+ *  Unable to test for upload and remove image and deterministically generated from profile name.
+ *  Not sure how to test if drawable changed from "@drawable/white_person" to whatever the user uploaded or if it was determined by their initial or something.
+ *  I am able to test if the pfp exists, but not if it changes.
+ *  The following are the corresponding user stories to these issues:
+ *  US 01.03.01	As an entrant I want to upload a profile picture for a more personalized experience
+ *  US 01.03.02	As an entrant I want remove profile picture if need be
+ *  US 01.03.03	As an entrant I want my profile picture to be deterministically generated from my profile name if I haven't uploaded a profile image yet.
+ *   @author Jasleen
  */
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 
-// **MAKE SURE your profile on the app is clear. You can go on firebase and delete it or use a different device.
-// If there is an issue, sometimes running the test individually helps.
+/*
+    **MAKE SURE your profile on the app is clear. You can go on firebase and delete it or use a different device.
+    If there is an issue, sometimes running the test individually helps.
 
-// Running the tests in alphabetical order because the "identifiedByDeviceTest" fails if we do not check for it before provide and update info tests
-// As for all the other tests, order does not matter
-// CITATION: https://junit.org/junit4/javadoc/4.12/org/junit/FixMethodOrder.html
+    Running the tests in alphabetical order because the "identifiedByDeviceTest" fails if we do not check for it before provide and update info tests
+    As for all the other tests, order does not matter
+    CITATION: https://junit.org/junit4/javadoc/4.12/org/junit/FixMethodOrder.html
+*/
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ProfileUITest {
+
+    // Grants permission to send notifications so pop-up doesn't appear
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS);
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
@@ -58,7 +68,7 @@ public class ProfileUITest {
 
     // This tests if we are able to go from Home to Profile
     @Test
-    public void A_navigateToProfileTest() throws InterruptedException {
+    public void A_navigateToProfileTest() {
 
         onView(withContentDescription("Open navigation drawer")).perform(click());
         onView(withId(R.id.nav_profile)).perform(click());
@@ -73,7 +83,7 @@ public class ProfileUITest {
 
     // US 01.07.01	As an entrant, I want to be identified by my device, so that I don't have to use a username and password
     @Test
-    public void B_identifiedByDeviceTest() throws InterruptedException {
+    public void B_identifiedByDeviceTest() {
 
         onView(withContentDescription("Open navigation drawer")).perform(click());
         onView(withId(R.id.nav_profile)).perform(click());
@@ -122,7 +132,7 @@ public class ProfileUITest {
 
     // This tests if from the Profile page we are able to switch to the Edit Profile page by pressing the button
     @Test
-    public void D_editProfileSwitchTest() throws InterruptedException {
+    public void D_editProfileSwitchTest() {
 
         onView(withContentDescription("Open navigation drawer")).perform(click());
         onView(withId(R.id.nav_profile)).perform(click());

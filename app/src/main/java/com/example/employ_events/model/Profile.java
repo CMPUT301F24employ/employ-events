@@ -127,7 +127,7 @@ public class Profile {
     }
 
     /**
-     * Sets the user's amin role.
+     * Sets the user's admin role.
      * @param admin true to indicate user is an admin, false otherwise.
      */
     public void setAdmin(boolean admin) {isAdmin = admin;}
