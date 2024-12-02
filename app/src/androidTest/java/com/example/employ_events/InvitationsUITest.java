@@ -160,7 +160,7 @@ public class InvitationsUITest {
 
         onView(withId(R.id.decline_invitation_button)).perform(click());
         Thread.sleep(2000);
-        onView(withText("Accept")).perform(click());
+        onView(withText("Decline")).perform(click());
         Thread.sleep(5000);
 
         // Check that we are returned to the invitations RecyclerView.
