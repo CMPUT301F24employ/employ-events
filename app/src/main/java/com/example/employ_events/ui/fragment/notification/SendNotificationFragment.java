@@ -21,6 +21,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 
 /**
+ * @author: Sahara
  * A fragment that allows the user to send notifications to event entrants.
  * The user can enter a custom message, select a category of recipients,
  * and send notifications to entrants in Firestore.
