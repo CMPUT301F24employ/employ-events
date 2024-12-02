@@ -126,6 +126,7 @@ public class ProfileFragment extends Fragment{
         // Hiding edit button if the user is an admin and only showing delete profile button
         if (isAdmin) {
             editProfileButton.setVisibility(View.GONE);
+            notificationSettingsButton.setVisibility(View.GONE);
         } else {
             deleteProfileButton.setVisibility(View.GONE);
         }
