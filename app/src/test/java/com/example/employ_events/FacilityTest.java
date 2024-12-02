@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.example.employ_events.ui.facility.Facility;
+import com.example.employ_events.model.Facility;
 
 public class FacilityTest {
     private Facility facility;

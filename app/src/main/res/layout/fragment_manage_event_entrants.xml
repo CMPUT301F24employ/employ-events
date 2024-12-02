@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.events.ManageEventEntrants"
+    tools:context=".ui.fragment.event.ManageEventEntrantsFragment"
     android:fillViewport="true"
     android:padding="16dp">
     <LinearLayout

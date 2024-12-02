@@ -10,6 +10,7 @@
         android:id="@+id/recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/adminAction"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,8 +21,9 @@
 
     <Button
         android:id="@+id/adminAction"
-        android:layout_width="400dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="50dp"
         android:text="DELETE IMAGE"
         app:layout_constraintBottom_toBottomOf="parent"

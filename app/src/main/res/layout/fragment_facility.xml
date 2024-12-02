@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue_light_background"
-    tools:context=".ui.facility.FacilityFragment">
+    tools:context=".ui.fragment.facility.FacilityFragment">
 
     <ScrollView
         android:id="@+id/scrollView2"

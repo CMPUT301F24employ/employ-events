@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.example.employ_events.ui.profile.Profile;
+import com.example.employ_events.model.Profile;
 
 public class ProfileTest {
     private Profile profile;

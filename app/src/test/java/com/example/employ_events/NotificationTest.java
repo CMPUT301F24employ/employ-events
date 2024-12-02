@@ -1,5 +1,5 @@
 package com.example.employ_events;
-import com.example.employ_events.ui.notifications.Notification;
+import com.example.employ_events.model.Notification;
 
 import org.junit.Before;
 import org.junit.Test;
