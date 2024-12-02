@@ -5,12 +5,16 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -18,6 +22,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,48 +37,102 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static org.hamcrest.Matchers.not;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@RunWith(AndroidJUnit4.class)
-
+import com.example.employ_events.model.Profile;
+import com.google.firebase.firestore.FirebaseFirestore;
 /*
-BEFORE TESTING MAKE SURE:
- - You have a profile set up that has admin set to true on firebase
- - You might have to run test one by one
+Test must be ran all at once due to test_01 allowing for refresh of admin status.
  */
 /**
  * Admin browse image and browse facility ui test
  * @author Aaron
- **/
+ * @author Tina
+ * @author Jasleen
+ */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(AndroidJUnit4.class)
 public class AdminBrowseImageAndFacilityTest {
+    private FirebaseFirestore db;
+    String adminImageUID = "adminImageUID";
+
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS);
+
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
+
+    /**
+     * Sets the uniqueID for testing and create an admin profile.
+     * @author Tina
+     */
+    @Before
+    public void setUp() throws InterruptedException {
+        // Set the uniqueID in SharedPreferences (simulate a logged-in user)
+        SharedPreferences sharedPreferences = ApplicationProvider.getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("uniqueID", adminImageUID);
+        editor.apply();
+
+        // Create a test profile in Firestore
+        createProfile();
+    }
+
+    /**
+     * Helper method to create a test profile in Firestore.
+     * @author Jasleen
+     */
+    public void createProfile() throws InterruptedException {
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+
+        // Create a test profile with admin set to true
+        Profile testProfile = new Profile(adminImageUID);
+        testProfile.setName("Jasleen Tina");
+        testProfile.setEmail("jasleentina@gmail.com");
+        testProfile.setAdmin(true);
+
+        // Upload test profile to Firestore
+        db.collection("userProfiles").document(adminImageUID)
+                .set(testProfile)
+                .addOnSuccessListener(aVoid -> Log.d("AdminBrowseProfilesUITest", "Test profile added"))
+                .addOnFailureListener(e -> Log.e("AdminBrowseProfilesUITest", "Error adding profile", e));
+
+    }
+
+    /**
+     * Refreshing the app allows the admin status to update, otherwise all the tests fail
+     * @author Jasleen
+      */
     @Test
-    public void test01_AdminButton() throws InterruptedException{
+    public void test01_refreshTest() throws InterruptedException {
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+    }
+
+    @Test
+    public void test02_AdminButton() throws InterruptedException{
+        Thread.sleep(2000);
         // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
         // Wait for the menu to open
-        Thread.sleep(1500);
+        Thread.sleep(2000);
         // Check if admin buttons are shown
         onView(withId(R.id.nav_image)).check(matches(isDisplayed()));
         onView(withId(R.id.nav_browse_event)).check(matches(isDisplayed()));
         onView(withId(R.id.nav_browse_profiles)).check(matches(isDisplayed()));
         onView(withId(R.id.adminBrowseFacilitiesFragment)).check(matches(isDisplayed()));
     }
+
     /**
      * US 03.03.01 As an administrator, I want to be able to remove images. &
      * US 03.06.01 As an administrator, I want to be able to browse images.
+     * @author Aaron
      */
-
-
     @Test
-    public void test02_AdminImageButtonAndBackToHome() throws InterruptedException{
+    public void test03_AdminImageButtonAndBackToHome() throws InterruptedException{
         // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
         // Wait for the menu to open
-        Thread.sleep(1500);
+        Thread.sleep(3000);
         // Click on the "Admin image" menu item
         onView(withId(R.id.nav_image)).perform(click());
         // Wait for the screen to open
@@ -119,57 +179,64 @@ public class AdminBrowseImageAndFacilityTest {
     }
     /**
      * US 03.07.01 As an administrator I want to remove facilities that violate app policy
+     * @author Aaron
+     * @author Tina
      */
-
-    public void test03_AdminFacilitiesButtonAndBackToHome() throws InterruptedException{
-        Thread.sleep(1500);
+    @Test
+    public void test04_AdminFacilitiesButtonAndBackToHome() throws InterruptedException{
         // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
         // Wait for the menu to open
-        Thread.sleep(1500);
+        Thread.sleep(3000);
+
         // CLick on facility button to make a facility
-        onView(withText("Facility")).perform(click());
-        // Wait for the screen to open
-        Thread.sleep(1500);
+        onView(withId(R.id.nav_facility)).perform(click());
+        Thread.sleep(2000);
+
         // Enter the information in the right place
-        onView(withId(R.id.editFacilityName)).perform(ViewActions.replaceText("Tests"));
-        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.replaceText("test12@gmail.com"));
-        onView(withId(R.id.editFacilityAddress)).perform(ViewActions.replaceText("edmonton"));
-        // Wait for the action to open
+        onView(withId(R.id.editFacilityName)).perform(ViewActions.replaceText("Employ Centre"));
+        onView(withId(R.id.editFacilityEmail)).perform(ViewActions.replaceText("employ@events.com"));
+        onView(withId(R.id.editFacilityAddress)).perform(ViewActions.replaceText("Employ St, Edmonton, AB"));
         Thread.sleep(1500);
+
         // Create the facility
         onView(withText("Create")).perform(click());
-        // Wait for it to complete cresting
         Thread.sleep(1500);
+
         // Open navigation drawer
         onView(withContentDescription("Open navigation drawer")).perform(click());
-        Thread.sleep(1500);
+        Thread.sleep(3000);
+
         //Click on the admin facilities browse
         onView(withId(R.id.adminBrowseFacilitiesFragment)).perform(click());
-        // Wait for the menu to open
-        Thread.sleep(1500);
+        Thread.sleep(3000);
+
         // Check if you are on the right screen
         onView(withId(R.id.allFacilitiesRecyclerView)).check(matches(isDisplayed()));
+
         // Swipe up and down to see the other things from the list
-        Espresso.onView(ViewMatchers.withId(R.id.recycler)).perform(ViewActions.swipeUp());
-        Espresso.onView(ViewMatchers.withId(R.id.recycler)).perform(ViewActions.swipeDown());
+        Espresso.onView(ViewMatchers.withId(R.id.allFacilitiesRecyclerView)).perform(ViewActions.swipeUp());
+        Espresso.onView(ViewMatchers.withId(R.id.allFacilitiesRecyclerView)).perform(ViewActions.swipeDown());
+
         // Click on the facility that you just made
-        onView(withText("Tests")).perform(click());
-        Thread.sleep(1500);
+        onView(withText("Employ Centre")).perform(click());
+        Thread.sleep(2000);
+
         // Check if the information are right
-        onView(withText("Tests")).check(matches(isDisplayed()));
-        onView(withText("test12@gmail.com")).check(matches(isDisplayed()));
-        onView(withText("edmonton")).check(matches(isDisplayed()));
-        Thread.sleep(1500);
+        onView(withText("Employ Centre")).check(matches(isDisplayed()));
+        onView(withText("employ@events.com")).check(matches(isDisplayed()));
+        onView(withText("Employ St, Edmonton, AB")).check(matches(isDisplayed()));
+
         // Delete the facility
         onView(withText("DELETE FACILITY")).perform(click());
-        Thread.sleep(1500);
+        Thread.sleep(2000);
         // Check if the facility that you just deleted still in the list
         onView(withId(R.id.adminBrowseFacilitiesFragment)).check(matches(not(hasDescendant(withText("test")))));
-        Thread.sleep(1500);
+
         //Go back to the main screen
         onView(withContentDescription("Navigate up")).perform(click());
-        Thread.sleep(1500);
+        Thread.sleep(2000);
+
         // Check if you are in the main screen
         onView(withId(R.id.welcomeMessage)).check(matches(isDisplayed()));
         onView(withId(R.id.organizersSection)).check(matches(isDisplayed()));
@@ -180,5 +247,37 @@ public class AdminBrowseImageAndFacilityTest {
         onView(withId(R.id.wonLotteryCount)).check(matches(isDisplayed()));
         onView(withId(R.id.invitationsSection)).check(matches(isDisplayed()));
         onView(withId(R.id.invitationsCount)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Helper method to delete the test profile and its data from Firestore after a test.
+     * @author Tina
+     */
+    @After
+    public void tearDown() {
+        db.collection("userProfiles")
+                .whereEqualTo("uniqueID", adminImageUID)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // Delete the profile
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        queryDocumentSnapshots.getDocuments().get(0).getReference().delete()
+                                .addOnSuccessListener(aVoid -> Log.d("FacilityTest", "Profile deleted"))
+                                .addOnFailureListener(e -> Log.e("FacilityTest", "Error deleting profile", e));
+                    }
+                });
+
+        db.collection("facilities")
+                .whereEqualTo("organizer_id", adminImageUID)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // Delete the profile
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        queryDocumentSnapshots.getDocuments().get(0).getReference().delete()
+                                .addOnSuccessListener(aVoid -> Log.d("FacilityTest", "Profile deleted"))
+                                .addOnFailureListener(e -> Log.e("FacilityTest", "Error deleting profile", e));
+                    }
+                });
+
     }
 }
