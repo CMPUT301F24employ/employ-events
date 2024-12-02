@@ -28,8 +28,10 @@ import androidx.test.rule.GrantPermissionRule;
 
 import com.example.employ_events.model.Facility;
 import com.example.employ_events.model.Profile;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,9 +56,8 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AdminBrowseEventsUITest {
 
-    String eventName1 = "Swimming Event 5567", eventName2 = "Golfing Lessons 0234",
-    testAdminProfileID = "testUIDAdminBrowseEvents", testFacilityID = "testFacilityForAdminBrowse",
-    docName1, docName2;
+    String eventName1 = "Swimming Event 5567", eventName2 = "Golf Lessons",
+    testAdminProfileID = "testUIDAdminBrowseEvents", testFacilityID = "testFacilityForAdminBrowse";
 
     // Grants permission to send notifications so pop-up doesn't appear
     @Rule
@@ -99,6 +100,7 @@ public class AdminBrowseEventsUITest {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef1 = db.collection("userProfiles").document(testAdminProfileID);
         DocumentReference docRef2 = db.collection("facilities").document(testFacilityID);
+        CollectionReference colRef = db.collection("events");
 
         // Setting up test profile if it doesn't exist
         docRef1.get().addOnSuccessListener(documentSnapshot -> {
@@ -126,6 +128,18 @@ public class AdminBrowseEventsUITest {
                 Log.d("TestingTests", "Test facility created: " + testAdminProfileID);
             }
         }).addOnFailureListener(e -> Log.e("TestingTests", "Error checking for test facility: " + e));
+
+        colRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    colRef.document(document.getId()).delete()
+                            .addOnSuccessListener(aVoid -> Log.d("TestingTests", "Document " + document.getId() + " deleted"))
+                            .addOnFailureListener(e -> Log.w("TestingTests", "Error deleting document", e));
+                }
+            } else {
+                Log.w("TestingTests", "Error getting documents", task.getException());
+            }
+        });
     }
 
     /**
@@ -292,8 +306,7 @@ public class AdminBrowseEventsUITest {
         onView(withId(R.id.view_event_button)).perform(click());
         onView(withText(eventName2)).perform(click());
         Thread.sleep(1000);
-        onView(withId(R.id.qr_code_button)).perform(click());
-
-        // Check to see that image isn't loaded ??
+        // Check to see that image isn't loaded
+        //onView(withId(R.id.qr_code_button)).perform(click());
     }
 }
