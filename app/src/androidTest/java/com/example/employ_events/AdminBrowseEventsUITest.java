@@ -31,6 +31,7 @@ import com.example.employ_events.model.Profile;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -42,7 +43,9 @@ import org.junit.runners.MethodSorters;
 @LargeTest
 
 /**
- * Testing browse events
+ * US 03.04.01 As an administrator, I want to be able to browse events.
+ * US 03.01.01 As an administrator, I want to be able to remove events.
+ * US 03.03.02 As an administrator, I want to be able to remove hashed QR code data
  * @author Connor
  */
 // Makes tests run in alphabetical order
@@ -50,7 +53,8 @@ import org.junit.runners.MethodSorters;
 public class AdminBrowseEventsUITest {
 
     String eventName1 = "Swimming Event 5567", eventName2 = "Golfing Lessons 0234",
-    testAdminProfileID = "testUIDAdminBrowseEvents", testFacilityID = "testFacilityForAdminBrowse";
+    testAdminProfileID = "testUIDAdminBrowseEvents", testFacilityID = "testFacilityForAdminBrowse",
+    docName1, docName2;
 
     // Grants permission to send notifications so pop-up doesn't appear
     @Rule
@@ -70,6 +74,19 @@ public class AdminBrowseEventsUITest {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("uniqueID", testAdminProfileID);
         editor.apply();
+    }
+
+    @After
+    public void tearDown() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // removing events if they're still there
+        db.collection("events").document(eventName1).delete()
+                .addOnSuccessListener(unused -> Log.d("TestingTests", "Event: " + eventName1 + " successfully deleted!"))
+                .addOnFailureListener(e -> Log.d("TestingTests", "Error: Failed to delete event: " + eventName1));
+        db.collection("events").document(eventName2).delete()
+                .addOnSuccessListener(unused -> Log.d("TestingTests", "Event: " + eventName2 + " successfully deleted!"))
+                .addOnFailureListener(e -> Log.d("TestingTests", "Error: Failed to delete event: " + eventName2));
     }
 
     /**
@@ -109,9 +126,8 @@ public class AdminBrowseEventsUITest {
         }).addOnFailureListener(e -> Log.e("TestingTests", "Error checking for test facility: " + e));
     }
 
-
     /**
-     * // Just to open the app and load the info
+     * Just to open the app and load the info
      * @throws InterruptedException for sleep function
      */
     @Test
@@ -133,7 +149,7 @@ public class AdminBrowseEventsUITest {
     }
 
     @Test
-    public void B_createEventToUseTest() throws InterruptedException {
+    public void B_createEventToUseTest1() throws InterruptedException {
         // First going to facility and creating an event
         onView(withContentDescription("Open navigation drawer")).perform(click());
         onView(withId(R.id.nav_facility)).perform(click());
@@ -165,13 +181,50 @@ public class AdminBrowseEventsUITest {
         // Wait so we can see the details/allow ui to update
         Thread.sleep(1000);
 
+        // Create the event and wait a bit for toast to clear
+        onView(withId(R.id.save_event_button)).perform(click());
+        Thread.sleep(5000);
+    }
+
+    @Test
+    public void B_createEventToUseTest2() throws InterruptedException {
+        // First going to facility and creating an event
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+        onView(withId(R.id.nav_facility)).perform(click());
+        // Click view events
+        onView(withId(R.id.view_event_button)).perform(click());
+        // Click add event
+        onView(withId(R.id.addEventButton)).perform(click());
+        // Enter name + all the other required fields
+        onView(withId(R.id.event_title)).check(matches(isDisplayed())).perform(replaceText(eventName2), closeSoftKeyboard());
+        onView(withId(R.id.description)).check(matches(isDisplayed())).perform(replaceText("d"), closeSoftKeyboard());
+
+        // For the dates just choose the option it shows and hit "OK" twice
+        onView(withId(R.id.event_date)).perform(click());
+        onView(withText("OK")).perform(click());
+        onView(withText("OK")).perform(click());
+        onView(withId(R.id.registration_start_deadline)).perform(click());
+        onView(withText("OK")).perform(click());
+        onView(withText("OK")).perform(click());
+        onView(withId(R.id.registration_date_deadline)).perform(click());
+        onView(withText("OK")).perform(click());
+        onView(withText("OK")).perform(click());
+
+        // Enter event capacity
+        onView(withId(R.id.event_capacity)).check(matches(isDisplayed())).perform(replaceText("1"), closeSoftKeyboard());
+
+        // Scroll to bottom of screen
+        Espresso.onView(ViewMatchers.withId(R.id.add_event_scroll_view)).perform(ViewActions.swipeUp());
+
+        // Wait so we can see the details/allow ui to update
+        Thread.sleep(1000);
+
         // Create the event
         onView(withId(R.id.save_event_button)).perform(click());
-        Thread.sleep(1000);
+        Thread.sleep(5000);
     }
 
     /**
-     * US 03.04.01 As an administrator, I want to be able to browse events.
      * Testing to see if the event is in the recycler view
      */
     @Test
@@ -181,10 +234,8 @@ public class AdminBrowseEventsUITest {
         onView(withId(R.id.nav_browse_event)).perform(click());
 
         // Check to see if the event is in the recycler view
-
         onView(withText(eventName1)).check(matches(isDisplayed()));
     }
-
 
     /** Checks to see if delete event button is there, deletes the event,
      * then goes back to browse events page to check if event is gone.
@@ -209,79 +260,38 @@ public class AdminBrowseEventsUITest {
         onView(withText(eventName1)).check(doesNotExist());
     }
 
-//    @Test
-//    public void E_createEventToUseTest2() throws InterruptedException {
-//        // First going to facility and creating an event
-//        onView(withContentDescription("Open navigation drawer")).perform(click());
-//        onView(withId(R.id.nav_facility)).perform(click());
-//        // Click view events
-//        onView(withId(R.id.view_event_button)).perform(click());
-//        // Click add event
-//        onView(withId(R.id.addEventButton)).perform(click());
-//        // Enter name + all the other required fields
-//        onView(withId(R.id.event_title)).check(matches(isDisplayed())).perform(replaceText(eventName2), closeSoftKeyboard());
-//        onView(withId(R.id.description)).check(matches(isDisplayed())).perform(replaceText("d"), closeSoftKeyboard());
-//
-//        // For the dates just choose the option it shows and hit "OK" twice
-//        onView(withId(R.id.event_date)).perform(click());
-//        onView(withText("OK")).perform(click());
-//        onView(withText("OK")).perform(click());
-//        onView(withId(R.id.registration_start_deadline)).perform(click());
-//        onView(withText("OK")).perform(click());
-//        onView(withText("OK")).perform(click());
-//        onView(withId(R.id.registration_date_deadline)).perform(click());
-//        onView(withText("OK")).perform(click());
-//        onView(withText("OK")).perform(click());
-//
-//        // Enter event capacity
-//        onView(withId(R.id.event_capacity)).check(matches(isDisplayed())).perform(replaceText("1"), closeSoftKeyboard());
-//
-//        // Scroll to bottom of screen
-//        Espresso.onView(ViewMatchers.withId(R.id.add_event_scroll_view)).perform(ViewActions.swipeUp());
-//
-//        // Wait 2 seconds so we can see the details/allow ui to update
-//        Thread.sleep(2000);
-//
-//        // Create the event
-//        onView(withId(R.id.save_event_button)).perform(click());
-//        Thread.sleep(1000);
-//    }
+    /**
+     * Checks to see if delete event qr code button is there, delete the code,
+     * then goes to the manage event screen to confirm that the qr code is gone
+     * @throws InterruptedException for sleep function
+     */
+    @Test
+    public void E_removeQRDataTest() throws InterruptedException {
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+        onView(withId(R.id.nav_browse_event)).perform(click());
+        onView(withText(eventName2)).perform(click());
 
-    // US 03.03.02 As an administrator, I want to be able to remove hashed QR code data
-//    @Test
-//    public void F_removeQRDataTest() throws InterruptedException {
-//        onView(withContentDescription("Open navigation drawer")).perform(click());
-//        onView(withId(R.id.nav_browse_event)).perform(click());
-//        onView(withText(eventName1)).perform(click());
-//
-//        // Check to see if delete event qr code button is there
-//        onView(withId(R.id.delete_qr_button)).check(matches(isDisplayed()));
-//
-//        onView(withId(R.id.delete_qr_button)).perform(click());
-//        Thread.sleep(1000);
-//    }
+        // Check to see if delete event qr code button is there
+        onView(withId(R.id.delete_qr_button)).check(matches(isDisplayed()));
 
-//    /**
-//     * Helper method to create a test event in Firestore.
-//     */
-//    private void createTestEvent(String testEventName) {
-//        // Initialize Firestore and prepare a test event
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-////        FirebaseStorage storage = FirebaseStorage.getInstance();
-//        Event testEvent = new Event();
-//        testEvent.setEventTitle(eventName1);
-//        testEvent.setEventCapacity(1);
-//        Date currentDate = new Date();
-//        testEvent.setEventDate(currentDate);
-//
-//        CollectionReference collectionReference = db.collection("events");
-//
-//        // Add the test event to Firestore
-//        collectionReference.add(testEvent)
-//                        .addOnSuccessListener(documentReference -> {
-////                            String eventID = documentReference.getId();
-////                            StorageReference storageReference = storage.getReference().child("QRCodes/" + eventID + ".png");
-//
-//                        }).addOnFailureListener(e -> Log.e("TestingTests", "Error saving event qr to storage"));
-//    }
+        // Click it
+        onView(withId(R.id.delete_qr_button)).perform(click());
+        Thread.sleep(1000);
+
+        // Making your way back to viewing your event details
+        pressBack();
+        Thread.sleep(1000);
+        pressBack();
+        Thread.sleep(1000);
+
+        onView(withContentDescription("Open navigation drawer")).perform(click());
+        onView(withId(R.id.nav_facility)).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.view_event_button)).perform(click());
+        onView(withText(eventName2)).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.qr_code_button)).perform(click());
+
+        // Check to see that image isn't loaded ??
+    }
 }
