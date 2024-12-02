@@ -166,7 +166,7 @@
                     android:ems="10"
                     android:hint="Address"
                     android:inputType="textPostalAddress"
-                    android:maxLength="15"
+                    android:maxLength="100"
                     android:minHeight="48dp"
                     android:padding="10dp"
                     android:textAlignment="textEnd"

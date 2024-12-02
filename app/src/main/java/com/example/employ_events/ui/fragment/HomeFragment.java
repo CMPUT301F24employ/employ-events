@@ -189,7 +189,7 @@ public class HomeFragment extends Fragment {
                 .collection("entrantsList")
                 .addSnapshotListener((entrantSnapshot, error) -> {
                     if (error != null) {
-                        Log.e("FirestoreError", "Error fetching entrants for event: ", error);
+                        Log.e("FirestoreError", "Error fetching entrants for event " + eventId + ": ", error);
                         return;
                     }
 
@@ -198,16 +198,19 @@ public class HomeFragment extends Fragment {
                         Log.d("EntrantListener", "Current entrants in event " + eventId + ": " + currentEntrantCount);
 
                         // Check if the entrant count has changed since the last snapshot
-                        if (!previousEntrantCounts.containsKey(eventId) || previousEntrantCounts.get(eventId) != currentEntrantCount) {
-                            // If the count has changed, update the total entrants count
-                            totalEntrantsCount += currentEntrantCount - (previousEntrantCounts.getOrDefault(eventId, 0));
-
-                            // Log the updated total entrants count
+                        int previousCount = previousEntrantCounts.getOrDefault(eventId, 0);
+                        if (previousCount != currentEntrantCount) {
+                            // Update the total entrants count
+                            synchronized (this) {
+                                totalEntrantsCount += currentEntrantCount - previousCount;
+                            }
                             Log.d("EntrantListener", "Updated total entrants count: " + totalEntrantsCount);
 
-                            // Update the UI with the new total entrants count
-                            String entrantC = "Total Event Entrants: " + totalEntrantsCount;
-                            eventEntrantsCount.setText(entrantC);
+                            // Update the UI if the TextView is available
+                            if (eventEntrantsCount != null) {
+                                String entrantC = "Total Event Entrants: " + totalEntrantsCount;
+                                eventEntrantsCount.setText(entrantC);
+                            }
                         }
 
                         // Store the current entrant count for this event
@@ -220,6 +223,7 @@ public class HomeFragment extends Fragment {
         // Store the listener so it can be removed later if needed
         entrantListeners.put(eventId, entrantListener);
     }
+
 
     /**
      * Listens to and fetches the counts for:
