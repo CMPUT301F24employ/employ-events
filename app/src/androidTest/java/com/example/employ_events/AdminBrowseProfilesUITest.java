@@ -45,7 +45,7 @@ import java.util.Date;
  * - Tests if an admin is able to delete a user profile and it's associated data (if there is any) such as facility and events.
  * US 03.05.01 As an administrator, I want to be able to browse profiles.
  * US 03.02.01 As an administrator, I want to be able to remove profiles.
- * ISSUES: Having issues testing for toasts and scrolling through the list to find the profile.
+ * ISSUES: Having issues testing for toasts and scrolling. So, I'm unable to test for something that's in the list, but just not in view.
  * @author Jasleen
  * @author Tina
  * @author Connor
