@@ -52,6 +52,7 @@ Test must be ran all at once due to test_01 allowing for refresh of admin status
 @RunWith(AndroidJUnit4.class)
 public class AdminBrowseImageAndFacilityTest {
     private FirebaseFirestore db;
+    String adminImageUID = "adminImageUID";
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS);
@@ -69,7 +70,7 @@ public class AdminBrowseImageAndFacilityTest {
         // Set the uniqueID in SharedPreferences (simulate a logged-in user)
         SharedPreferences sharedPreferences = ApplicationProvider.getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("uniqueID", "testProfileUniqueID");
+        editor.putString("uniqueID", adminImageUID);
         editor.apply();
 
         // Create a test profile in Firestore
@@ -85,13 +86,13 @@ public class AdminBrowseImageAndFacilityTest {
         db = FirebaseFirestore.getInstance();
 
         // Create a test profile with admin set to true
-        Profile testProfile = new Profile("TestProfileUniqueID");
-        testProfile.setName("Jasleen");
-        testProfile.setEmail("jasleen@gmail.com");
+        Profile testProfile = new Profile(adminImageUID);
+        testProfile.setName("Jasleen Tina");
+        testProfile.setEmail("jasleentina@gmail.com");
         testProfile.setAdmin(true);
 
         // Upload test profile to Firestore
-        db.collection("userProfiles").document("testProfileUniqueID")
+        db.collection("userProfiles").document(adminImageUID)
                 .set(testProfile)
                 .addOnSuccessListener(aVoid -> Log.d("AdminBrowseProfilesUITest", "Test profile added"))
                 .addOnFailureListener(e -> Log.e("AdminBrowseProfilesUITest", "Error adding profile", e));
@@ -255,7 +256,7 @@ public class AdminBrowseImageAndFacilityTest {
     @After
     public void tearDown() {
         db.collection("userProfiles")
-                .whereEqualTo("uniqueID", "testProfileUniqueID")
+                .whereEqualTo("uniqueID", adminImageUID)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     // Delete the profile
@@ -267,7 +268,7 @@ public class AdminBrowseImageAndFacilityTest {
                 });
 
         db.collection("facilities")
-                .whereEqualTo("organizer_id", "testProfileUniqueID")
+                .whereEqualTo("organizer_id", adminImageUID)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     // Delete the profile
