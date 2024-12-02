@@ -30,9 +30,9 @@ https://github.com/osmdroid/osmdroid
  */
 
 /**
- * @author Tina
  * A fragment that displays a map with markers showing the join locations of entrants for the event.
  * The map is centered based on the average location of all the entrants, and each entrant's location is marked with a pin.
+ * @author Tina
  */
 public class EventEntrantsMapFragment extends Fragment {
 

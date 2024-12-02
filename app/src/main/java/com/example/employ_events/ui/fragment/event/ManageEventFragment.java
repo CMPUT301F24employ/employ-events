@@ -1,15 +1,11 @@
 package com.example.employ_events.ui.fragment.event;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentManageEventBinding;
 import com.example.employ_events.ui.viewmodel.ManageEventViewModel;
@@ -27,10 +24,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -45,6 +38,11 @@ and a button to delete the event/qr code if the user is an admin.
 
 /**
  * Fragment to manage event details including editing, viewing entrants, and obtaining QR codes.
+ * @author Tina
+ * @author Sahara
+ * @author Aasvi
+ * @author Jasleen
+ * @author Connor
  */
 public class ManageEventFragment extends Fragment {
     private FragmentManageEventBinding binding;
@@ -60,6 +58,11 @@ public class ManageEventFragment extends Fragment {
     /**
      * Inflates the layout, initializes views, fetches event details from Firestore,
      * and sets up click listeners for various buttons.
+     * @author Connor
+     * @author Tina
+     * @author Sahara
+     * @author Aasvi
+     * @author Jasleen
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -186,6 +189,7 @@ public class ManageEventFragment extends Fragment {
     /**
      * Displays the event details in the UI based on the retrieved document from Firestore.
      * Handles both required and optional fields (e.g., waiting list capacity, event fee, etc.).
+     * @author Tina
      *
      * @param document The Firestore document containing event data.
      * @param galleryViewModel The ViewModel for managing event data.
@@ -250,25 +254,17 @@ public class ManageEventFragment extends Fragment {
     }
 
     /**
-     * Loads an image from the specified URL and sets it in the banner ImageView.
-     * This method runs in a background thread to avoid blocking the main UI thread.
-     *
-     * @param url The URL of the image to be loaded.
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
+     * @author Tina
      */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(input);
-                requireActivity().runOnUiThread(() -> bannerImage.setImageBitmap(bitmap));
-            } catch (IOException e) {
-                Log.e("ProfileFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(bannerImage);
+        }
     }
 
 }

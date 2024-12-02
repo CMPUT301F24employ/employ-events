@@ -2,8 +2,6 @@ package com.example.employ_events.ui.fragment.facility;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.employ_events.R;
 import com.example.employ_events.databinding.FragmentFacilityBinding;
 import com.example.employ_events.model.Facility;
@@ -33,10 +32,6 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +47,9 @@ US 02.01.03 As an organizer, I want to create and manage my facility profile.
 
 /**
  * FacilityFragment displays facility profile information.
+ * @author Tina
+ * @author Jasleen
+ * @author Sahara
  */
 public class FacilityFragment extends Fragment implements CreateFacilityFragment.CreateFacilityDialogListener {
 
@@ -69,10 +67,11 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
      * Firestore and updates the user's profile.
      * @param facility  The created Facility object.
      * @param uniqueID  A unique identifier for the facility.
+     * @author Tina
      */
     @Override
     public void createFacility(Facility facility, String uniqueID) {
-        // This is where you add the facility to Firestore (you can call the method from the MainActivity if needed)
+        // Add the facility to Firestore
         Map<String, Object> data = new HashMap<>();
         data.put("organizer", true);
         db.collection("facilities").add(facility);
@@ -92,6 +91,7 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     /**
      * Displays the dialog for creating a facility. This method initializes the dialog fragment
      * and sets the listener for facility creation events.
+     * @author Tina
      */
     private void showCreateFacilityDialog() {
         CreateFacilityFragment dialogFragment = new CreateFacilityFragment();
@@ -166,6 +166,7 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
      * Retrieves the facility ID associated with the given unique ID.
      * @param uniqueID The unique ID of the user.
      * @param listener Callback to return the facility ID.
+     * @author Tina
      */
     private void getFacilityID(String uniqueID, OnFacilityIDFetchedListener listener) {
         Query facility = db.collection("facilities").whereEqualTo("organizer_id", uniqueID);
@@ -184,6 +185,7 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
      * Displays the facility's profile information in the UI.
      * @param document The Firestore document containing the facility's profile data.
      * @param facilityViewModel The ViewModel associated with this fragment.
+     * @author Tina
      */
     private void displayProfile(DocumentSnapshot document, FacilityViewModel facilityViewModel) {
         name.setText(Objects.requireNonNull(document.get("name")).toString());
@@ -206,27 +208,23 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     }
 
     /**
-     * Loads an image from a URL and displays it in the ImageView.
-     * @param url The URL of the image to be loaded.
+     * Loads an image from a URL and displays it in the bannerImage.
+     * @param imageUrl The URL of the image to be loaded.
+     * @author Tina
      */
-    private void loadImageFromUrl(String url) {
-        new Thread(() -> {
-            try {
-                URL imageUrl = new URL(url);
-                HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(input);
-                requireActivity().runOnUiThread(() -> facilityPFP.setImageBitmap(bitmap));
-            } catch (IOException e) {
-                Log.e("FacilityFragment", "Error loading image: " + e.getMessage());
-            }
-        }).start();
+    private void loadImageFromUrl(String imageUrl) {
+        if (isAdded()) {
+            // Proceed with image loading
+            Glide.with(requireContext())
+                    .load(imageUrl)
+                    .into(facilityPFP);
+            facilityPFP.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
      * Callback interface for fetching facility ID.
+     * @author Tina
      */
     public interface OnFacilityIDFetchedListener {
         void onFacilityIDFetched(String facilityID);
@@ -236,6 +234,7 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
      * Checks if the user is an organizer and prompts non-organizers to create a facility. This
      * method fetches user profile data from Firestore to determine the user's status.
      * @param uniqueID The unique ID of the user.
+     * @author Sahara
      */
     private void setupUserProfile(String uniqueID) {
         DocumentReference docRef = db.collection("userProfiles").document(uniqueID);
@@ -302,9 +301,9 @@ public class FacilityFragment extends Fragment implements CreateFacilityFragment
     }
 
     /**
-     * @author Jasleen
      * Deletes the facility and all associated events and data from Firebase.
      * @param uniqueID The unique ID of the user, used to identify the facility.
+     * @author Jasleen
      */
     private void deleteFacility(String uniqueID) {
         // Fetch the facility ID

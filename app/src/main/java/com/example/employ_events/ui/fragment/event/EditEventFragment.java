@@ -44,10 +44,10 @@ US 2.04.02	As an organizer I want to update an event poster to provide visual in
  */
 
 /**
- * @author Tina
  * A Fragment for editing event details -uploading and displaying a banner image.
  * This fragment allows users to select an image from their device, upload it to Firebase Storage,
  * and save the image URI to Firestore.
+ * @author Tina
  */
 public class EditEventFragment extends Fragment {
 
@@ -235,9 +235,9 @@ public class EditEventFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Loads an image from a URL and displays it in the bannerImage.
      * @param imageUrl The URL of the image to be loaded.
+     * @author Tina
      */
     private void loadImageFromUrl(String imageUrl) {
         if (isAdded()) {

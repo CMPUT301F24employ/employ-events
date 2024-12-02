@@ -32,10 +32,10 @@ US 01.05.03 As an entrant I want to be able to decline an invitation when chosen
  */
 
 /**
- * @author Tina
  * A fragment that displays some details for a specific event that the user is invited to.
  * It retrieves the event details from Firestore using the event ID passed from the previous fragment.
  * Allows the user to accept or decline the invitation.
+ * @author Tina
  */
 public class InvitationFragment extends Fragment {
 

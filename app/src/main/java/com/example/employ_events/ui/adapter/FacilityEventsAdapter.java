@@ -25,6 +25,8 @@ manage events page.
 
 /**
  * Adapter for displaying events in a RecyclerView within a facility.
+ * @author Sahara
+ * @author Aasvi
  */
 public class FacilityEventsAdapter extends RecyclerView.Adapter<FacilityEventsAdapter.FEViewHolder> {
 

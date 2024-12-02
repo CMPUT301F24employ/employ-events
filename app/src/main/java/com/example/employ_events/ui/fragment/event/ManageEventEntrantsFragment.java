@@ -63,9 +63,11 @@ US 01.04.02 As an entrant I want to receive notification of not chosen on the ap
  */
 
 /**
- * @author Tina, Sahara, Aasvi
  * Fragment responsible for managing event entrants. This includes displaying entrants,
  * filtering based on status, and generating sample data for event entrants.
+ * @author Tina
+ * @author Sahara
+ * @author Aasvi
  */
 public class ManageEventEntrantsFragment extends Fragment {
 
@@ -215,9 +217,9 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Cancels an individual entrant.
      * @param entrantUniqueID The unique ID of the entrant to be removed.
+     * @author Tina
      */
     private void deleteAnEntrant(String entrantUniqueID) {
         db.collection("events").document(eventId).collection("entrantsList").document(entrantUniqueID).get()
@@ -238,11 +240,11 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Updates the entrant count for the UI
      * @param callback The callback to notify the caller of the operation's success or failure.
      *                 The callback is invoked with a boolean indicating whether the operation
      *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
+     * @author Tina
      */
     private void updateCounts(OnCompleteListener<Boolean> callback) {
         db.collection("events").document(eventId)
@@ -277,8 +279,8 @@ public class ManageEventEntrantsFragment extends Fragment {
 
 
     /**
-     * @author Tina
      * Checks the events geolocation requirement and hides the entrants map button if not required.
+     * @author Tina
      */
     private void updateViewEntrantsMapVisibility(OnCompleteListener<Boolean> callback) {
         db.collection("events").document(eventId).get()
@@ -299,9 +301,9 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Fetches the entrants for a given event and populates the entrant list.
      * @param eventId The unique identifier of the event
+     * @author Tina
      */
     private void fetchEntrants(String eventId) {
         entrantsListener = db.collection("events")
@@ -342,12 +344,12 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Sahara, Tina
      * Fetches event data and generates a sample list of entrants based on event capacity.
      * @param eventId The unique identifier of the event
      * @param callback The callback to notify the caller of the operation's success or failure.
      *                 The callback is invoked with a boolean indicating whether the operation
      *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
+     * @author Tina
      */
     private void fetchEventAndGenerateSample(String eventId, OnCompleteListener<Boolean> callback) {
         DocumentReference eventRef = db.collection("events").document(eventId);
@@ -383,7 +385,6 @@ public class ManageEventEntrantsFragment extends Fragment {
 
 
     /**
-     * @author Tina
      * Fetches the list of entrants for the given event and updates the status of each
      * entrant who is on the accepted list by removing them from the accepted list and
      * adding them to the cancelled list. The update is performed using a batch to ensure
@@ -393,6 +394,7 @@ public class ManageEventEntrantsFragment extends Fragment {
      * @param callback The callback to notify the caller of the operation's success or failure.
      *                 The callback is invoked with a boolean indicating whether the operation
      *                 was successful. A value of 'true' indicates success, 'false' indicates failure.
+     * @author Tina
      */
     private void fetchEventAndRemoveEntrants(String eventId, OnCompleteListener<Boolean> callback) {
         db.collection("events")
@@ -434,9 +436,10 @@ public class ManageEventEntrantsFragment extends Fragment {
 
 
     /**
-     * @author Tina, Aasvi
      * Filters the entrants list based on the selected tab (status).
      * @param tabPosition The position of the selected tab (0 - Waitlisted, 1 - Selected, 2 - Cancelled, 3 - Registered)
+     * @author Tina
+     * @author Aasvi
      */
     private void filterEntrantsByTab(int tabPosition) {
         List<Entrant> filteredList = new ArrayList<>();
@@ -472,8 +475,9 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Tina, Aasvi
      * Sets up the TabLayout and its tab selection listener for filtering entrants.
+     * @author Aasvi
+     * @author Tina
      */
     private void setupTabLayout() {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -490,9 +494,8 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Sahara
      * Adds a notification to the user's profile in Firestore.
-     *
+     * @author Sahara
      * @param userID     The ID of the user to add the notification to
      * @param notification The Notification object containing the message to be saved
      */
@@ -512,10 +515,10 @@ public class ManageEventEntrantsFragment extends Fragment {
     }
 
     /**
-     * @author Tina
      * Sends a notification to lottery "winners" and "losers" :
      * US 01.04.01 As an entrant I want to receive notification when chosen from the waiting list (when I "win" the lottery)
      * US 01.04.02 As an entrant I want to receive notification of not chosen on the app (when I "lose" the lottery)
+     * @author Tina
      */
     private void sendLotteryNotification() {
         db.collection("events").document(eventId).collection("entrantsList").get()

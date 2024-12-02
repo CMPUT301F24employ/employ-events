@@ -15,9 +15,11 @@ import android.content.pm.PackageManager;
 import androidx.core.content.ContextCompat;
 
 /**
- * @author Sahara, Tina, Aasvi
  * Represents a notification for event-related actions, such as invitations, cancellations, or waitlist updates.
  * Provides functionality for creating and sending notifications to users.
+ * @author Sahara
+ * @author Tina
+ * @author Aasvi
  */
 public class Notification {
     private String eventID, message, CHANNEL_ID;

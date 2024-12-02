@@ -26,12 +26,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Date;
 
-/*
- */
-
 /**
- * @author Tina, Jasleen, Aasvi.
  * Fragment to display a list of registered events. Fetches data from Firestore and displays it in a RecyclerView.
+ * @author Tina
+ * @author Jasleen
+ * @author Aasvi
  */
 public class RegisteredEventsFragment extends Fragment {
 
@@ -48,6 +47,10 @@ public class RegisteredEventsFragment extends Fragment {
      * @param container          the parent view that the fragment’s UI is attached to
      * @param savedInstanceState previously saved instance data
      * @return the root view of the inflated fragment layout
+     *
+     * @author Jasleen
+     * @author Aasvi
+     * @author Tina
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,8 +84,8 @@ public class RegisteredEventsFragment extends Fragment {
     }
 
     /**
-     * @author Tina, Aasvi, Jasleen.
      * Fetches registered events from the Firestore 'waitinglist' collection and updates the adapter with the data.
+     * @author Tina
      */
     private void loadRegisteredEvents(ArrayList<Event> eventDataList, RegisteredArrayAdapter adapter) {
         if (uniqueID == null) {

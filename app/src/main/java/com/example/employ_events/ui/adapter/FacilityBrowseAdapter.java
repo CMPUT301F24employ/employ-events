@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Jasleen
  * Adapter for displaying a list of facilities in a RecyclerView.
  * This adapter binds each facility's data to a view and handles click facilities.
+ * @author Jasleen
  */
 public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAdapter.FacilityViewHolder> {
 
@@ -28,9 +28,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     private final FacilityClickListener listener;
 
     /**
-     * @author Jasleen
      * Constructor for initializing the adapter with context, facility list, and click listener.
-     *
+     * @author Jasleen
      * @param context      the context in which the adapter is used
      * @param facilityList the initial list of facilities
      * @param listener     the click listener for handling facility item clicks
@@ -42,17 +41,16 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     }
 
     /**
-     * @author Jasleen
      * Interface for handling item click events.
+     * @author Jasleen
      */
     public interface FacilityClickListener {
         void onItemClick(Facility facility);
     }
 
     /**
-     * @author Jasleen
      * Called when a new ViewHolder is created.
-     *
+     * @author Jasleen
      * @param parent   the parent ViewGroup
      * @param viewType the type of view to be created
      * @return a new FacilityViewHolder instance
@@ -65,9 +63,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     }
 
     /**
-     * @author Jasleen
      * Binds data to a ViewHolder at a specific position.
-     *
+     * @author Jasleen
      * @param holder   the ViewHolder to bind data to
      * @param position the position of the item in the list
      */
@@ -83,9 +80,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     }
 
     /**
-     * @author Jasleen
      * Returns the total number of items in the facility list.
-     *
+     * @author Jasleen
      * @return the number of items
      */
     @Override
@@ -94,9 +90,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     }
 
     /**
-     * @author Jasleen
      * Updates the current facility list with new data and refreshes the RecyclerView.
-     *
+     * @author Jasleen
      * @param facilities the new list of facilities to display
      */
     public void updateFacilityList(List<Facility> facilities) {
@@ -106,8 +101,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
     }
 
     /**
-     * @author Jasleen
      * ViewHolder class for managing views within a facility item.
+     * @author Jasleen
      */
     public static class FacilityViewHolder extends RecyclerView.ViewHolder {
 
@@ -117,9 +112,8 @@ public class FacilityBrowseAdapter extends RecyclerView.Adapter<FacilityBrowseAd
         private final TextView addressTextView;
 
         /**
-         * @author Jasleen
          * Constructor for initializing the views of a facility item.
-         *
+         * @author Jasleen
          * @param itemView the root view of the facility item layout
          */
         public FacilityViewHolder(@NonNull View itemView) {

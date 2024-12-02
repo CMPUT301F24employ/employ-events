@@ -23,11 +23,10 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 /**
- * @author Connor
- * @author Tina
  * ScanQRCodeFragment allows entrants scan a qr code then be navigated to the event details page.
  * US 01.06.02	As an entrant I want to be able to be sign up for an event by scanning the QR code
  * US 01.06.01	As an entrant I want to view event details within the app by scanning the promotional QR code
+ * @author Connor
  */
 public class ScanQrCodeFragment extends Fragment {
 

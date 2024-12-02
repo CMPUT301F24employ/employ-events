@@ -34,6 +34,7 @@ US 02.01.03 As an organizer, I want to create and manage my facility profile
  * A DialogFragment for creating a new facility. It collects information from the user,
  * such as facility name, address, email, and phone number, and communicates this information
  * back to the hosting activity through the CreateFacilityDialogListener interface.
+ * @author Tina
  */
 public class CreateFacilityFragment extends DialogFragment {
     private CreateFacilityDialogListener listener;

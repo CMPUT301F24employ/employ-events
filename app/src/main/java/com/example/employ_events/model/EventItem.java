@@ -4,8 +4,8 @@ Used for displaying in an item in a list.
  */
 
 /**
- * @author Tina
  * Represents an event with an ID and a name.
+ * @author Tina
  */
 public class EventItem {
     private String eventId;

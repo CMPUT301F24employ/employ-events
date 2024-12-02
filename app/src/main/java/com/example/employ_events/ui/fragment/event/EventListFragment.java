@@ -36,6 +36,8 @@ on click of an event, sends them to the specific event page.
  * EventListFragment displays a list of events for a specific facility.
  * It fetches events from Firestore based on the facility ID and allows
  * the user to view event details or add a new event.
+ * @author Aasvi
+ * @author Connor
  */
 public class EventListFragment extends Fragment implements FacilityEventsAdapter.FEClickListener {
 
