@@ -146,7 +146,7 @@ public class SendNotificationFragment extends Fragment {
                                     String entrantId = document.getId();
                                     Notification notification = new Notification(eventId, message, false, ORGANIZER_CHANNEL_ID);
                                     addNotification(entrantId, notification);
-                                    notification.sendNotification(getContext()); // Trigger system notification
+                                    //notification.sendNotification(getContext()); // Trigger system notification
                                 }
                             }
                         } else {
@@ -171,10 +171,7 @@ public class SendNotificationFragment extends Fragment {
                 .document(userID)
                 .collection("Notifications")
                 .add(new HashMap<String, Object>() {{
-                    put("eventID", notification.getEventID());
-                    put("message", notification.getMessage());
-                    put("read", notification.isRead());
-                    put("CHANNEL_ID", notification.getCHANNEL_ID());
+                    put("Notification", notification);
                 }})
                 .addOnSuccessListener(aVoid ->
                         System.out.println("Notification successfully added!")
