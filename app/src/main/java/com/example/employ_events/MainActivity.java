@@ -57,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
         com.example.employ_events.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        createNotificationChannels();
-        requestNotificationPermission();
         setSupportActionBar(binding.appBarMain.toolbar);
+        requestNotificationPermission();
+        createNotificationChannels();
         monitorNotifications();
 
         db = FirebaseFirestore.getInstance();
@@ -137,39 +137,40 @@ public class MainActivity extends AppCompatActivity {
      */
     private void createNotificationChannels() {
         // Create the NotificationManager instance
+
+
+        // Organizer Notification Channel
+        CharSequence organizerName = getString(R.string.organizer_channel_name);
+        String organizerDescription = getString(R.string.organizer_channel_description);
+        String ORGANIZER_CHANNEL_ID = "organizer_notification_channel";
+        int organizerImportance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel organizerChannel = new NotificationChannel(
+                ORGANIZER_CHANNEL_ID, organizerName, organizerImportance);
+        organizerChannel.setDescription(organizerDescription);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(organizerChannel);
 
-        if (notificationManager != null) {
-            // Organizer Notification Channel
-            CharSequence organizerName = getString(R.string.organizer_channel_name);
-            String organizerDescription = getString(R.string.organizer_channel_description);
-            String ORGANIZER_CHANNEL_ID = "organizer_notification_channel";
-            int organizerImportance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel organizerChannel = new NotificationChannel(
-                    ORGANIZER_CHANNEL_ID, organizerName, organizerImportance);
-            organizerChannel.setDescription(organizerDescription);
-            notificationManager.createNotificationChannel(organizerChannel);
+//
+//            // App Notification Channel
+//            CharSequence appName = getString(R.string.app_channel_name);
+//            String appDescription = getString(R.string.app_channel_description);
+//            String APP_CHANNEL_ID = "app_notification_channel";
+//            int appImportance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel appChannel = new NotificationChannel(
+//                    APP_CHANNEL_ID, appName, appImportance);
+//            appChannel.setDescription(appDescription);
+//            notificationManager.createNotificationChannel(appChannel);
+//
+//            // Admin Notification Channel
+//            CharSequence adminName = getString(R.string.admin_channel_name);
+//            String adminDescription = getString(R.string.admin_channel_description);
+//            String ADMIN_CHANNEL_ID = "admin_notification_channel";
+//            int adminImportance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel adminChannel = new NotificationChannel(
+//                    ADMIN_CHANNEL_ID, adminName, adminImportance);
+//            adminChannel.setDescription(adminDescription);
+//            notificationManager.createNotificationChannel(adminChannel);
 
-            // App Notification Channel
-            CharSequence appName = getString(R.string.app_channel_name);
-            String appDescription = getString(R.string.app_channel_description);
-            String APP_CHANNEL_ID = "app_notification_channel";
-            int appImportance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel appChannel = new NotificationChannel(
-                    APP_CHANNEL_ID, appName, appImportance);
-            appChannel.setDescription(appDescription);
-            notificationManager.createNotificationChannel(appChannel);
-
-            // Admin Notification Channel
-            CharSequence adminName = getString(R.string.admin_channel_name);
-            String adminDescription = getString(R.string.admin_channel_description);
-            String ADMIN_CHANNEL_ID = "admin_notification_channel";
-            int adminImportance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel adminChannel = new NotificationChannel(
-                    ADMIN_CHANNEL_ID, adminName, adminImportance);
-            adminChannel.setDescription(adminDescription);
-            notificationManager.createNotificationChannel(adminChannel);
-        }
     }
 
     /**
@@ -194,12 +195,15 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String uniqueID = sharedPreferences.getString("uniqueID", null);
 
+
         if (uniqueID == null) {
             Log.e("MonitorNotifications", "Unique ID is null. Cannot monitor notifications.");
             return;
         }
 
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
         db.collection("userProfiles")
                 .document(uniqueID)
@@ -210,26 +214,31 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
+
                     if (snapshots != null && !snapshots.isEmpty()) {
                         // List to store unread notifications
                         List<Notification> unreadNotifications = new ArrayList<>();
 
+
                         for (QueryDocumentSnapshot doc : snapshots) {
                             // Convert Firestore data to Notification object
+
 
                             Map<String, Object> notificationMap = (Map<String, Object>) doc.get("Notification");
                             if (notificationMap != null) {
                                 String eventID = (String) notificationMap.get("eventID");
                                 String message = (String) notificationMap.get("message");
                                 Boolean read = (Boolean) notificationMap.get("read");
-                                String CHANNEL_ID = (String) notificationMap.get("CHANNEL_ID");
+
+
 
 
                                 // Create Notification object
-                                Notification notification = new Notification(eventID, message, Boolean.TRUE.equals(read), CHANNEL_ID);
+                                Notification notification = new Notification(eventID, message, Boolean.TRUE.equals(read), "organizer_notification_channel");
                                 // Check if notification is unread
                                 if (!notification.isRead()) {
                                     unreadNotifications.add(notification);
+
 
                                     // Optionally mark the notification as read in Firebase
                                     doc.getReference().update("Notification.read", true)
@@ -240,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
 
+
                             // Send all unread notifications
                             for (Notification notification : unreadNotifications) {
                                 notification.sendNotification(getApplicationContext());
@@ -248,4 +258,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }

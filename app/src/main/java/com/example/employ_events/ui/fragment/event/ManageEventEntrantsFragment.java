@@ -533,14 +533,14 @@ public class ManageEventEntrantsFragment extends Fragment {
                                 boolean notSelected = Boolean.TRUE.equals(document.getBoolean("onWaitingList"));
                                 if (isSelected) {
                                     String message = "Congratulations, you have won the event lottery for " + eventName + "! Accept your invitation to secure your spot!";
-                                    Notification notification = new Notification(eventId, message, false, "app_notification_channel");
-                                    notification.sendNotification(this.getContext());
+                                    Notification notification = new Notification(eventId, message, false, "organizer_notification_channel");
+                                    //notification.sendNotification(this.getContext());
                                     addNotification(entrantId, notification);
                                 }
                                 else if (notSelected){
                                     String message = "Sorry, you didn't win the event lottery for " + eventName + ". You will automatically remain in the waiting list for another chance of being chosen!";
-                                    Notification notification = new Notification(eventId, message, false, "app_notification_channel");
-                                    notification.sendNotification(this.getContext());
+                                    Notification notification = new Notification(eventId, message, false, "organizer_notification_channel");
+                                    //notification.sendNotification(this.getContext());
                                     addNotification(entrantId, notification);
                                 }
 
